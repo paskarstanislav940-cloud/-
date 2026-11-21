@@ -13,7 +13,7 @@ Język polski: 1
 Matematyka: 1(0), n
 Podstawy informatyki: 4
 Programowanie obiektowe: 1, 1
-Projektowanie i administrowanie: 1, 1, 1, 1, 1, 2, 2
+Projektowanie i administrowanie bazami danych: 1, 1, 1, 1, 1, 2, 2
 Projektowanie oprogramowania: 2
 Projektowanie stron internetowych: nb, nb, nb, nkl
 Wychowanie fizyczne: np

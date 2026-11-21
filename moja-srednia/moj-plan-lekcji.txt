@@ -1,0 +1,19 @@
+Pn: 6 Geografia; 7 Informatyka; 8 Edukacja zdrowotna; 9 Matematyka; 10 Edukacja dla bezpieczeństwa; 11 Podstawy informatyki; 12 Programowanie obiektowe
+Wt: 1 Historia; 2 Język angielski zawodowy; 3 Bezpieczeństwo i higiena pracy; 4 Język polski; 5-7 Wychowanie fizyczne; 8 Zajęcia z wychowawcą
+Śr: 3 Matematyka; 4 Informatyka; 5 Język angielski; 6 Programowanie obiektowe; 7 Biologia; 8 Matematyka; 9 Projektowanie i administrowanie bazami danych; 10 Projektowanie stron internetowych
+Czw: 4 Język niemiecki; 5 Język angielski; 6 Język niemiecki; 7 Projektowanie oprogramowania; 8 Fizyka
+Pt: 1 Chemia; 2 Biznes i zarządzanie; 3 Język angielski; 4 Bezpieczeństwo i higiena pracy; 5 Język polski; 6 Język polski; 7 Język angielski zawodowy; 8 Projektowanie stron internetowych
+Dzwonki
+0 7:10-7:55
+1 8:00-8:45
+2 8:50-9:35
+3 9:50-10:35
+4 10:45-11:30
+5 11:50-12:35
+6 12:50-13:35
+7 13:45-14:30
+8 14:35-15:20
+9 15:25-16:10
+10 16:15-17:00
+11 17:05-17:50
+12 17:55-18:40

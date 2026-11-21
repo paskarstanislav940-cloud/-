@@ -100,6 +100,7 @@ select.sel{min-height:38px;border:1px solid var(--line);border-radius:10px;backg
 
 /* cards */
 .list{display:grid;gap:10px}
+.list > *{min-width:0}
 .card{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--st,var(--line-2));border-radius:var(--radius);overflow:hidden}
 .st-strong{--st:var(--strong);--st-soft:var(--strong-soft)}
 .st-good{--st:var(--good);--st-soft:var(--good-soft)}
@@ -203,6 +204,52 @@ details.help code{font-size:12px;background:var(--surface);padding:0 4px;border-
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
 .toast button{border:0;background:transparent;color:var(--bg);font-weight:650;text-decoration:underline;padding:0}
 
+/* tabs */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:0 0 12px}
+.tabs button{flex:1;border:0;background:none;padding:10px 4px;font-size:14.5px;font-weight:600;color:var(--ink-3);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs button.on{color:var(--ink);border-bottom-color:var(--accent)}
+.btn.sm{min-height:32px;padding:0 10px;font-size:13px}
+.notice{background:var(--edge-soft);border-radius:10px;padding:10px 12px;font-size:13.5px;margin-top:12px}
+.notice.bad{background:var(--weak-soft)}
+.months{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}
+.mchip{font-size:12.5px;padding:4px 8px;border-radius:8px;background:var(--surface-2);color:var(--ink-2)}
+.mchip b{color:var(--ink)}
+/* attendance */
+.att-card{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--st);border-radius:var(--radius);padding:12px}
+.att-top{display:flex;gap:10px;align-items:center}
+.att-top .ch-main{flex:1;min-width:0}
+.att-bar{position:relative;height:6px;background:var(--surface-2);border-radius:4px;margin:10px 0 8px}
+.att-bar i{display:block;height:100%;border-radius:4px;background:var(--st)}
+.att-bar b{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink-2);border-radius:1px}
+.att-hint{font-size:13.5px;line-height:1.45}
+.att-hint + .att-hint{margin-top:3px}
+.att-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+/* schedule */
+.days{display:flex;gap:4px;margin-bottom:10px}
+.days button{flex:1;min-height:42px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-weight:600;font-size:14px;padding:0}
+.days button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.days button.today:not(.on){border-color:var(--accent);color:var(--accent)}
+.nowbox{background:var(--accent-soft);border-radius:var(--radius);padding:12px 14px;margin-bottom:10px;font-size:14px}
+.nowbox b{font-size:15.5px}
+.lessons{display:grid;gap:6px}
+.lesson{display:grid;grid-template-columns:58px 1fr auto;gap:10px;align-items:center;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:10px;width:100%;text-align:left}
+.lesson .ln{font-weight:700;font-size:16px;line-height:1.1}
+.lesson .ln small{display:block;font-weight:500;font-size:11.5px;color:var(--ink-3);margin-top:2px}
+.lesson .lname{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lesson .lname small{display:block;font-weight:400;font-size:12px;color:var(--ink-3)}
+.lesson .lb{display:flex;flex-direction:column;gap:3px;align-items:flex-end}
+.lesson.cur{border-color:var(--accent);box-shadow:inset 4px 0 0 var(--accent)}
+.lesson.past{opacity:.5}
+.pill{font-size:12px;font-weight:650;padding:2px 7px;border-radius:6px;background:var(--st-soft);color:var(--st);white-space:nowrap}
+.freelesson{font-size:12.5px;color:var(--ink-3);padding:0 12px}
+.week{width:100%;border-collapse:collapse;font-size:12.5px;table-layout:fixed}
+.week th,.week td{border:1px solid var(--line);padding:4px;vertical-align:top}
+.week th{background:var(--surface-2);font-weight:600;color:var(--ink-2)}
+.week td.n{width:64px;color:var(--ink-3);white-space:nowrap}
+.week .wc{display:block;border-radius:6px;padding:3px 5px;background:var(--st-soft);color:var(--ink);font-weight:500;line-height:1.25}
+.pc-only{display:none}
+@media (min-width:760px){ .pc-only{display:block} }
+
 @media (max-width:520px){
   .summary{grid-template-columns:1fr;gap:12px}
   .big{font-size:36px}
@@ -227,6 +274,13 @@ details.help code{font-size:12px;background:var(--surface);padding:0 4px;border-
     </div>
   </header>
 
+  <nav class="tabs" id="mainTabs" aria-label="Разделы">
+    <button data-act="tab" data-tab="grades">Оценки</button>
+    <button data-act="tab" data-tab="att">Посещаемость</button>
+    <button data-act="tab" data-tab="sched">Расписание</button>
+  </nav>
+
+  <section id="tab-grades">
   <div class="viewbar">
     <div class="seg" id="viewSeg" role="tablist" aria-label="Период">
       <button data-act="view" data-view="1" role="tab">I semestr</button>
@@ -252,6 +306,25 @@ details.help code{font-size:12px;background:var(--surface);padding:0 4px;border-
   </div>
 
   <main class="list" id="list"></main>
+  </section>
+
+  <section id="tab-att" class="hidden">
+    <section class="summary" id="attSummary"></section>
+    <div class="listbar"><h2>По предметам</h2>
+      <div class="right"><button class="btn" data-act="open-att-import">Импорт</button></div></div>
+    <div class="list" id="attList"></div>
+  </section>
+
+  <section id="tab-sched" class="hidden">
+    <div class="days" id="days"></div>
+    <div id="nowBox"></div>
+    <div class="lessons" id="lessons"></div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn" data-act="add-lesson">+ Урок</button>
+      <button class="btn" data-act="open-sched-import">Импорт расписания</button>
+    </div>
+    <div class="pc-only" style="margin-top:18px"><h2 style="font-size:15px;margin:0 0 8px">Вся неделя</h2><div id="weekGrid" style="overflow-x:auto"></div></div>
+  </section>
 
   <div class="foot">
     <span>Данные хранятся только в этом браузере (localStorage).</span>
@@ -325,6 +398,10 @@ details.help code{font-size:12px;background:var(--surface);padding:0 4px;border-
           <select class="inp" name="currentSem"><option value="0">Авто по дате</option><option value="1">I semestr</option><option value="2">II semestr</option></select>
         </label>
       </div>
+      <div class="fgrid">
+        <label class="field"><span>Мин. посещаемость, %</span><input class="inp" name="attTarget" type="number" min="1" max="100" step="1"></label>
+        <label class="field"><span>Конец семестра</span><input class="inp" name="semEnd" type="date"></label>
+      </div>
       <label class="field"><span>Веса по категориям (для импорта, если вес не указан). Формат: <code>Категория=вес</code>, по строке.</span>
         <textarea class="inp" name="catWeights" rows="5"></textarea>
       </label>
@@ -383,6 +460,58 @@ details.help code{font-size:12px;background:var(--surface);padding:0 4px;border-
   </form>
 </dialog>
 
+<!-- Generic text import (attendance / schedule) -->
+<dialog id="dlgText">
+  <div class="dlg">
+    <div class="dlg-h"><h3 id="textTitle">Импорт</h3><button class="btn icon ghost" data-act="close" aria-label="Закрыть">✕</button></div>
+    <div class="dlg-b">
+      <details class="help"><summary>Какой текст подходит</summary><div id="textHelp"></div></details>
+      <textarea class="inp paste" id="textArea" spellcheck="false" placeholder="Вставьте текст…"></textarea>
+      <div class="row"><button class="btn ghost" data-act="text-example">Вставить пример</button><span class="small muted" id="textInfo"></span></div>
+      <div id="textPreview" style="display:grid;gap:8px"></div>
+    </div>
+    <div class="dlg-f"><button class="btn ghost" data-act="close">Отмена</button><button class="btn primary" data-act="text-import" id="textImportBtn" disabled>Импортировать</button></div>
+  </div>
+</dialog>
+
+<!-- Attendance edit -->
+<dialog id="dlgAtt">
+  <form class="dlg" id="attForm" method="dialog">
+    <div class="dlg-h"><h3 id="attTitle">Посещаемость</h3><button type="button" class="btn icon ghost" data-act="close" aria-label="Закрыть">✕</button></div>
+    <div class="dlg-b">
+      <div class="fgrid">
+        <label class="field"><span>Всего уроков</span><input class="inp" name="total" type="number" min="0" step="1"></label>
+        <label class="field"><span>Nieobecność nieuspr.</span><input class="inp" name="abs" type="number" min="0" step="1"></label>
+        <label class="field"><span>Nieobecność uspr.</span><input class="inp" name="absEx" type="number" min="0" step="1"></label>
+        <label class="field"><span>Spóźnienie nieuspr.</span><input class="inp" name="late" type="number" min="0" step="1"></label>
+        <label class="field"><span>Spóźnienie uspr.</span><input class="inp" name="lateEx" type="number" min="0" step="1"></label>
+        <label class="field"><span>Zwolnienie</span><input class="inp" name="rel" type="number" min="0" step="1"></label>
+      </div>
+      <p class="note" style="margin:0">Посещаемость = (всего − пропуски) / всего. Опоздания и nieobecność z przyczyn szkolnych считаются присутствием.</p>
+    </div>
+    <div class="dlg-f" style="justify-content:space-between"><button type="button" class="btn danger" data-act="att-clear">Очистить</button>
+      <span class="row"><button type="button" class="btn ghost" data-act="close">Отмена</button><button type="submit" class="btn primary">Сохранить</button></span></div>
+  </form>
+</dialog>
+
+<!-- Lesson edit -->
+<dialog id="dlgLesson">
+  <form class="dlg" id="lessonForm" method="dialog">
+    <div class="dlg-h"><h3 id="lessonTitle">Урок</h3><button type="button" class="btn icon ghost" data-act="close" aria-label="Закрыть">✕</button></div>
+    <div class="dlg-b">
+      <div class="fgrid">
+        <label class="field"><span>День</span><select class="inp" name="day"></select></label>
+        <label class="field"><span>Номер урока</span><select class="inp" name="n"></select></label>
+      </div>
+      <label class="field"><span>Предмет</span><input class="inp" name="name" list="mySubjList" required maxlength="80" autocomplete="off"></label>
+      <label class="field"><span>Кабинет / учитель (необязательно)</span><input class="inp" name="room" maxlength="60"></label>
+    </div>
+    <div class="dlg-f" style="justify-content:space-between"><button type="button" class="btn danger" data-act="lesson-delete">Удалить</button>
+      <span class="row"><button type="button" class="btn ghost" data-act="close">Отмена</button><button type="submit" class="btn primary">Сохранить</button></span></div>
+  </form>
+</dialog>
+<datalist id="mySubjList"></datalist>
+
 <datalist id="catList"><option>Sprawdzian</option><option>Kartkówka</option><option>Odpowiedź</option><option>Praca domowa</option><option>Aktywność</option><option>Praca klasowa</option><option>Projekt</option><option>Test</option></datalist>
 <datalist id="subjList"></datalist>
 
@@ -399,6 +528,7 @@ const DEF_SETTINGS = {
   plus: 0.5, minus: 0.25, defaultWeight: 1, margin: 0.15,
   thresholds: [1.75, 2.75, 3.75, 4.75, 5.5],
   yearMode: 'all', currentSem: 0,
+  attTarget: 50, semEnd: '',
   catWeights: 'Sprawdzian=3\nPraca klasowa=3\nTest=3\nKartkówka=2\nOdpowiedź=1\nPraca domowa=1\nAktywność=1'
 };
 
@@ -622,7 +752,25 @@ function normalizeSettings(s){
   s.yearMode = s.yearMode === 'mean' ? 'mean' : 'all';
   s.currentSem = [0, 1, 2].includes(+s.currentSem) ? +s.currentSem : 0;
   s.catWeights = String(s.catWeights || '');
+  s.attTarget = clampNum(s.attTarget, 50, 1, 100);
+  s.semEnd = /^\d{4}-\d{2}-\d{2}$/.test(s.semEnd || '') ? s.semEnd : '';
   return s;
+}
+function normalizeAtt(a){
+  if (!a || typeof a !== 'object') return null;
+  const n = k => clampNum(a[k], 0, 0, 9999);
+  const o = { total: a.total == null || a.total === '' ? null : Math.round(n('total')), abs: n('abs'), absEx: n('absEx'), late: n('late'), lateEx: n('lateEx'), rel: n('rel'), school: n('school'), pct: a.pct == null ? null : clampNum(a.pct, 0, 0, 100) };
+  if (o.total != null && o.total < o.abs + o.absEx) o.total = o.abs + o.absEx;
+  return o;
+}
+const DEF_BELLS = [['7:10','7:55'],['8:00','8:45'],['8:50','9:35'],['9:50','10:35'],['10:45','11:30'],['11:50','12:35'],['12:50','13:35'],['13:45','14:30'],['14:35','15:20'],['15:25','16:10'],['16:15','17:00'],['17:05','17:50'],['17:55','18:40']];
+function normalizeSchedule(sc){
+  sc = sc || {};
+  const bells = DEF_BELLS.map((b, i) => (Array.isArray(sc.bells) && Array.isArray(sc.bells[i]) && sc.bells[i].length === 2) ? sc.bells[i].map(String) : b.slice());
+  const days = [0, 1, 2, 3, 4].map(d => (Array.isArray(sc.days) && Array.isArray(sc.days[d]) ? sc.days[d] : [])
+    .filter(l => l && l.name != null && l.n >= 0 && l.n <= 12).map(l => ({ n: +l.n, name: String(l.name).slice(0, 80), room: l.room ? String(l.room).slice(0, 60) : '' }))
+    .sort((a, b) => a.n - b.n));
+  return { bells, days };
 }
 function normalizeState(d){
   d = d || {};
@@ -630,8 +778,12 @@ function normalizeState(d){
     settings: normalizeSettings(d.settings),
     view: ['1', '2', 'year'].includes(d.view) ? d.view : null,
     sort: d.sort || 'order',
+    tab: ['grades', 'att', 'sched'].includes(d.tab) ? d.tab : 'grades',
+    attMonths: Array.isArray(d.attMonths) ? d.attMonths.filter(m => m && m.name).map(m => ({ name: String(m.name).slice(0, 30), pct: clampNum(m.pct, 0, 0, 100), abs: clampNum(m.abs, 0, 0, 9999) })) : [],
+    schedule: normalizeSchedule(d.schedule),
     subjects: (Array.isArray(d.subjects) ? d.subjects : []).map(x => ({
       id: String(x.id || uid()), name: String(x.name || 'Przedmiot').slice(0, 80),
+      att: normalizeAtt(x.att),
       grades: (Array.isArray(x.grades) ? x.grades : []).filter(g => g && parseMark(g.v)).map(g => ({
         id: String(g.id || uid()), v: String(g.v).toLowerCase(), w: clampNum(g.w, 1, 0, 10),
         sem: +g.sem === 2 ? 2 : 1, cat: g.cat ? String(g.cat).slice(0, 80) : '', date: g.date ? String(g.date).slice(0, 10) : ''
@@ -650,7 +802,7 @@ function save(){
 }
 let state = load();
 const S = () => state.settings;
-const ui = { open: new Set(), pad: {}, sim: {}, help: {} };
+const ui = { open: new Set(), pad: {}, sim: {}, help: {}, day: null };
 try { const o = JSON.parse(localStorage.getItem(KEY + '.open') || '[]'); o.forEach(id => ui.open.add(id)); } catch (e) {}
 const saveOpen = () => { try { localStorage.setItem(KEY + '.open', JSON.stringify([...ui.open])); } catch (e) {} };
 
@@ -876,7 +1028,7 @@ function cardHTML(sub){
       <div class="ch-main"><div class="ch-name">${esc(sub.name)}</div>
         <div class="ch-meta"><span class="tag">${ss.label}</span>${ss.meta ? esc(ss.meta) : ''}</div></div>
       <div class="ch-avg"><span class="avg">${fmt(st.w)}</span>
-        <div class="ch-sub">${st.a != null ? 'ar. ' + fmt(st.a) + ' · ' : ''}${p ? 'итог ≈ ' + p : ''}</div></div>
+        <div class="ch-sub">${st.a != null ? 'ar. ' + fmt(st.a) + ' · ' : ''}${p ? 'итог ≈ ' + p : ''}${attChip(sub)}</div></div>
       <svg class="chev" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
     <div class="chips">${chips}</div>
@@ -948,8 +1100,16 @@ function refreshSim(sid){
   if (a) a.innerHTML = simResultHTML(s);
   if (h) h.innerHTML = helperHTML(s);
 }
-function renderAll(){ renderTabs(); renderSummary(); renderList(); renderSubjList(); }
+function renderAll(){
+  renderTabs(); renderSubjList();
+  document.querySelectorAll('#mainTabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === state.tab));
+  ['grades', 'att', 'sched'].forEach(t => $('#tab-' + t).classList.toggle('hidden', t !== state.tab));
+  if (state.tab === 'grades') { renderSummary(); renderList(); }
+  else if (state.tab === 'att') renderAtt();
+  else renderSched();
+}
 function renderSubjList(){
+  $('#mySubjList').innerHTML = state.subjects.map(x => `<option>${esc(x.name)}</option>`).join('');
   const have = new Set(state.subjects.map(s => normTxt(s.name)));
   const names = ['Matematyka', 'Język polski', 'Język angielski', 'Język niemiecki', 'Język hiszpański', 'Historia', 'Historia i teraźniejszość', 'Wiedza o społeczeństwie', 'Biologia', 'Chemia', 'Fizyka', 'Geografia', 'Informatyka', 'Wychowanie fizyczne', 'Edukacja dla bezpieczeństwa', 'Religia', 'Plastyka', 'Muzyka', 'Technika', 'Podstawy przedsiębiorczości', 'Biznes i zarządzanie', 'Filozofia'];
   $('#subjList').innerHTML = names.filter(n => !have.has(normTxt(n))).map(n => `<option>${n}</option>`).join('');
@@ -1036,7 +1196,20 @@ document.addEventListener('click', e => {
       r.dataset.theme = curDark ? 'light' : 'dark';
       try { localStorage.setItem(KEY + '.theme', r.dataset.theme); } catch (er) {}
       break; }
-    case 'open-import': openImport(); break;
+    case 'open-import': state.tab === 'att' ? openText('att') : state.tab === 'sched' ? openText('sched') : openImport(); break;
+    case 'tab': state.tab = el.dataset.tab; save(); renderAll(); window.scrollTo(0, 0); break;
+    case 'open-att-import': openText('att'); break;
+    case 'open-sched-import': openText('sched'); break;
+    case 'text-example': $('#textArea').value = textMode === 'att' ? ATT_EXAMPLE : SCHED_EXAMPLE; runText(); break;
+    case 'text-import': doTextImport(); break;
+    case 'att-plus': attBump(sid, false); break;
+    case 'att-miss': attBump(sid, true); break;
+    case 'att-edit': openAtt(sid); break;
+    case 'att-clear': { const s = findSub(attEditing); if (s) { const snap = snapshot(); s.att = null; save(); $('#dlgAtt').close(); renderAll(); toast('Данные посещаемости очищены', snap); } break; }
+    case 'day': ui.day = +el.dataset.day; renderSched(); break;
+    case 'add-lesson': openLesson(null); break;
+    case 'edit-lesson': openLesson(+el.dataset.day, +el.dataset.i); break;
+    case 'lesson-delete': { if (!lessonEditing || lessonEditing.i == null) { $('#dlgLesson').close(); break; } const snap = snapshot(); state.schedule.days[lessonEditing.day].splice(lessonEditing.i, 1); save(); $('#dlgLesson').close(); renderSched(); toast('Урок удалён', snap); break; }
     case 'open-settings': openSettings(); break;
     case 'open-data': openData(); break;
     case 'open-add-subject': openSubjectDlg(); break;
@@ -1075,7 +1248,7 @@ document.addEventListener('click', e => {
     case 'demo': loadDemo(); break;
     case 'wipe':
       if (!confirm('Удалить все предметы и оценки? Это действие можно отменить только сразу после удаления.')) break;
-      { const snap = snapshot(); state.subjects = []; save(); renderAll(); $('#dlgData').open && $('#dlgData').close(); toast('Все данные удалены', snap); }
+      { const snap = snapshot(); state.subjects = []; state.attMonths = []; state.schedule = normalizeSchedule({}); save(); renderAll(); $('#dlgData').open && $('#dlgData').close(); toast('Все данные удалены', snap); }
       break;
     case 'reset-settings': fillSettings(normalizeSettings({})); break;
   }
@@ -1129,6 +1302,7 @@ function catWeightMap(){
   return m;
 }
 function matchExisting(name){
+  const byKey = findSubByName(name); if (byKey) return byKey;
   const n = normTxt(name);
   return state.subjects.find(s => normTxt(s.name) === n) || state.subjects.find(s => { const k = normTxt(s.name); return n.startsWith(k + ' (') || k.startsWith(n + ' ('); }) || null;
 }
@@ -1209,13 +1383,15 @@ function fillSettings(s){
   f.plus.value = s.plus; f.minus.value = s.minus; f.defaultWeight.value = s.defaultWeight; f.margin.value = s.margin;
   s.thresholds.forEach((t, i) => f['t' + i].value = t);
   f.yearMode.value = s.yearMode; f.currentSem.value = s.currentSem; f.catWeights.value = s.catWeights;
+  f.attTarget.value = s.attTarget; f.semEnd.value = s.semEnd || semEndDate();
 }
 function openSettings(){ fillSettings(S()); $('#dlgSettings').showModal(); }
 $('#settingsForm').addEventListener('submit', e => {
   e.preventDefault(); const f = e.target;
   state.settings = normalizeSettings({
     plus: f.plus.value, minus: f.minus.value, defaultWeight: f.defaultWeight.value, margin: f.margin.value,
-    thresholds: [0, 1, 2, 3, 4].map(i => f['t' + i].value), yearMode: f.yearMode.value, currentSem: f.currentSem.value, catWeights: f.catWeights.value
+    thresholds: [0, 1, 2, 3, 4].map(i => f['t' + i].value), yearMode: f.yearMode.value, currentSem: f.currentSem.value, catWeights: f.catWeights.value,
+    attTarget: f.attTarget.value, semEnd: f.semEnd.value
   });
   ui.pad = {}; ui.help = {};
   save(); $('#dlgSettings').close(); renderAll(); toast('Настройки сохранены');
@@ -1228,7 +1404,7 @@ function openData(){
   $('#dlgData').showModal();
 }
 function exportJSON(){
-  const data = JSON.stringify({ app: 'moja-srednia', version: 1, exported: new Date().toISOString(), settings: state.settings, subjects: state.subjects }, null, 2);
+  const data = JSON.stringify({ app: 'moja-srednia', version: 1, exported: new Date().toISOString(), settings: state.settings, subjects: state.subjects, schedule: state.schedule, attMonths: state.attMonths }, null, 2);
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([data], { type: 'application/json' }));
   a.download = `srednia-backup-${new Date().toISOString().slice(0, 10)}.json`;
@@ -1280,6 +1456,356 @@ function loadDemo(){
   save(); renderAll();
   const d = $('#dlgData'); if (d.open) d.close();
   toast('Демо-предметы загружены', snap);
+}
+
+/* ===================== Парсеры посещаемости и расписания ===================== */
+/*ATT-START*/
+const SUBJ_ALIASES = { 'bhp': 'bezpieczenstwo i higiena pracy', 'edb': 'edukacja dla bezpieczenstwa', 'wf': 'wychowanie fizyczne', 'w-f': 'wychowanie fizyczne', 'zzw': 'zajecia z wychowawca', 'godzina wychowawcza': 'zajecia z wychowawca', 'wos': 'wiedza o spoleczenstwie', 'hit': 'historia i terazniejszosc', 'j. polski': 'jezyk polski', 'j. angielski': 'jezyk angielski', 'j. niemiecki': 'jezyk niemiecki' };
+function subjKey(name){ const n = normTxt(name).replace(/[.:\s]+$/, ''); return SUBJ_ALIASES[n] || n; }
+const MONTHS = ['wrzesien','pazdziernik','listopad','grudzien','styczen','luty','marzec','kwiecien','maj','czerwiec','lipiec','sierpien',
+  'вересень','жовтень','листопад','грудень','січень','лютий','березень','квітень','травень','червень','липень','серпень',
+  'сентябрь','октябрь','ноябрь','декабрь','январь','февраль','март','апрель','май','июнь','июль','август','september','october','november','december','january','february','march','april','may','june','july','august'];
+const ATT_TOTAL = ['razem','ogolem','suma','разом','всього','итого','всего','total'];
+const ATT_SKIP = /^(frekwencja|tydzien|statystyk|przedmiot|obecnosc|тиждень|статистика|предмети|відвідуваніст|неделя|посещаемост|week|statistics|subjects)/;
+function attLabelKey(n){
+  if (/(przyczyn|причин|school reason|szkoln)/.test(n)) return 'school';
+  const unex = /(nieuspr|необґрунт|необгрунт|неуваж|unexcus|nieuzasad)/.test(n);
+  if (/(spozn|запізн|опозд|late)/.test(n)) return unex ? 'late' : 'lateEx';
+  if (/(zwoln|звільн|освобожд|releas)/.test(n)) return 'rel';
+  if (/(nieobec|відсутн|отсутств|absen|пропуск)/.test(n)) return unex ? 'abs' : 'absEx';
+  return null;
+}
+function parseAttendance(text){
+  const lines = String(text || '').replace(/\r/g, '').split('\n').map(l => l.replace(/ /g, ' ').trim()).filter(Boolean);
+  const blocks = []; let cur = null, pendingName = '', pendingKey = null;
+  for (const line of lines) {
+    const n = normTxt(line);
+    if (ATT_SKIP.test(n)) { pendingName = ''; continue; }
+    const key = attLabelKey(n);
+    if (key) {
+      const m = line.match(/(\d+)\s*$/);
+      if (cur) { if (m) cur[key] = +m[1]; else pendingKey = key; }
+      pendingName = '';
+      continue;
+    }
+    if (/^\d+$/.test(line)) { if (cur && pendingKey) cur[pendingKey] = +line; pendingKey = null; continue; }
+    const pm = line.match(/(\d+(?:[.,]\d+)?)\s*%/);
+    if (pm) {
+      const before = line.slice(0, pm.index).replace(/[:\-–\s]+$/, '').trim();
+      const name = cleanName((pendingName ? pendingName + ' ' : '') + before);
+      if (name) { cur = { name, pct: parseFloat(pm[1].replace(',', '.')), abs: 0, absEx: 0, late: 0, lateEx: 0, rel: 0, school: 0 }; blocks.push(cur); }
+      pendingName = ''; pendingKey = null;
+      continue;
+    }
+    if (/\p{L}/u.test(line) && line.length <= 80) pendingName = pendingName ? pendingName + ' ' + line : line;
+  }
+  const out = { subjects: [], months: [], totals: [] };
+  for (const b of blocks) {
+    const k = normTxt(b.name);
+    const absent = b.abs + b.absEx;
+    b.total = b.pct < 100 ? Math.round(absent / (1 - b.pct / 100)) : (absent === 0 ? null : absent);
+    if (MONTHS.includes(k)) out.months.push(b);
+    else if (ATT_TOTAL.includes(k)) out.totals.push(b);
+    else out.subjects.push(b);
+  }
+  return out;
+}
+const DAY_KEYS = [['pn','pon','poniedzialek','пн','понедельник','понеділок','mon','monday'],['wt','wto','wtorek','вт','вторник','вівторок','tue','tuesday'],['sr','sro','sroda','ср','среда','середа','wed','wednesday'],['cz','czw','czwartek','чт','четверг','четвер','thu','thursday'],['pt','pi','pia','piatek','пт','пятница','пʼятниця','пятниця',"п'ятниця",'fri','friday']];
+function dayIndex(w){ const n = normTxt(w).replace(/[.:,]+$/, ''); return DAY_KEYS.findIndex(a => a.includes(n)); }
+function niceName(s){ s = cleanName(s); if (s === s.toUpperCase() && /\p{L}{4,}/u.test(s) && s.length > 4) s = s.charAt(0) + s.slice(1).toLowerCase(); return s; }
+function parseSchedule(text){
+  const lines = String(text || '').replace(/\r/g, '').split('\n').map(l => l.replace(/ /g, ' ').trim()).filter(Boolean);
+  const days = [[], [], [], [], []]; const bells = {}; let day = -1, any = false;
+  const addEntry = (str) => {
+    const m = str.trim().match(/^(\d{1,2})(?:\s*[-–]\s*(\d{1,2}))?\s*[.):]?\s+(.+)$/);
+    if (!m || day < 0) return;
+    let name = m[3].trim(), room = '';
+    const rm = name.match(/\s*[\(\[](.+?)[\)\]]\s*$/); if (rm) { room = rm[1]; name = name.slice(0, rm.index); }
+    const a = +m[1], b = m[2] ? +m[2] : a;
+    for (let i = a; i <= Math.min(b, 12); i++) if (i >= 0) { days[day].push({ n: i, name: niceName(name), room }); any = true; }
+  };
+  for (const line of lines) {
+    const bm = line.match(/^(\d{1,2})\s*[.):]?\s*(\d{1,2}[:.]\d{2})\s*[-–]\s*(\d{1,2}[:.]\d{2})\s*$/);
+    if (bm) { bells[+bm[1]] = [bm[2].replace('.', ':'), bm[3].replace('.', ':')]; continue; }
+    if (/^(dzwonki|звонки|дзвінки|bells)/i.test(normTxt(line))) { day = -1; continue; }
+    const first = line.split(/[\s:]+/)[0];
+    const di = dayIndex(first);
+    if (di >= 0) { day = di; const rest = line.slice(first.length).replace(/^[\s:–-]+/, ''); if (rest) rest.split(/;/).forEach(addEntry); continue; }
+    line.split(/;/).forEach(addEntry);
+  }
+  days.forEach(d => d.sort((a, b) => a.n - b.n));
+  return { days, bells, any };
+}
+/*ATT-END*/
+
+/* ===================== Посещаемость ===================== */
+function findSubByName(name){ const k = subjKey(name); return state.subjects.find(s => subjKey(s.name) === k) || null; }
+function attOf(sub){
+  const a = sub && sub.att; if (!a) return null;
+  const absent = a.abs + a.absEx;
+  const pct = a.total > 0 ? (a.total - absent) / a.total * 100 : a.pct;
+  return Object.assign({}, a, { absent, pct, present: a.total != null ? a.total - absent : null });
+}
+function attStatus(p){ if (p == null) return 'none'; const t = S().attTarget; return p < t ? 'weak' : p < t + 10 ? 'edge' : p < 80 ? 'mid' : p < 90 ? 'good' : 'strong'; }
+const fmtPct = p => p == null ? '—' : (Math.round(p * 10) / 10).toString().replace(/\.0$/, '') + '%';
+function attChip(sub){ const a = attOf(sub); if (!a || a.pct == null) return ''; const c = attStatus(a.pct); return ` · <span style="color:var(--${c === 'none' ? 'ink-3' : c});font-weight:${c === 'weak' ? 650 : 400}">frekw. ${fmtPct(a.pct)}</span>`; }
+const pad2 = x => String(x).padStart(2, '0');
+const isoDate = d => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+function semEndDate(){
+  if (S().semEnd) return S().semEnd;
+  const now = new Date(), y = now.getFullYear(), m = now.getMonth();
+  if (currentSem() === 1) return `${m >= 8 ? y + 1 : y}-01-31`;
+  return `${y}-06-26`;
+}
+function lessonsPerDay(sub){ const k = subjKey(sub.name); return state.schedule.days.map(d => d.filter(l => subjKey(l.name) === k).length); }
+function remainingLessons(sub){
+  const per = lessonsPerDay(sub); if (!per.some(Boolean)) return null;
+  const end = new Date(semEndDate() + 'T23:59:59'); let d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() + 1);
+  let n = 0, guard = 0;
+  while (d <= end && guard++ < 400) {
+    const wd = d.getDay(), m = d.getMonth(), day = d.getDate();
+    const holiday = (m === 11 && day >= 23) || (m === 0 && (day === 1 || day === 6)) || (m === 10 && (day === 1 || day === 11)) || (m === 4 && (day === 1 || day === 3));
+    if (wd >= 1 && wd <= 5 && !holiday) n += per[wd - 1];
+    d.setDate(d.getDate() + 1);
+  }
+  return { n, perWeek: per.reduce((a, b) => a + b, 0) };
+}
+const plural = (n, a, b, c) => { const m10 = n % 10, m100 = n % 100; return m10 === 1 && m100 !== 11 ? a : (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) ? b : c; };
+const lessonsWord = n => `${n} ${plural(n, 'урок', 'урока', 'уроков')}`;
+function attHints(sub, a){
+  const out = []; if (!a || a.total == null || a.total === 0) return out;
+  const t = S().attTarget / 100, P = a.present, T = a.total, tp = S().attTarget + '%';
+  const rem = remainingLessons(sub);
+  const endTxt = new Date(semEndDate() + 'T12:00:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+  if (P / T < t - 1e-9) {
+    const x = Math.ceil((t * T - P) / (1 - t) - 1e-9);
+    let msg = `Чтобы выйти на <b>${tp}</b>, нужно посетить <b>${lessonsWord(x)}</b> подряд без пропусков`;
+    if (rem && rem.perWeek) msg += ` (≈ ${Math.ceil(x / rem.perWeek)} нед. при ${rem.perWeek} ур./нед.)`;
+    out.push(msg + '.');
+    if (rem && x > rem.n) out.push(`<span style="color:var(--weak)">До ${endTxt} осталось лишь ~${lessonsWord(rem.n)} — этого не хватит. Стоит поговорить с учителем или wychowawcą о usprawiedliwieniu и egzaminie klasyfikacyjnym.</span>`);
+  } else {
+    const k = Math.floor(P / t - T + 1e-9);
+    out.push(k > 0 ? `Запас: можно пропустить ещё <b>${lessonsWord(k)}</b> и остаться ≥ ${tp}.` : `Запаса нет: любой следующий пропуск опустит ниже ${tp}.`);
+  }
+  if (rem && rem.n > 0) out.push(`<span class="muted">Если ходить на все ~${lessonsWord(rem.n)} до ${endTxt}: будет <b>${fmtPct((P + rem.n) / (T + rem.n) * 100)}</b>.</span>`);
+  return out;
+}
+function renderAtt(){
+  const withAtt = state.subjects.filter(s => s.att);
+  const sum = $('#attSummary'), list = $('#attList');
+  if (!withAtt.length) {
+    sum.classList.add('hidden');
+    list.innerHTML = `<div class="emptystate"><b>Нет данных о посещаемости</b><p>Вставьте статистику frekwencji из eduvulcan (раздел «Frekwencja» → «Przedmioty»). Пропуски по предметам и % посчитаются автоматически.</p><div class="row"><button class="btn primary" data-act="open-att-import">Импорт посещаемости</button></div></div>`;
+    return;
+  }
+  sum.classList.remove('hidden');
+  let T = 0, A = 0, abs = 0, absEx = 0, late = 0, totalKnown = true;
+  withAtt.forEach(s => { const a = attOf(s); if (a.total == null) { totalKnown = false; return; } T += a.total; A += a.absent; abs += a.abs; absEx += a.absEx; late += a.late + a.lateEx; });
+  const pct = T ? (T - A) / T * 100 : null;
+  const below = withAtt.filter(s => attOf(s).pct < S().attTarget).length;
+  const st = attStatus(pct);
+  sum.innerHTML = `<div class="st-${st}"><div class="big" style="color:var(--st)">${fmtPct(pct)}</div><div class="big-label">посещаемость по предметам<br>${T ? `${T - A} из ${T} уроков` : ''}</div></div>
+    <div class="sum-stats">
+      <div class="stat"><b style="color:var(--weak)">${abs}</b><span>nieusprawiedliwione</span></div>
+      <div class="stat"><b>${absEx}</b><span>usprawiedliwione</span></div>
+      <div class="stat"><b>${late}</b><span>опоздания</span></div>
+      <div class="stat"><b style="color:${below ? 'var(--weak)' : 'inherit'}">${below} из ${withAtt.length}</b><span>предметов ниже ${S().attTarget}%</span></div>
+    </div>
+    ${state.attMonths.length ? `<div class="months">${state.attMonths.map(m => `<span class="mchip">${esc(m.name)} <b>${fmtPct(m.pct)}</b> · ${m.abs} проп.</span>`).join('')}</div>` : ''}
+    ${below ? `<div class="notice bad" style="grid-column:1/-1;margin-top:4px">Если пропущено больше половины уроков предмета, могут не аттестовать (<b>nieklasyfikowany</b>). При usprawiedliwionych пропусках есть право на egzamin klasyfikacyjny, при nieusprawiedliwionych — только с согласия rady pedagogicznej. Лучше закрывать пропуски (usprawiedliwienie) вовремя.</div>` : ''}`;
+  const sorted = withAtt.slice().sort((x, y) => (attOf(x).pct ?? 101) - (attOf(y).pct ?? 101));
+  const target = S().attTarget;
+  list.innerHTML = sorted.map(s => {
+    const a = attOf(s); const c = attStatus(a.pct);
+    const label = { weak: 'ниже порога', edge: 'на грани', mid: 'средне', good: 'хорошо', strong: 'отлично', none: '' }[c];
+    const details = [a.total != null ? `пропущено ${a.absent} из ${a.total}` : '', a.absEx ? `uspr. ${a.absEx}` : '', (a.late + a.lateEx) ? `опозд. ${a.late + a.lateEx}` : '', a.rel ? `zwoln. ${a.rel}` : ''].filter(Boolean).join(' · ');
+    return `<article class="att-card st-${c}">
+      <div class="att-top"><div class="ch-main"><div class="ch-name">${esc(s.name)}</div><div class="ch-meta"><span class="tag">${label}</span>${details}</div></div>
+        <span class="avg">${fmtPct(a.pct)}</span></div>
+      <div class="att-bar"><i style="width:${Math.max(0, Math.min(100, a.pct || 0))}%"></i><b style="left:calc(${target}% - 1px)" title="порог ${target}%"></b></div>
+      ${attHints(s, a).map(h => `<div class="att-hint">${h}</div>`).join('')}
+      <div class="att-actions"><button class="btn sm" data-act="att-plus" data-sid="${s.id}">+ был на уроке</button><button class="btn sm" data-act="att-miss" data-sid="${s.id}">+ пропуск</button><button class="btn sm ghost" data-act="att-edit" data-sid="${s.id}">Изменить</button></div>
+    </article>`;
+  }).join('') + `<div class="row" style="margin-top:4px">${state.subjects.filter(s => !s.att).length ? `<span class="note">Без данных: ${state.subjects.filter(s => !s.att).map(s => esc(s.name)).join(', ')}</span>` : ''}</div>`;
+}
+function attBump(sid, missed){
+  const s = findSub(sid); if (!s) return; const snap = snapshot();
+  if (!s.att) s.att = normalizeAtt({ total: 0 });
+  if (s.att.total == null) s.att.total = s.att.abs + s.att.absEx;
+  s.att.total += 1; if (missed) s.att.abs += 1;
+  save(); renderAtt(); toast(`${s.name}: ${missed ? 'пропуск' : 'был на уроке'} → ${fmtPct(attOf(s).pct)}`, snap);
+}
+let attEditing = null;
+function openAtt(sid){
+  const s = findSub(sid); if (!s) return; attEditing = sid;
+  const a = s.att || {}; const f = $('#attForm');
+  ['total', 'abs', 'absEx', 'late', 'lateEx', 'rel'].forEach(k => f[k].value = a[k] ?? (k === 'total' ? '' : 0));
+  $('#attTitle').textContent = 'Посещаемость · ' + s.name; $('#dlgAtt').showModal();
+}
+$('#attForm').addEventListener('submit', e => {
+  e.preventDefault(); const s = findSub(attEditing); if (!s) return; const f = e.target;
+  const snap = snapshot();
+  s.att = normalizeAtt({ total: f.total.value === '' ? null : f.total.value, abs: f.abs.value, absEx: f.absEx.value, late: f.late.value, lateEx: f.lateEx.value, rel: f.rel.value, pct: s.att ? s.att.pct : null });
+  save(); $('#dlgAtt').close(); renderAll(); toast('Сохранено', snap);
+});
+
+/* ===================== Расписание ===================== */
+const DAY_NAMES = ['Pn', 'Wt', 'Śr', 'Czw', 'Pt'];
+const DAY_FULL = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek'];
+const toMin = t => { const [h, m] = String(t).split(':').map(Number); return h * 60 + m; };
+function todayIdx(){ const d = new Date().getDay(); return d >= 1 && d <= 5 ? d - 1 : -1; }
+function renderSched(){
+  const sc = state.schedule; const today = todayIdx();
+  if (ui.day == null) ui.day = today >= 0 ? today : 0;
+  const day = ui.day;
+  $('#days').innerHTML = DAY_NAMES.map((d, i) => `<button data-act="day" data-day="${i}" class="${i === day ? 'on' : ''} ${i === today ? 'today' : ''}" aria-label="${DAY_FULL[i]}">${d}<span class="small" style="display:block;font-weight:400;opacity:.75">${sc.days[i].length || '–'}</span></button>`).join('');
+  const lessons = sc.days[day];
+  const nowM = new Date().getHours() * 60 + new Date().getMinutes();
+  let curIdx = -1, nextIdx = -1;
+  if (day === today) lessons.forEach((l, i) => { const [a, b] = sc.bells[l.n] || ['0:00', '0:00']; if (nowM >= toMin(a) && nowM < toMin(b)) curIdx = i; if (nextIdx < 0 && toMin(a) > nowM) nextIdx = i; });
+  const nb = $('#nowBox');
+  if (!sc.days.some(d => d.length)) {
+    nb.innerHTML = ''; $('#lessons').innerHTML = `<div class="emptystate"><b>Расписание пустое</b><p>Вставьте план уроков текстом (например «Pn 6 Geografia») или добавьте уроки вручную.</p><div class="row"><button class="btn primary" data-act="open-sched-import">Импорт расписания</button><button class="btn" data-act="add-lesson">+ Урок</button></div></div>`;
+    $('#weekGrid').innerHTML = ''; return;
+  }
+  if (day === today) {
+    const c = lessons[curIdx], nx = lessons[nextIdx];
+    const bell = l => sc.bells[l.n] || ['', ''];
+    let html = '';
+    if (c) html += `Сейчас: <b>${esc(c.name)}</b> · ${c.n} урок, до ${bell(c)[1]}`;
+    if (nx) { const mins = toMin(bell(nx)[0]) - nowM; html += `${html ? '<br>' : ''}Дальше: <b>${esc(nx.name)}</b> в ${bell(nx)[0]} <span class="muted">(через ${mins >= 60 ? Math.floor(mins / 60) + ' ч ' : ''}${mins % 60} мин)</span>`; }
+    if (!html) html = lessons.length ? 'На сегодня уроки закончились 🎉' : 'Сегодня уроков нет';
+    nb.innerHTML = `<div class="nowbox">${html}</div>`;
+  } else nb.innerHTML = '';
+  if (!lessons.length) { $('#lessons').innerHTML = `<div class="note" style="padding:8px 2px">В этот день уроков нет.</div>`; }
+  else {
+    let prevN = null; const parts = [];
+    lessons.forEach((l, i) => {
+      if (prevN != null && l.n > prevN + 1) parts.push(`<div class="freelesson">окно: ${l.n - prevN - 1} ${plural(l.n - prevN - 1, 'урок', 'урока', 'уроков')}</div>`);
+      prevN = l.n;
+      const s = findSubByName(l.name); const [a, b] = sc.bells[l.n] || ['', ''];
+      let pills = '';
+      if (s) {
+        const st = subjStats(s, state.view || String(currentSem()));
+        if (st.w != null) pills += `<span class="pill st-${status(st.w).cls}">${fmt(st.w)}</span>`;
+        const at = attOf(s); if (at && at.pct != null) pills += `<span class="pill st-${attStatus(at.pct)}">${fmtPct(at.pct)}</span>`;
+      }
+      const cls = day === today ? (i === curIdx ? ' cur' : (toMin(b) <= nowM ? ' past' : '')) : '';
+      parts.push(`<button type="button" class="lesson${cls}" data-act="edit-lesson" data-day="${day}" data-i="${i}">
+        <span class="ln">${l.n}<small>${a}–${b}</small></span>
+        <span class="lname">${esc(l.name)}${l.room ? `<small>${esc(l.room)}</small>` : ''}</span>
+        <span class="lb">${pills}</span></button>`);
+    });
+    $('#lessons').innerHTML = parts.join('');
+  }
+  // неделя
+  const ns = sc.days.flat().map(l => l.n); const lo = Math.min(...ns), hi = Math.max(...ns);
+  let g = `<table class="week"><thead><tr><th style="width:64px"></th>${DAY_NAMES.map((d, i) => `<th>${DAY_FULL[i]}</th>`).join('')}</tr></thead><tbody>`;
+  for (let n = lo; n <= hi; n++) {
+    g += `<tr><td class="n"><b>${n}</b> ${sc.bells[n] ? sc.bells[n][0] : ''}</td>` + sc.days.map(d => {
+      const l = d.find(x => x.n === n); if (!l) return '<td></td>';
+      const s = findSubByName(l.name); const at = s && attOf(s);
+      return `<td><span class="wc st-${at && at.pct != null ? attStatus(at.pct) : 'none'}">${esc(l.name)}</span></td>`;
+    }).join('') + '</tr>';
+  }
+  $('#weekGrid').innerHTML = g + '</tbody></table><p class="note">Цвет ячейки — посещаемость предмета.</p>';
+}
+let lessonEditing = null;
+function openLesson(day, i){
+  const f = $('#lessonForm');
+  f.day.innerHTML = DAY_FULL.map((d, k) => `<option value="${k}">${d}</option>`).join('');
+  f.n.innerHTML = state.schedule.bells.map((b, k) => `<option value="${k}">${k} · ${b[0]}–${b[1]}</option>`).join('');
+  if (day == null) {
+    lessonEditing = { day: ui.day ?? 0, i: null };
+    const used = state.schedule.days[lessonEditing.day].map(l => l.n);
+    f.day.value = lessonEditing.day; f.n.value = used.length ? Math.min(12, Math.max(...used) + 1) : 1; f.name.value = ''; f.room.value = '';
+    $('#lessonTitle').textContent = 'Новый урок';
+  } else {
+    lessonEditing = { day, i }; const l = state.schedule.days[day][i];
+    f.day.value = day; f.n.value = l.n; f.name.value = l.name; f.room.value = l.room || '';
+    $('#lessonTitle').textContent = 'Урок';
+  }
+  $('#dlgLesson').showModal();
+}
+$('#lessonForm').addEventListener('submit', e => {
+  e.preventDefault(); const f = e.target; const snap = snapshot();
+  const name = f.name.value.trim(); if (!name) return;
+  if (lessonEditing.i != null) state.schedule.days[lessonEditing.day].splice(lessonEditing.i, 1);
+  const d = +f.day.value; state.schedule.days[d].push({ n: +f.n.value, name, room: f.room.value.trim() });
+  state.schedule.days[d].sort((a, b) => a.n - b.n);
+  ui.day = d; save(); $('#dlgLesson').close(); renderSched(); toast('Расписание сохранено', snap);
+});
+
+/* ===================== Импорт посещаемости / расписания ===================== */
+let textMode = 'att', textParsed = null;
+const ATT_EXAMPLE = `Frekwencja od początku roku szkolnego
+Matematyka 38.71%
+Nieobecność nieusprawiedliwiona 19
+Nieobecność usprawiedliwiona 0
+Spóźnienie nieusprawiedliwione 1
+Spóźnienie usprawiedliwione 0
+Zwolnienie 0
+Nieobecność z przyczyn szkolnych 0
+Biologia
+58.33%
+Nieobecność nieusprawiedliwiona
+5`;
+const SCHED_EXAMPLE = `Pn: 6 Geografia; 7 Informatyka; 8 Matematyka
+Wt
+1 Historia
+2-3 Wychowanie fizyczne
+Dzwonki
+1 8:00-8:45
+2 8:50-9:35`;
+const TEXT_HELP = {
+  att: `<ul><li>eduvulcan → <b>Frekwencja</b> → вкладка со статистикой по предметам → выделить всё и скопировать.</li><li>Понимаются подписи на польском, украинском, русском и английском: «Nieobecność nieusprawiedliwiona / Відсутність необґрунтована 19», процент — «Matematyka 38.71%».</li><li>Число уроков считается из процента и пропусков. Месяцы (Wrzesień, Вересень…) попадают в сводку.</li></ul>`,
+  sched: `<ul><li>Формат: день, затем «номер урока + предмет». Например <code>Pn: 6 Geografia; 7 Informatyka</code> или на отдельных строках <code>Wt</code>, <code>1 Historia</code>.</li><li>Сдвоенные уроки: <code>5-7 Wychowanie fizyczne</code>. Кабинет — в скобках: <code>3 Matematyka (s. 12)</code>.</li><li>Звонки (необязательно): после строки <code>Dzwonki</code> — <code>1 8:00-8:45</code>.</li><li>Импорт заменяет всё расписание.</li></ul>`
+};
+function openText(mode){
+  textMode = mode; textParsed = null;
+  $('#textTitle').textContent = mode === 'att' ? 'Импорт посещаемости (frekwencja)' : 'Импорт расписания';
+  $('#textHelp').innerHTML = TEXT_HELP[mode];
+  $('#textArea').value = ''; $('#textPreview').innerHTML = ''; $('#textInfo').textContent = '';
+  $('#textImportBtn').disabled = true;
+  $('#dlgText').showModal();
+}
+let textTimer = null;
+$('#textArea').addEventListener('input', () => { clearTimeout(textTimer); textTimer = setTimeout(runText, 300); });
+function runText(){
+  const txt = $('#textArea').value, pv = $('#textPreview'), btn = $('#textImportBtn');
+  if (textMode === 'att') {
+    const r = textParsed = parseAttendance(txt);
+    pv.innerHTML = r.subjects.map(b => { const ex = findSubByName(b.name); const st = attStatus(b.pct);
+      return `<div class="pv st-${st}"><div class="pv-h"><b style="flex:1">${esc(b.name)}</b><span class="tag ${ex ? '' : 'new'}">${ex ? '→ ' + esc(ex.name) : 'новый'}</span><span class="pill">${fmtPct(b.pct)}</span></div>
+        <div class="pv-sum">пропусков ${b.abs + b.absEx}${b.absEx ? ` (uspr. ${b.absEx})` : ''}${b.late + b.lateEx ? ` · опозданий ${b.late + b.lateEx}` : ''} · уроков ≈ ${b.total ?? '?'}</div></div>`; }).join('')
+      + (r.months.length ? `<div class="months">${r.months.map(m => `<span class="mchip">${esc(m.name)} <b>${fmtPct(m.pct)}</b></span>`).join('')}</div>` : '');
+    $('#textInfo').textContent = txt.trim() ? `Предметов: ${r.subjects.length}${r.months.length ? `, месяцев: ${r.months.length}` : ''}` : '';
+    btn.disabled = !r.subjects.length && !r.months.length;
+  } else {
+    const r = textParsed = parseSchedule(txt);
+    pv.innerHTML = r.days.map((d, i) => d.length ? `<div class="pv"><b>${DAY_FULL[i]}</b><div class="pv-sum">${d.map(l => `${l.n}. ${esc(l.name)}${findSubByName(l.name) ? '' : ' <span class="tag new" style="font-size:11px;padding:0 4px;border-radius:4px">нет в оценках</span>'}`).join('<br>')}</div></div>` : '').join('')
+      + (Object.keys(r.bells).length ? `<div class="note">Звонков: ${Object.keys(r.bells).length}</div>` : '');
+    $('#textInfo').textContent = r.any ? `Уроков: ${r.days.flat().length}` : (txt.trim() ? 'Не распознано' : '');
+    btn.disabled = !r.any && !Object.keys(r.bells).length;
+  }
+}
+function doTextImport(){
+  if (!textParsed) return; const snap = snapshot();
+  if (textMode === 'att') {
+    let nNew = 0;
+    for (const b of textParsed.subjects) {
+      let s = findSubByName(b.name) || matchExisting(b.name);
+      if (!s) { s = { id: uid(), name: b.name, grades: [], att: null }; state.subjects.push(s); nNew++; }
+      s.att = normalizeAtt(b);
+    }
+    if (textParsed.months.length) state.attMonths = textParsed.months.map(m => ({ name: m.name, pct: m.pct, abs: m.abs + m.absEx }));
+    save(); $('#dlgText').close(); state.tab = 'att'; renderAll();
+    toast(`Посещаемость: ${textParsed.subjects.length} предм.${nNew ? `, новых: ${nNew}` : ''}`, snap);
+  } else {
+    if (textParsed.any) state.schedule.days = textParsed.days;
+    Object.entries(textParsed.bells).forEach(([n, b]) => { if (+n <= 12) state.schedule.bells[+n] = b; });
+    save(); $('#dlgText').close(); state.tab = 'sched'; renderAll(); toast('Расписание импортировано', snap);
+  }
 }
 
 /* ===================== Старт ===================== */
