@@ -70,8 +70,8 @@ button{cursor:pointer;background:none;border:0;padding:0}
    Верхняя строка
    ========================================================================== */
 .top{
-  position:sticky;top:0;z-index:50;background:rgba(246,245,240,.96);
-  border-bottom:1px solid var(--line);
+  position:sticky;top:0;z-index:50;background:#F6F5F0;
+  border-bottom:1px solid rgba(18,18,18,.12);
 }
 .top-in{max-width:var(--max);margin:0 auto;height:64px;padding:0 var(--gut);display:flex;align-items:center;gap:18px}
 .logo{font:400 24px/1 var(--f-display);text-decoration:none;letter-spacing:-.01em;display:flex;align-items:baseline;gap:2px}
@@ -189,7 +189,7 @@ button{cursor:pointer;background:none;border:0;padding:0}
   position:relative;
 }
 .wall.is-table{
-  display:block;height:1180px;border-radius:18px;
+  display:block;height:1400px;border-radius:18px;transition:height .4s var(--ease);
   background:
     radial-gradient(circle at 1px 1px, rgba(18,18,18,.13) 1px, transparent 0) 0 0/26px 26px,
     var(--kraft);
@@ -601,7 +601,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
             <button class="btn btn-ghost" id="openMail" type="button">Письмом</button>
           </div>
           <div class="sheet-foot">
-            <span>Текст копируется сразу — если Telegram не подставит его сам, просто вставьте.</span>
+            <span>Текст скопирован — если поле ввода пустое, просто вставьте (Ctrl+V / Cmd+V)</span>
             <button class="reset" id="reset" type="button">начать заново</button>
           </div>
           <div class="sheet-note" aria-hidden="true">отвечаю сам ↑</div>
@@ -867,8 +867,9 @@ const WALL = [
 
 /* позиции «на столе»: x — доля ширины, y — px, r — наклон */
 const TABLE = {
-  product:[.02, 40, -3], screen:[.38, 20, 4], question:[.64, 30, 6], press:[.80, 300, -5],
-  now:[.03, 360, 3], quote:[.30, 420, -4], type:[.52, 560, -2], landing:[.06, 760, -3], log:[.40, 880, 2]
+  product:[.01, 40, -2.5], screen:[.37, 28, 3],  question:[.76, 44, 4],
+  now:[.03, 340, 2.5],     press:[.76, 380, -4],  quote:[.30, 480, -3],
+  type:[.53, 650, -1.5],   landing:[.04, 720, -3], log:[.31, 930, 1.5]
 };
 
 const wall = $('#wall');
@@ -905,7 +906,7 @@ function toggleCard(card){
   const swap = () => flipLayout(() => {
     card.classList.toggle('is-open', open);
     card.setAttribute('aria-expanded', open);
-    if (isTable()){ card.style.zIndex = ++zTop; clampCard(card); }
+    if (isTable()){ card.style.zIndex = ++zTop; clampCard(card); fitBoard(); }
   });
   if (reduced){ swap(); busy = false; return; }
   const a = paper.animate([{transform:'rotateY(0deg)'},{transform:'rotateY(90deg)'}], {duration:170, easing:'ease-in', fill:'forwards'});
@@ -958,23 +959,60 @@ $$('[data-todo]').forEach(cb => {
 const isTable = () => wall.classList.contains('is-table');
 const canTable = () => innerWidth > 900;
 
+const TABLE_MIN_H = 1400, TABLE_GAP = 32;   // минимальная высота стола и зазор между карточками
 function clampCard(card){
-  const W = wall.clientWidth, H = wall.clientHeight;
-  const w = card.offsetWidth, h = card.offsetHeight;
+  // по горизонтали — в пределах стола, по вертикали только сверху: снизу стол сам растёт
+  const W = wall.clientWidth, w = card.offsetWidth;
   const x = Math.min(Math.max(parseFloat(card.style.left) || 0, 10), W - w - 10);
-  const y = Math.min(Math.max(parseFloat(card.style.top) || 0, 16), Math.max(16, H - h - 10));
+  const y = Math.max(parseFloat(card.style.top) || 0, 20);
   card.style.left = x + 'px'; card.style.top = y + 'px';
 }
+function fitBoard(){
+  // высота стола = нижний край самой нижней карточки + запас
+  if (!isTable()) return;
+  const bottom = Math.max(...cards.map(c => c.offsetTop + c.offsetHeight));
+  wall.style.height = Math.max(TABLE_MIN_H, bottom + 120) + 'px';
+}
+function resolveOverlaps(){
+  // раздвигаем карточки, чтобы никакие две не перекрывались (с учётом наклона — зазор TABLE_GAP)
+  const placed = [];
+  [...cards].sort((a, b) => a.offsetTop - b.offsetTop).forEach(c => {
+    const x = c.offsetLeft, w = c.offsetWidth, h = c.offsetHeight;
+    let y = c.offsetTop, moved = true;
+    while (moved){
+      moved = false;
+      for (const p of placed){
+        if (x < p.x + p.w + TABLE_GAP && x + w + TABLE_GAP > p.x && y < p.y + p.h + TABLE_GAP && y + h + TABLE_GAP > p.y){
+          y = p.y + p.h + TABLE_GAP; moved = true;
+        }
+      }
+    }
+    c.style.top = y + 'px';
+    placed.push({x, y, w, h});
+  });
+}
 function layoutTable(random){
-  const W = wall.clientWidth, H = wall.clientHeight;
+  const W = wall.clientWidth;
+  // «перемешать»: карточки меняются местами внутри своего размера (s ↔ s, w ↔ w) + небольшой случайный сдвиг
+  const slot = {};
+  if (random){
+    ['s','w'].forEach(size => {
+      const ids = WALL.filter(c => c.size === size).map(c => c.id);
+      const mixed = [...ids].sort(() => Math.random() - .5);
+      ids.forEach((id, i) => slot[id] = TABLE[mixed[i]]);
+    });
+  }
+  const jit = n => (Math.random() * 2 - 1) * n;
   cards.forEach(c => {
-    const t = TABLE[c.dataset.id];
-    const x = random ? Math.random() * (W - c.offsetWidth - 20) + 10 : t[0] * W;
-    const y = random ? Math.random() * (H - c.offsetHeight - 30) + 16 : t[1];
-    const r = random ? +(Math.random() * 12 - 6).toFixed(1) : t[2];
+    const t = random ? slot[c.dataset.id] : TABLE[c.dataset.id];
+    const x = t[0] * W + (random ? jit(36) : 0);
+    const y = t[1] + (random ? jit(30) : 0);
+    const r = random ? +jit(5).toFixed(1) : t[2];
     c.style.left = x + 'px'; c.style.top = y + 'px'; c.style.setProperty('--r', r + 'deg');
     clampCard(c);
   });
+  resolveOverlaps();
+  fitBoard();
 }
 function setView(v){
   if (v === 'table' && !canTable()) v = 'grid';
@@ -983,6 +1021,7 @@ function setView(v){
       if (v === 'table'){ wall.classList.add('is-table'); layoutTable(false); }
       else {
         wall.classList.remove('is-table');
+        wall.style.height = '';
         cards.forEach(c => {
           c.style.left = c.style.top = c.style.zIndex = '';
           c.style.setProperty('--r', WALL.find(w => w.id === c.dataset.id).r + 'deg');
@@ -1004,7 +1043,7 @@ $$('[data-view]').forEach(b => b.addEventListener('click', () => setView(b.datas
 $('#shuffle').addEventListener('click', () => flipLayout(() => layoutTable(true), 700));
 addEventListener('resize', () => {
   if (isTable() && !canTable()) setView('grid');
-  else if (isTable()) cards.forEach(clampCard);
+  else if (isTable()){ cards.forEach(clampCard); fitBoard(); }
   syncSeg();
 });
 syncSeg(); document.fonts && document.fonts.ready.then(syncSeg);
@@ -1028,7 +1067,7 @@ cards.forEach(card => {
   const end = e => {
     if (e.pointerId !== pid) return;
     pid = null;
-    if (moving){ dragged = true; card.classList.remove('is-drag'); clampCard(card); setTimeout(() => dragged = false, 0); }
+    if (moving){ dragged = true; card.classList.remove('is-drag'); clampCard(card); fitBoard(); setTimeout(() => dragged = false, 0); }
   };
   card.addEventListener('pointerup', end); card.addEventListener('pointercancel', end);
 });
@@ -1161,10 +1200,13 @@ async function copyBrief(){
 }
 async function openTelegram(){
   const text = plain();
-  const w = window.open(`${ME.telegramUrl}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+  const url = `${ME.telegramUrl}?text=${encodeURIComponent(text)}`;
+  // сначала копируем, пока вкладка в фокусе, потом открываем Telegram
   const ok = await copyText(text);
-  toast('открываю Telegram', ok ? 'Текст уже в буфере — если не подставился, вставьте' : 'Если текст не подставился — скопируйте его из листа');
-  if (!w) location.href = `${ME.telegramUrl}?text=${encodeURIComponent(text)}`;
+  toast(ok ? 'текст скопирован' : 'не удалось скопировать',
+        ok ? 'Если поле ввода пустое, просто вставьте (Ctrl+V / Cmd+V)' : 'Скопируйте текст из листа вручную');
+  const w = window.open(url, '_blank');
+  if (w) w.opener = null; else location.href = url;   // всплывающее окно заблокировано — открываем здесь
 }
 $('#copyMsg').addEventListener('click', copyBrief);
 $('#openTg').addEventListener('click', openTelegram);
