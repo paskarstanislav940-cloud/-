@@ -399,6 +399,7 @@ details.help code{font-size:12px;background:var(--surface);padding:0 4px;border-
         </label>
       </div>
       <div class="fgrid">
+        <label class="field"><span>Мин. оценок за период</span><input class="inp" name="minGrades" type="number" min="0" max="20" step="1"></label>
         <label class="field"><span>Мин. посещаемость, %</span><input class="inp" name="attTarget" type="number" min="1" max="100" step="1"></label>
         <label class="field"><span>Конец семестра</span><input class="inp" name="semEnd" type="date"></label>
       </div>
@@ -528,7 +529,7 @@ const DEF_SETTINGS = {
   plus: 0.5, minus: 0.25, defaultWeight: 1, margin: 0.15,
   thresholds: [1.75, 2.75, 3.75, 4.75, 5.5],
   yearMode: 'all', currentSem: 0,
-  attTarget: 50, semEnd: '',
+  attTarget: 50, semEnd: '', minGrades: 3,
   catWeights: 'Sprawdzian=3\nPraca klasowa=3\nTest=3\nKartkówka=2\nOdpowiedź=1\nPraca domowa=1\nAktywność=1'
 };
 
@@ -690,7 +691,7 @@ function parseVulcan(text, opts){
     }
 
     // Строки "Ключ: значение"
-    const kv = cells.length === 1 ? line.match(/^([\p{L} ().\-]{2,40}?)\s*:\s*(.*)$/u) : null;
+    const kv = cells.length === 1 ? line.match(/^([\p{L} ().\-]{2,80}?)\s*:\s*(.*)$/u) : null;
     if (kv) {
       const key = normTxt(kv[1]), val = kv[2];
       if (key.startsWith('wag')) { const w = parseNum(val); if (ctx.lastGrade && w != null) { ctx.lastGrade.w = w; ctx.lastGrade.wExplicit = true; } continue; }
@@ -719,7 +720,7 @@ function parseVulcan(text, opts){
     const words = line.split(/\s+/);
     const gi = words.findIndex(w => GRADE_START_RE.test(w));
     if (gi > 0) {
-      const prefix = words.slice(0, gi).join(' ');
+      const prefix = words.slice(0, gi).join(' ').replace(/[:\-–]+$/, '').trim();
       if (isSubjectName(prefix) || (nameLike(prefix) && !isCategory(prefix))) {
         cur = getSubj(prefix);
         feed(cur, tokenize(words.slice(gi).join(' '), ctx));
@@ -753,6 +754,7 @@ function normalizeSettings(s){
   s.currentSem = [0, 1, 2].includes(+s.currentSem) ? +s.currentSem : 0;
   s.catWeights = String(s.catWeights || '');
   s.attTarget = clampNum(s.attTarget, 50, 1, 100);
+  s.minGrades = Math.round(clampNum(s.minGrades, 3, 0, 20));
   s.semEnd = /^\d{4}-\d{2}-\d{2}$/.test(s.semEnd || '') ? s.semEnd : '';
   return s;
 }
@@ -785,6 +787,7 @@ function normalizeState(d){
     subjects: (Array.isArray(d.subjects) ? d.subjects : []).map(x => ({
       id: String(x.id || uid()), name: String(x.name || 'Przedmiot').slice(0, 80),
       att: normalizeAtt(x.att),
+      graded: typeof x.graded === 'boolean' ? x.graded : undefined,
       grades: (Array.isArray(x.grades) ? x.grades : []).filter(g => g && parseMark(g.v)).map(g => ({
         id: String(g.id || uid()), v: String(g.v).toLowerCase(), w: clampNum(g.w, 1, 0, 10),
         sem: +g.sem === 2 ? 2 : 1, cat: g.cat ? String(g.cat).slice(0, 80) : '', date: g.date ? String(g.date).slice(0, 10) : ''
@@ -948,6 +951,15 @@ function chipHTML(g, sid, planned, idx){
   return `<button type="button" class="${cls}" data-act="edit-grade" data-sid="${sid}" data-gid="${g.id}" title="${esc(title)}">${esc(g.v === '-' ? '−' : g.v)}${sub}</button>`;
 }
 
+function isGraded(sub){ return typeof sub.graded === 'boolean' ? sub.graded : subjKey(sub.name) !== 'zajecia z wychowawca'; }
+function gradeCount(sub, view){ return gradesIn(sub, view).filter(g => valueOf(g.v) != null && g.w > 0).length; }
+/* сколько оценок не хватает до минимума (0 — хватает или предмет не оценивается) */
+function gradesMissing(sub, view){
+  const min = S().minGrades; if (!min || !isGraded(sub)) return 0;
+  if (view === 'year') return Math.max(0, ...[1, 2].map(sem => min - gradeCount(sub, String(sem))));
+  return Math.max(0, min - gradeCount(sub, view));
+}
+const missTag = (sub, view) => { const m = gradesMissing(sub, view); return m ? `<span class="tag" style="color:var(--weak)">нужно ещё ${m} ${plural(m, 'оценку', 'оценки', 'оценок')}</span>` : ''; };
 function renderTabs(){
   if (!state.view) state.view = String(currentSem());
   document.querySelectorAll('#viewSeg button').forEach(b => { const on = b.dataset.view === state.view; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
@@ -981,6 +993,7 @@ function renderSummary(){
       <div class="stat"><b>${finalMean == null ? '—' : finalMean.toFixed(2)}</b><span>средняя итоговых оценок</span></div>
       <div class="stat"><b>${pasek}</b><span>pasek (≥ 4.75)</span></div>
       <div class="stat"><b>${nGrades}</b><span>оценок в периоде</span></div>
+      ${S().minGrades ? (() => { const lack = state.subjects.filter(s => gradesMissing(s, view) > 0); return `<div class="stat"><b style="color:${lack.length ? 'var(--weak)' : 'var(--strong)'}">${lack.length ? lack.length + ' предм.' : 'везде ✓'}</b><span>меньше ${S().minGrades} оценок</span></div>`; })() : ''}
     </div>
     <div class="dist">
       <div class="dist-bar" role="img" aria-label="Распределение предметов по статусу">${order.map(([k]) => counts[k] ? `<i style="width:${counts[k] / total * 100}%;background:var(--${k})"></i>` : '').join('')}</div>
@@ -997,7 +1010,7 @@ function sortedSubjects(){
     case 'name': arr.sort(cmpName); break;
     case 'avg-desc': arr.sort((x, y) => (y.a ?? -1) - (x.a ?? -1)); break;
     case 'avg-asc': arr.sort((x, y) => (x.a ?? 99) - (y.a ?? 99)); break;
-    case 'risk': arr.sort((x, y) => (risk[status(x.a).cls] - risk[status(y.a).cls]) || ((x.a ?? 99) - (y.a ?? 99))); break;
+    case 'risk': arr.sort((x, y) => ((gradesMissing(y.s, view) > 0) - (gradesMissing(x.s, view) > 0)) || (risk[status(x.a).cls] - risk[status(y.a).cls]) || ((x.a ?? 99) - (y.a ?? 99))); break;
   }
   return arr.map(x => x.s);
 }
@@ -1029,7 +1042,7 @@ function cardHTML(sub){
   return `<article class="card st-${ss.cls}${open ? ' open' : ''}" id="c-${sub.id}">
     <button type="button" class="card-head" data-act="toggle" data-sid="${sub.id}" aria-expanded="${open}">
       <div class="ch-main"><div class="ch-name">${esc(sub.name)}</div>
-        <div class="ch-meta"><span class="tag">${ss.label}</span>${ss.meta ? esc(ss.meta) : ''}</div></div>
+        <div class="ch-meta">${missTag(sub, view)}<span class="tag">${ss.label}</span>${ss.meta ? esc(ss.meta) : ''}</div></div>
       <div class="ch-avg"><span class="avg">${fmt(st.w)}</span>
         <div class="ch-sub">${st.a != null ? 'ar. ' + fmt(st.a) + ' · ' : ''}${p ? 'итог ≈ ' + p : ''}${attChip(sub)}</div></div>
       <svg class="chev" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1056,7 +1069,7 @@ function bodyHTML(sub){
       <button type="button" class="btn icon ghost" data-act="sim-remove" data-sid="${sub.id}" data-i="${i}" aria-label="Убрать">✕</button></div>`).join('');
   return `<div class="card-body">
     <section class="blk">
-      <h4>Добавить оценку <em>→ ${tsem === 1 ? 'I' : 'II'} semestr</em></h4>
+      <h4>Добавить оценку <em>→ ${tsem === 1 ? 'I' : 'II'} semestr${S().minGrades && isGraded(sub) ? ` · есть ${gradeCount(sub, String(tsem))} из ${S().minGrades}` : ''}</em></h4>
       <div class="row"><span class="seg chipsel" role="group" aria-label="Плюс/минус">${mods}</span><span class="lbl" style="min-width:auto;margin-left:6px">вес</span><span class="chipsel">${ws}</span>
         <input class="inp w-in" type="number" min="0" max="10" step="0.5" data-in="pad-w" data-sid="${sub.id}" value="${[1, 2, 3, 4, 5].includes(pad.w) ? '' : pad.w}" placeholder="др." aria-label="Другой вес"></div>
       <div class="row"><input class="inp cat-in" list="catList" placeholder="Категория (необязательно)" data-in="pad-cat" data-sid="${sub.id}" value="${esc(pad.cat)}" maxlength="80"></div>
@@ -1078,7 +1091,7 @@ function bodyHTML(sub){
     </section>
     <div class="card-foot">
       <span class="note">${sub.grades.length} оценок всего · I: ${sub.grades.filter(g => g.sem === 1).length}, II: ${sub.grades.filter(g => g.sem === 2).length}</span>
-      <span class="row"><button type="button" class="btn ghost" data-act="rename" data-sid="${sub.id}">Переименовать</button><button type="button" class="btn ghost danger" data-act="del-subject" data-sid="${sub.id}">Удалить предмет</button></span>
+      <span class="row"><label class="check small"><input type="checkbox" data-in="graded" data-sid="${sub.id}" ${isGraded(sub) ? '' : 'checked'}> без оценок</label><button type="button" class="btn ghost" data-act="rename" data-sid="${sub.id}">Переименовать</button><button type="button" class="btn ghost danger" data-act="del-subject" data-sid="${sub.id}">Удалить предмет</button></span>
     </div>
   </div>`;
 }
@@ -1271,6 +1284,7 @@ document.addEventListener('input', e => {
 document.addEventListener('change', e => {
   const el = e.target; const k = el.dataset && el.dataset.in; if (!k) return;
   const sid = el.dataset.sid;
+  if (k === 'graded') { const s = findSub(sid); s.graded = !el.checked; save(); updateCard(sid); return; }
   if (k === 'sim-v' || k === 'sim-w') {
     const g = ui.sim[sid][+el.dataset.i]; if (!g) return;
     if (k === 'sim-v') g.v = el.value; else g.w = +el.value;
@@ -1387,7 +1401,7 @@ function fillSettings(s){
   f.plus.value = s.plus; f.minus.value = s.minus; f.defaultWeight.value = s.defaultWeight; f.margin.value = s.margin;
   s.thresholds.forEach((t, i) => f['t' + i].value = t);
   f.yearMode.value = s.yearMode; f.currentSem.value = s.currentSem; f.catWeights.value = s.catWeights;
-  f.attTarget.value = s.attTarget; f.semEnd.value = s.semEnd || semEndDate();
+  f.attTarget.value = s.attTarget; f.minGrades.value = s.minGrades; f.semEnd.value = s.semEnd || semEndDate();
 }
 function openSettings(){ fillSettings(S()); $('#dlgSettings').showModal(); }
 $('#settingsForm').addEventListener('submit', e => {
@@ -1395,7 +1409,7 @@ $('#settingsForm').addEventListener('submit', e => {
   state.settings = normalizeSettings({
     plus: f.plus.value, minus: f.minus.value, defaultWeight: f.defaultWeight.value, margin: f.margin.value,
     thresholds: [0, 1, 2, 3, 4].map(i => f['t' + i].value), yearMode: f.yearMode.value, currentSem: f.currentSem.value, catWeights: f.catWeights.value,
-    attTarget: f.attTarget.value, semEnd: f.semEnd.value
+    attTarget: f.attTarget.value, minGrades: f.minGrades.value, semEnd: f.semEnd.value
   });
   ui.pad = {}; ui.help = {};
   save(); $('#dlgSettings').close(); renderAll(); toast('Настройки сохранены');
@@ -1712,6 +1726,8 @@ function renderSched(){
       if (s) {
         const st = subjStats(s, state.view || String(currentSem()));
         if (st.w != null) pills += `<span class="pill st-${status(st.w).cls}">${fmt(st.w)}</span>`;
+        const miss = gradesMissing(s, String(targetSem()));
+        if (miss) pills += `<span class="pill st-weak" title="не хватает оценок для аттестации">${S().minGrades - miss}/${S().minGrades} оц.</span>`;
         const at = attOf(s); if (at && at.pct != null) pills += `<span class="pill st-${attStatus(at.pct)}">${fmtPct(at.pct)}</span>`;
       }
       const cls = day === today ? (i === curIdx ? ' cur' : (toMin(b) <= nowM ? ' past' : '')) : '';
