@@ -1,0 +1,19 @@
+Bezpieczeństwo i higiena pracy: +
+Biologia: 5, 5, 4-
+Biznes i zarządzanie: 1
+Chemia: nb, 1(0)
+Edukacja dla bezpieczeństwa: 5, 4, 5, 5
+Edukacja zdrowotna: 5, 4
+Geografia: nb, 2-
+Informatyka: 1, 2, 3
+Język angielski: 6-, 5, 3-
+Język angielski zawodowy: 4
+Język niemiecki: 4, 4
+Język polski: 1
+Matematyka: 1(0), n
+Podstawy informatyki: 4
+Programowanie obiektowe: 1, 1
+Projektowanie i administrowanie: 1, 1, 1, 1, 1, 2, 2
+Projektowanie oprogramowania: 2
+Projektowanie stron internetowych: nb, nb, nb, nkl
+Wychowanie fizyczne: np

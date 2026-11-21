@@ -394,6 +394,7 @@ details.help code{font-size:12px;background:var(--surface);padding:0 4px;border-
 const KEY = 'moja-srednia.v1';
 const MARKS = ['1','1+','2-','2','2+','3-','3','3+','4-','4','4+','5-','5','5+','6-','6'];
 const INFO_MARKS = ['np','bz','nb','+','-'];
+const EXTRA_INFO = ['nkl','nk','zw','n'];
 const DEF_SETTINGS = {
   plus: 0.5, minus: 0.25, defaultWeight: 1, margin: 0.15,
   thresholds: [1.75, 2.75, 3.75, 4.75, 5.5],
@@ -406,14 +407,14 @@ const DEF_SETTINGS = {
 const KNOWN_SUBJECTS = ['matematyka','jezyk polski','jezyk angielski','jezyk niemiecki','jezyk hiszpanski','jezyk francuski','jezyk rosyjski','jezyk wloski','jezyk lacinski','jezyk ukrainski','jezyk kaszubski','lacina','historia','historia i terazniejszosc','wiedza o spoleczenstwie','biologia','chemia','fizyka','geografia','informatyka','plastyka','muzyka','technika','wychowanie fizyczne','edukacja dla bezpieczenstwa','religia','etyka','wychowanie do zycia w rodzinie','przyroda','podstawy przedsiebiorczosci','biznes i zarzadzanie','filozofia','zajecia z wychowawca','godzina wychowawcza','doradztwo zawodowe','edukacja zdrowotna','historia muzyki','historia sztuki','zajecia artystyczne','edukacja wczesnoszkolna','jezyk obcy'];
 const KEYWORDS = ['ocena','oceny','waga','data','kategoria','srednia','nauczyciel','przedmiot','brak','semestr','okres','opis','komentarz','przewidywan','proponowan','wystawi','dodal','kolumna','legenda','frekwencja','uwagi','punkty','lp','nr ','wynik','podsumowanie','zachowanie','zmodyfikowan','poprawa'];
 const CATEGORIES = ['sprawdzian','kartkowka','odpowiedz','praca domowa','praca klasowa','zadanie','aktywnosc','test','projekt','dyktando','wypracowanie','recytacja','cwiczenia','zeszyt','referat','prezentacja','praca na lekcji','praca w grupach','praca','inne','konkurs','olimpiada','czytanie','diagnoza','egzamin','probny','matura','wypowiedz','sprawnosc','umiejetnosci','postawa','badanie','pisanie','sluchanie','mowienie','wiersz','kolokwium','lektura'];
-const GRADE_RE = /^(np|bz|nb|[1-6][+\-]?|[+\-])$/i;
-const GRADE_START_RE = /^(np|bz|nb|[1-6][+\-]?)(?:[\(\[][^\)\]]*[\)\]])?[,;.]?$/i;
+const GRADE_RE = /^(np|bz|nb|nkl|nk|zw|n|[1-6][+\-]?|[+\-])$/i;
+const GRADE_START_RE = /^(np|bz|nb|nkl|[1-6][+\-]?)(?:[\(\[][^\)\]]*[\)\]])?[,;.]?$/i;
 
 function normTxt(s){
   return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/ł/g,'l').replace(/[ \s]+/g,' ').trim();
 }
 function startsWithAny(n, list){ return list.some(k => n === k.trim() || n.startsWith(k)); }
-function isCategory(s){ const n = normTxt(s); return n.length <= 40 && CATEGORIES.some(c => n === c || n.startsWith(c + ' ') || n.startsWith(c)); }
+function isCategory(s){ const n = normTxt(s); return n.length <= 40 && CATEGORIES.some(c => n === c || n.startsWith(c + ' ')); }
 function isKeyword(s){ const n = normTxt(s); return startsWithAny(n, KEYWORDS); }
 function nameLike(s){
   s = String(s).trim();
@@ -511,7 +512,16 @@ function parseVulcan(text, opts){
     }
   }
 
-  for (const raw of lines) {
+  const nextHasGrades = i => {
+    for (let j = i + 1; j < lines.length; j++) {
+      const l = lines[j].trim(); if (!l) continue;
+      const first = l.split(/[\s,]+/)[0].replace(/[.]+$/, '');
+      return GRADE_RE.test(first) && tokenize(l, { lastGrade: null, pendingCat: '' }).some(p => p.t === 'G');
+    }
+    return false;
+  };
+  for (let li = 0; li < lines.length; li++) {
+    const raw = lines[li];
     const line = raw.replace(/ /g, ' ').trim();
     if (!line) continue;
     const n = normTxt(line);
@@ -587,7 +597,7 @@ function parseVulcan(text, opts){
       }
     }
     if (gi === -1 && !/\d/.test(line.replace(/[\(\[]\s*\d+\s*[\)\]]/g, '')) ) {
-      if (isSubjectName(line)) { cur = getSubj(line); continue; }
+      if (isSubjectName(line) || (nameLike(line) && nextHasGrades(li))) { cur = getSubj(line); continue; }
       if (isCategory(line) && line.length <= 40) { if (ctx.lastGrade && !ctx.lastGrade.cat) ctx.lastGrade.cat = line.slice(0, 80); else ctx.pendingCat = line.slice(0, 80); continue; }
     }
     const pcs = tokenize(line, ctx);
@@ -647,7 +657,7 @@ const saveOpen = () => { try { localStorage.setItem(KEY + '.open', JSON.stringif
 /* ===================== Расчёты ===================== */
 function parseMark(v){
   v = String(v == null ? '' : v).trim().toLowerCase().replace(/[−–]/g, '-');
-  if (INFO_MARKS.includes(v)) return { info: true, label: v };
+  if (INFO_MARKS.includes(v) || EXTRA_INFO.includes(v)) return { info: true, label: v };
   const m = v.match(/^([1-6])([+\-]?)$/);
   return m ? { info: false, base: +m[1], mod: m[2] } : null;
 }
@@ -1120,7 +1130,7 @@ function catWeightMap(){
 }
 function matchExisting(name){
   const n = normTxt(name);
-  return state.subjects.find(s => normTxt(s.name) === n) || state.subjects.find(s => { const k = normTxt(s.name); return n.startsWith(k + ' ') || k.startsWith(n + ' '); }) || null;
+  return state.subjects.find(s => normTxt(s.name) === n) || state.subjects.find(s => { const k = normTxt(s.name); return n.startsWith(k + ' (') || k.startsWith(n + ' ('); }) || null;
 }
 function runParse(){
   const txt = $('#pasteArea').value;
