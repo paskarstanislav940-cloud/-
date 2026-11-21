@@ -1,8 +1,8 @@
-Pn: 6 Geografia; 7 Informatyka; 8 Edukacja zdrowotna; 9 Matematyka; 10 Edukacja dla bezpieczeństwa; 11 Podstawy informatyki; 12 Programowanie obiektowe
-Wt: 1 Historia; 2 Język angielski zawodowy; 3 Bezpieczeństwo i higiena pracy; 4 Język polski; 5-7 Wychowanie fizyczne; 8 Zajęcia z wychowawcą
-Śr: 3 Matematyka; 4 Informatyka; 5 Język angielski; 6 Programowanie obiektowe; 7 Biologia; 8 Matematyka; 9 Projektowanie i administrowanie bazami danych; 10 Projektowanie stron internetowych
-Czw: 4 Język niemiecki; 5 Język angielski; 6 Język niemiecki; 7 Projektowanie oprogramowania; 8 Fizyka
-Pt: 1 Chemia; 2 Biznes i zarządzanie; 3 Język angielski; 4 Bezpieczeństwo i higiena pracy; 5 Język polski; 6 Język polski; 7 Język angielski zawodowy; 8 Projektowanie stron internetowych
+Pn: 6 Geografia (Salamon Wojciech); 7 Informatyka (Tomczak Magdalena); 8 Edukacja zdrowotna (Pończyński Michał); 9 Matematyka (Samel Ryszard); 10 Edukacja dla bezpieczeństwa (Radzikowski Jacek)
+Wt: 1 Historia (Kozłowski Roland); 2 Język angielski zawodowy (Novik Veronika); 3 Bezpieczeństwo i higiena pracy (Kozłowski Roland); 4 Język polski (Wojtczak Katarzyna); 5-7 Wychowanie fizyczne (Franoszek Patryk); 8 Zajęcia z wychowawcą (Franoszek Patryk)
+Śr: 3 Matematyka (Samel Ryszard); 4 Informatyka (Tomczak Magdalena); 5 Język angielski (Hovorun Olha); 6 Programowanie obiektowe (Sorocińska Helena); 7 Biologia (Pończyński Michał); 8 Matematyka (Samel Ryszard); 9 Projektowanie i administrowanie bazami danych (Janiak Krzysztof); 10 Projektowanie stron internetowych (Janiak Krzysztof)
+Czw: 1 Programowanie obiektowe (Sorocińska Helena); 2 Podstawy informatyki (Sorocińska Helena); 3 Język niemiecki (Woźniewski Sebastian); 4 Język angielski (Hovorun Olha); 5 Język niemiecki (Woźniewski Sebastian); 6 Projektowanie oprogramowania (Sorocińska Helena); 7 Fizyka (Simon Grażyna)
+Pt: 1 Chemia (Kawałek-Barańska Joanna); 2 Język angielski (Hovorun Olha); 3 Biznes i zarządzanie (Skalski Krzysztof); 4 Bezpieczeństwo i higiena pracy (Kozłowski Roland); 5 Język polski (Wojtczak Katarzyna); 6 Język polski (Wojtczak Katarzyna); 7 Język angielski zawodowy (Novik Veronika); 8 Projektowanie stron internetowych (Janiak Krzysztof)
 Dzwonki
 0 7:10-7:55
 1 8:00-8:45
