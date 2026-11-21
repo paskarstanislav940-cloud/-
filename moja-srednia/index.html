@@ -779,6 +779,7 @@ function normalizeState(d){
     view: ['1', '2', 'year'].includes(d.view) ? d.view : null,
     sort: d.sort || 'order',
     tab: ['grades', 'att', 'sched'].includes(d.tab) ? d.tab : 'grades',
+    attHorizon: d.attHorizon === 'year' ? 'year' : 'sem',
     attMonths: Array.isArray(d.attMonths) ? d.attMonths.filter(m => m && m.name).map(m => ({ name: String(m.name).slice(0, 30), pct: clampNum(m.pct, 0, 0, 100), abs: clampNum(m.abs, 0, 0, 9999) })) : [],
     schedule: normalizeSchedule(d.schedule),
     subjects: (Array.isArray(d.subjects) ? d.subjects : []).map(x => ({
@@ -1205,6 +1206,7 @@ document.addEventListener('click', e => {
     case 'text-example': $('#textArea').value = textMode === 'att' ? ATT_EXAMPLE : SCHED_EXAMPLE; runText(); break;
     case 'text-import': doTextImport(); break;
     case 'att-plus': attBump(sid, false); break;
+    case 'att-horizon': state.attHorizon = el.dataset.h; save(); renderAtt(); break;
     case 'att-miss': attBump(sid, true); break;
     case 'att-edit': openAtt(sid); break;
     case 'att-clear': { const s = findSub(attEditing); if (s) { const snap = snapshot(); s.att = null; save(); $('#dlgAtt').close(); renderAll(); toast('Данные посещаемости очищены', snap); } break; }
@@ -1560,14 +1562,26 @@ function semEndDate(){
   return `${m >= 8 ? y + 1 : y}-06-25`;
 }
 function lessonsPerDay(sub){ const k = subjKey(sub.name); return state.schedule.days.map(d => d.filter(l => subjKey(l.name) === k).length); }
+function yearEndDate(){
+  const now = new Date(), y = now.getMonth() >= 8 ? now.getFullYear() + 1 : now.getFullYear();
+  for (let d = 20; d <= 26; d++) { const dt = new Date(y, 5, d); if (dt.getDay() === 5) return isoDate(dt); }
+  return `${y}-06-25`;
+}
+function easter(y){ const a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451), mo = Math.floor((h + l - 7 * m + 114) / 31), da = ((h + l - 7 * m + 114) % 31) + 1; return new Date(y, mo - 1, da); }
+function isNoSchool(d){
+  const m = d.getMonth(), day = d.getDate();
+  if ((m === 11 && day >= 23) || (m === 0 && (day === 1 || day === 6)) || (m === 10 && (day === 1 || day === 11)) || (m === 4 && (day === 1 || day === 3))) return true;
+  const e = easter(d.getFullYear()), diff = Math.round((d - e) / 864e5);
+  return (diff >= -3 && diff <= 2) || diff === 60; // wiosenna przerwa świąteczna + Boże Ciało
+}
+const attEnd = () => state.attHorizon === 'year' ? yearEndDate() : semEndDate();
 function remainingLessons(sub){
   const per = lessonsPerDay(sub); if (!per.some(Boolean)) return null;
-  const end = new Date(semEndDate() + 'T23:59:59'); let d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() + 1);
+  const end = new Date(attEnd() + 'T23:59:59'); let d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() + 1);
   let n = 0, guard = 0;
   while (d <= end && guard++ < 400) {
     const wd = d.getDay(), m = d.getMonth(), day = d.getDate();
-    const holiday = (m === 11 && day >= 23) || (m === 0 && (day === 1 || day === 6)) || (m === 10 && (day === 1 || day === 11)) || (m === 4 && (day === 1 || day === 3));
-    if (wd >= 1 && wd <= 5 && !holiday) n += per[wd - 1];
+    if (wd >= 1 && wd <= 5 && !isNoSchool(d)) n += per[wd - 1];
     d.setDate(d.getDate() + 1);
   }
   return { n, perWeek: per.reduce((a, b) => a + b, 0) };
@@ -1578,7 +1592,7 @@ function attHints(sub, a){
   const out = []; if (!a || a.total == null || a.total === 0) return out;
   const t = S().attTarget / 100, P = a.present, T = a.total, tp = S().attTarget + '%';
   const rem = remainingLessons(sub);
-  const endTxt = new Date(semEndDate() + 'T12:00:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+  const endTxt = new Date(attEnd() + 'T12:00:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
   if (P / T < t - 1e-9) {
     const x = Math.ceil((t * T - P) / (1 - t) - 1e-9);
     let msg = `Чтобы выйти на <b>${tp}</b>, нужно посетить <b>${lessonsWord(x)}</b> подряд без пропусков`;
@@ -1589,7 +1603,12 @@ function attHints(sub, a){
     const k = Math.floor(P / t - T + 1e-9);
     out.push(k > 0 ? `Запас: можно пропустить ещё <b>${lessonsWord(k)}</b> и остаться ≥ ${tp}.` : `Запаса нет: любой следующий пропуск опустит ниже ${tp}.`);
   }
-  if (rem && rem.n > 0) out.push(`<span class="muted">Если ходить на все ~${lessonsWord(rem.n)} до ${endTxt}: будет <b>${fmtPct((P + rem.n) / (T + rem.n) * 100)}</b>.</span>`);
+  if (rem && rem.n > 0) {
+    const R = rem.n, canSkip = Math.floor(R - (t * (T + R) - P) - 1e-9);
+    let line = `До ${endTxt} ~${lessonsWord(R)}: если ходить на все — <b>${fmtPct((P + R) / (T + R) * 100)}</b>`;
+    line += canSkip >= 0 ? `; чтобы закончить с ≥ ${tp}, можно пропустить не больше <b>${canSkip}</b>.` : `; ${tp} не набрать даже без пропусков.`;
+    out.push(`<span class="muted">${line}</span>`);
+  }
   return out;
 }
 function renderAtt(){
@@ -1606,7 +1625,10 @@ function renderAtt(){
   const pct = T ? (T - A) / T * 100 : null;
   const below = withAtt.filter(s => attOf(s).pct < S().attTarget).length;
   const st = attStatus(pct);
-  sum.innerHTML = `<div class="st-${st}"><div class="big" style="color:var(--st)">${fmtPct(pct)}</div><div class="big-label">посещаемость по предметам<br>${T ? `${T - A} из ${T} уроков` : ''}</div></div>
+  const hz = state.attHorizon === 'year' ? 'year' : 'sem';
+  const fmtD = iso => new Date(iso + 'T12:00:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+  const horizon = `<div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="small muted">Прогноз:</span><div class="seg"><button data-act="att-horizon" data-h="sem" class="${hz === 'sem' ? 'on' : ''}">до ${fmtD(semEndDate())}</button><button data-act="att-horizon" data-h="year" class="${hz === 'year' ? 'on' : ''}">до конца года (${fmtD(yearEndDate())})</button></div>${hz === 'year' ? '<span class="note">без учёта ferie zimowych — реально уроков будет чуть меньше</span>' : ''}</div>`;
+  sum.innerHTML = horizon + `<div class="st-${st}"><div class="big" style="color:var(--st)">${fmtPct(pct)}</div><div class="big-label">посещаемость по предметам<br>${T ? `${T - A} из ${T} уроков` : ''}</div></div>
     <div class="sum-stats">
       <div class="stat"><b style="color:var(--weak)">${abs}</b><span>nieusprawiedliwione</span></div>
       <div class="stat"><b>${absEx}</b><span>usprawiedliwione</span></div>
