@@ -3,10 +3,24 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>fioritura — solo / sites & own product</title>
+<title>fioritura — сайты на заказ и свой продукт</title>
 <meta name="description" content="fioritura — один разработчик. Сайты и лендинги на заказ напрямую, плюс свой продукт, который я собираю в одиночку.">
 <meta name="theme-color" content="#F6F5F0">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23D9381E'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' text-anchor='middle' fill='%23F6F5F0'%3Ef%3C/text%3E%3C/svg%3E">
+<meta name="author" content="fioritura">
+<meta name="robots" content="index, follow">
+<!-- OpenGraph / соцсети. Значения ниже — для краулеров (они не выполняют JS), в браузере они переписываются под выбранный язык -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="fioritura">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:locale:alternate" content="en_GB">
+<meta property="og:locale:alternate" content="uk_UA">
+<meta property="og:locale:alternate" content="pl_PL">
+<meta property="og:title" content="fioritura — сайты на заказ и свой продукт">
+<meta property="og:description" content="fioritura — один разработчик. Сайты и лендинги на заказ напрямую, плюс свой продукт, который я собираю в одиночку.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="fioritura — сайты на заказ и свой продукт">
+<meta name="twitter:description" content="fioritura — один разработчик. Сайты и лендинги на заказ напрямую, плюс свой продукт, который я собираю в одиночку.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23F6F5F0'/%3E%3Cpath d='M20.5 7.2c-1.1-.6-2.2-.9-3.3-.9-3 0-4.7 1.9-4.7 5.3V13H9.8v2.6h2.7v8.2H10v2.3h8v-2.3h-2.6v-8.2h3.6V13h-3.6v-1.4c0-1.9.7-2.8 2-2.8.7 0 1.3.2 1.9.5z' fill='%23121212'/%3E%3Ccircle cx='24' cy='24' r='3.4' fill='%23D9381E'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- Prata: кириллица (RU/UK) + латиница, но БЕЗ польских ą ę ł ś ż → для PL заголовки идут в Playfair Display.
@@ -398,6 +412,57 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 .reset:hover{color:var(--acc)}
 .sheet-note{position:absolute;right:-10px;bottom:-44px;font:700 24px/1 var(--f-hand);color:var(--acc);transform:rotate(-5deg);white-space:nowrap}
 
+/* подсветка листа, когда в него только что подставили запрос */
+.sheet.is-pulse{animation:sheetPulse 1s var(--ease)}
+@keyframes sheetPulse{
+  0%{box-shadow:0 0 0 0 rgba(217,56,30,.5),0 26px 50px -28px rgba(18,18,18,.45)}
+  100%{box-shadow:0 0 0 18px rgba(217,56,30,0),0 26px 50px -28px rgba(18,18,18,.45)}
+}
+
+/* ==========================================================================
+   Форматы работы + FAQ
+   ========================================================================== */
+.formats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px 24px;align-items:start;margin-bottom:clamp(64px,8vw,112px)}
+.fmt{
+  position:relative;background:var(--paper-hi);border-top:3px solid var(--ink);border-radius:3px;box-shadow:var(--shadow);
+  padding:24px 24px 26px;display:flex;flex-direction:column;gap:14px;min-width:0;
+  transition:box-shadow .3s,border-color .3s,transform .35s var(--ease);
+}
+.fmt:nth-child(2){margin-top:36px}
+.fmt:nth-child(3){margin-top:72px}
+.fmt:hover{transform:translateY(-4px)}
+.fmt.is-picked{border-top-color:var(--acc);box-shadow:0 0 0 2px var(--acc),var(--shadow)}
+.fmt-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.fmt-n{font:700 32px/1 var(--f-hand);color:var(--acc)}
+.fmt .kicker{margin:0}
+.fmt h3{margin:0;font:400 clamp(24px,2.2vw,32px)/1.1 var(--f-display);letter-spacing:-.01em}
+.fmt-for{margin:0;color:var(--ink-2);font-size:15.5px}
+.fmt ul{list-style:none;margin:0;padding:0;border-top:1px dashed var(--line-2)}
+.fmt li{position:relative;padding:9px 0 9px 22px;border-bottom:1px dashed var(--line-2);font-size:15px}
+.fmt li::before{content:"+";position:absolute;left:2px;color:var(--acc);font-weight:700}
+.fmt .btn{margin-top:6px;align-self:flex-start;padding:14px 18px;font-size:15px}
+.fmt.is-picked .btn{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.fmt.is-picked .btn .ar{display:none}
+
+.faq{display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
+.faq-h{grid-column:1 / 5}
+.faq-h h3{margin:0 0 10px;font:400 clamp(30px,3.2vw,46px)/1.05 var(--f-display);letter-spacing:-.015em}
+.faq-h .hand{font-size:26px;color:var(--acc);display:block;transform:rotate(-2deg)}
+.faq-list{grid-column:5 / 13;border-top:2px solid var(--ink);min-width:0}
+.faq-list details{border-bottom:1px solid var(--line)}
+.faq-list summary{
+  list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:18px;
+  padding:22px 0;font:400 clamp(20px,1.8vw,26px)/1.2 var(--f-display);
+}
+.faq-list summary::-webkit-details-marker{display:none}
+.faq-list summary i{
+  flex:none;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--ink);display:grid;place-items:center;
+  font-style:normal;font:500 20px/1 var(--f-text);transition:transform .35s var(--ease),background .2s,color .2s;
+}
+.faq-list summary:hover i{background:var(--ink);color:var(--paper)}
+.faq-list details[open] summary i{transform:rotate(45deg);background:var(--acc);border-color:var(--acc);color:var(--paper)}
+.faq-list details p{margin:0 0 22px;max-width:62ch;color:var(--ink-2);font-size:16px}
+
 /* мобильный док */
 .dock{
   position:fixed;left:12px;right:12px;bottom:max(12px, env(safe-area-inset-bottom));z-index:60;display:none;gap:6px;align-items:center;
@@ -476,6 +541,18 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
   .dock{display:flex}
   .contacts-l,.c-list{grid-column:1 / 13}
   .toast{bottom:84px}
+  .formats{grid-template-columns:1fr;gap:22px}
+  .fmt:nth-child(n){margin-top:0}
+  .faq-h,.faq-list{grid-column:1 / 13}
+}
+/* лист запроса на телефоне: без пустого поля под текстом — шкала и кнопки сразу после сообщения */
+@media (max-width:767px){
+  .msg{min-height:0}
+  .msg p:last-child{margin-bottom:0}
+  .ready{margin:16px 0 14px;padding-top:14px}
+  .sheet{padding:28px 18px 20px}
+  .sheet-h{margin-bottom:14px;padding-bottom:12px}
+  .sheet-foot{margin-top:12px}
 }
 @media (max-width:620px){
   body{font-size:16px}
@@ -527,6 +604,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
     <span class="top-note" data-i="nav.note"></span>
     <nav class="top-nav" data-iaria="nav.aria">
       <a href="#build" data-i="nav.build"></a>
+      <a href="#formats" data-i="nav.formats"></a>
       <a href="#contact" data-i="nav.contact"></a>
       <a href="#order" class="pill"><span class="l" data-i="nav.order"></span><span class="s" data-i="nav.orderShort"></span></a>
       <div class="lang" role="group" data-lang-switch data-iaria="lang"></div>
@@ -598,6 +676,27 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
     </div>
 
     <div class="wall" id="wall"></div>
+  </div>
+</section>
+
+<!-- ======================================================================
+     ФОРМАТЫ РАБОТЫ + FAQ (тексты — I18N.<язык>.formats)
+     ====================================================================== -->
+<section class="sec" id="formats" aria-labelledby="formatsTitle">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num" data-in data-i="formats.num"></div>
+      <h2 class="sec-title" id="formatsTitle" data-in data-ih="formats.title"></h2>
+      <p class="sec-lede" data-in data-i="formats.lede"></p>
+    </div>
+    <div class="formats" id="formatList"></div>
+    <div class="faq">
+      <div class="faq-h" data-in>
+        <h3 data-i="formats.faqTitle"></h3>
+        <span class="hand" data-i="formats.faqHand"></span>
+      </div>
+      <div class="faq-list" id="faqList" data-in></div>
+    </div>
   </div>
 </section>
 
@@ -733,9 +832,9 @@ const LOCALE = {en:'en-GB', ru:'ru-RU', uk:'uk-UA', pl:'pl-PL'};   // для д�
 const I18N = {
   /* ----------------------------------------------------------------- RU */
   ru: {
-    meta:{ description:'fioritura — один разработчик. Сайты и лендинги на заказ напрямую, плюс свой продукт, который я собираю в одиночку.' },
+    meta:{ title:'fioritura — сайты на заказ и свой продукт', description:'fioritura — один разработчик. Сайты и лендинги на заказ напрямую, плюс свой продукт, который я собираю в одиночку.' },
     lang:'Язык',
-    nav:{ home:'fioritura — наверх', aria:'Навигация', note:'соло / сайты и свой продукт', build:'Что в сборке', contact:'Контакты', order:'Собрать запрос', orderShort:'Запрос' },
+    nav:{ home:'fioritura — наверх', aria:'Навигация', note:'соло / сайты и свой продукт', build:'Что в сборке', formats:'Форматы', contact:'Контакты', order:'Собрать запрос', orderShort:'Запрос' },
     hero:{
       h1:['{c}Один{/c} человек.', 'Сайты на заказ', 'и {u}свой продукт.{/u}'],
       note:'без менеджеров и брифов на сорок страниц',
@@ -756,7 +855,7 @@ const I18N = {
     },
     press:{ never:'ещё не нажимали', count:'нажато {n} {w}', forms:{one:'раз', few:'раза', many:'раз', other:'раза'}, more:' — понравилось же' },
     order:{
-      num:'№2 — заказ', title:'Соберите запрос <em>за минуту</em>',
+      num:'№3 — заказ', title:'Соберите запрос <em>за минуту</em>',
       lede:'Формы не будет. Кликайте по вариантам — рядом сразу пишется готовое сообщение. Скопируйте его или откройте Telegram с уже вставленным текстом. Отправляете вы, когда захотите.',
       sheetTitle:'Запрос на сайт', to:'кому:', ready:'собрано {n} из 5', readyDone:'запрос готов ✓',
       copy:'Скопировать запрос', tg:'Открыть в Telegram', mail:'Письмом',
@@ -764,11 +863,13 @@ const I18N = {
       reset:'начать заново', note:'отвечаю сам ↑',
       dockText:'запрос пишется сам', dockReady:'{n} из 5', dockDone:'готово ✓', dockCopy:'Копировать', dockTg:'В Telegram',
       extraTitle:'Пара слов от вас', extraSub:'необязательно, но очень помогает',
-      about:'О проекте', aboutPh:'Например: открываю студию керамики, нужен сайт с расписанием мастер-классов',
+      about:'О проекте', aboutPh:'Например: ',
+      aboutEx:['Открываю студию керамики — нужен сайт с расписанием и записью на мастер-классы', 'Запускаю приложение для бега — нужен лендинг под предзаказ', 'Хочу проверить идею сервиса — нужен кликабельный прототип', 'Свадебный фотограф — нужно портфолио, не похожее на шаблон'],
       links:'Ссылки, которые нравятся', linksPh:'ссылка или две', name:'Как к вам обращаться', namePh:'Имя', date:'Когда запуск'
     },
     /* вопросы конструктора: ключи вариантов совпадают с Q ниже */
     q:{
+      format:{ title:'Формат работы', sub:'можно выбрать и в блоке выше', opts:{launch:'Быстрый запуск', proto:'Вайбкод-прототип / MVP', custom:'Индивидуальная сборка'} },
       what:{ title:'Что нужно', opts:{landing:'Лендинг', promo:'Промо-сайт', card:'Сайт-визитка / портфолио', proto:'Прототип продукта', unsure:'Пока не знаю — помоги решить'} },
       when:{ title:'Когда', opts:{fast:'Быстро, до недели', calm:'Без спешки', date:'Есть дата запуска'} },
       how:{ title:'Как работаем', opts:{sprint:'Вайбкод-спринт вместе — собираем вживую', solo:'Собираешь сам, показываешь итерации', talk:'Сначала просто обсудить'} },
@@ -778,6 +879,7 @@ const I18N = {
     },
     /* как варианты звучат внутри сообщения */
     phrase:{
+      format:{launch:'быстрый запуск — лендинг или промо-сайт', proto:'вайбкод-прототип — MVP под гипотезу', custom:'индивидуальная сборка под задачу'},
       what:{landing:'лендинг', promo:'промо-сайт', card:'сайт-визитку', proto:'прототип продукта'},
       when:{fast:'быстро, хочется уложиться в неделю', calm:'без спешки, важнее сделать хорошо', date:'есть дата запуска'},
       how:{sprint:'вайбкод-спринт вместе — хочу видеть, как собирается', solo:'собираешь сам, а я смотрю итерации', talk:'сначала просто обсудить'},
@@ -789,12 +891,32 @@ const I18N = {
     msg:{
       hello:'Привет!', helloName:'Привет! Меня зовут {name}.', want:'Хочу собрать с тобой <b>{what}</b>.',
       unsure:'Нужен сайт, но пока не понимаю, какой именно. <b>Поможешь решить?</b>', placeholder:'Нужен… (выберите, что именно)',
-      when:'Срок: <b>{v}</b>.', how:'Формат: <b>{v}</b>.', have:'Что уже есть: {v}.', care:'Важно: {v}.',
+      when:'Срок: <b>{v}</b>.', format:'Формат: <b>{v}</b>.', how:'Как работаем: <b>{v}</b>.', have:'Что уже есть: {v}.', care:'Важно: {v}.',
       about:'О проекте: {v}', links:'Нравится: {v}', budget:'Бюджет: {v}.', end:'Когда сможешь посмотреть?',
-      and:' и ', fallback:'Привет! Хочу обсудить сайт.', subject:'Запрос на сайт'
+      and:' и ', template:['Привет! Хочу обсудить сайт.', 'Что нужно: …', 'Срок: …', 'О проекте: …', 'Когда сможешь посмотреть?'], subject:'Запрос на сайт'
+    },
+    formats:{
+      num:'№2 — форматы', title:'Как можно <em>работать вместе</em>',
+      lede:'Три понятных формата. Без цен с потолка: стоимость зависит от задачи, и я называю её после короткого разбора — до начала работы.',
+      cta:'Выбрать этот формат', picked:'Выбрано ✓',
+      items:{
+        launch:{ tag:'Быстрый запуск', title:'Лендинг или промо-сайт', for:'Когда нужно показать продукт, событие или услугу — и не через месяц.',
+                 gets:['Первый экран и структура под одно целевое действие', 'Адаптив, скорость, деплой на ваш домен', 'Живая ссылка с первых дней, правки — по ней'] },
+        proto:{  tag:'Вайбкод-прототип', title:'MVP под гипотезу', for:'Когда идею нужно проверить на людях, а не обсуждать на созвонах.',
+                 gets:['Кликабельный прототип с настоящей логикой, а не картинки', 'Собираем вживую, решения — сразу в коде', 'Понятно, что оставить, а что выкинуть перед разработкой'] },
+        custom:{ tag:'Под задачу', title:'Индивидуальная сборка', for:'Когда задача не влезает в шаблон: нестандартный интерфейс, интерактив, интеграции.',
+                 gets:['Сначала разбор: что действительно нужно', 'Предлагаю формат и этапы под вашу задачу', 'Работаю, пока результат не станет рабочим'] },
+      },
+      faqTitle:'Честно о главном', faqHand:'то, что обычно спрашивают первым',
+      faq:[
+        {q:'Сколько это займёт?', a:'Первую живую ссылку показываю в первые дни работы — дальше она растёт у вас на глазах. Точный срок называю после разбора задачи, а не до, и сразу говорю, от чего он зависит.'},
+        {q:'Как устроены правки?', a:'Правки — по живой сборке, короткими кругами: вы смотрите, пишете, я исправляю. Сколько кругов входит в работу, договариваемся на старте, чтобы обоим было спокойно.'},
+        {q:'Как с оплатой?', a:'По этапам: предоплата за старт, остальное — по готовности этапа или перед запуском. Схему и сумму фиксируем в переписке до начала работы — без сюрпризов в конце.'},
+        {q:'Вы один. А если что-то пойдёт не так?', a:'Зато вы говорите с тем, кто делает, — без испорченного телефона. Код, доступы и домен остаются у вас, развивать сайт дальше можно с кем угодно. Если задача не моя — скажу сразу и не возьмусь.'},
+      ]
     },
     contact:{
-      num:'№3 — связь', title:'Напишите. <em>Отвечаю сам.</em>',
+      num:'№4 — связь', title:'Напишите. <em>Отвечаю сам.</em>',
       p:'Без форм и без «оставьте заявку, менеджер свяжется». Быстрее всего — Telegram. Хотите следить за продуктом — GitHub и X.',
       link:'Или сначала соберите запрос ↑', hand:'нажали — скопировалось',
       mail:'Почта', ghText:'код и сборки', xText:'процесс по ходу',
@@ -806,15 +928,16 @@ const I18N = {
       brief:'запрос скопирован', briefText:'Вставьте его в Telegram или в письмо', briefFail:'Выделите текст в листе вручную',
       tg:'текст скопирован', tgText:'Если поле ввода пустое, просто вставьте (Ctrl+V / Cmd+V)',
       tgFail:'не удалось скопировать', tgFailText:'Скопируйте текст из листа вручную',
+      fmt:'формат в запросе', fmtText:'Текст уже собран — проверьте и отправьте',
       reset:'чистый лист', resetText:'Начинаем заново'
     },
   },
 
   /* ----------------------------------------------------------------- EN */
   en: {
-    meta:{ description:'fioritura — a solo developer. Custom websites and landing pages built directly with you, plus an own product built alone.' },
+    meta:{ title:'fioritura — websites to order & own product', description:'fioritura — a solo developer. Custom websites and landing pages built directly with you, plus an own product built alone.' },
     lang:'Language',
-    nav:{ home:'fioritura — back to top', aria:'Navigation', note:'solo / sites & own product', build:'On the desk', contact:'Contact', order:'Build a request', orderShort:'Request' },
+    nav:{ home:'fioritura — back to top', aria:'Navigation', note:'solo / sites & own product', build:'On the desk', formats:'Formats', contact:'Contact', order:'Build a request', orderShort:'Request' },
     hero:{
       h1:['{c}One{/c} person.', 'Websites to order', 'and {u}my own product.{/u}'],
       note:'no managers, no forty-page briefs',
@@ -835,7 +958,7 @@ const I18N = {
     },
     press:{ never:'not pressed yet', count:'pressed {n} {w}', forms:{one:'time', other:'times'}, more:' — told you it feels good' },
     order:{
-      num:'No. 2 — order', title:'Build a request <em>in a minute</em>',
+      num:'No. 3 — order', title:'Build a request <em>in a minute</em>',
       lede:'No form. Click the options — a ready message writes itself next to them. Copy it or open Telegram with the text already in. You send it, whenever you like.',
       sheetTitle:'Website request', to:'to:', ready:'{n} of 5 filled', readyDone:'request ready ✓',
       copy:'Copy request', tg:'Open in Telegram', mail:'By email',
@@ -843,10 +966,12 @@ const I18N = {
       reset:'start over', note:'I reply myself ↑',
       dockText:'the request writes itself', dockReady:'{n} of 5', dockDone:'ready ✓', dockCopy:'Copy', dockTg:'To Telegram',
       extraTitle:'A few words from you', extraSub:'optional, but it helps a lot',
-      about:'About the project', aboutPh:'E.g.: opening a ceramics studio, need a site with a workshop schedule',
+      about:'About the project', aboutPh:'E.g.: ',
+      aboutEx:['Opening a ceramics studio — need a site with a schedule and workshop sign-ups', 'Launching a running app — need a landing page for pre-orders', 'Want to test a service idea — need a clickable prototype', 'Wedding photographer — need a portfolio that doesn’t look like a template'],
       links:'Links you like', linksPh:'a link or two', name:'What should I call you', namePh:'Name', date:'Launch date'
     },
     q:{
+      format:{ title:'Work format', sub:'you can also pick one in the block above', opts:{launch:'Fast launch', proto:'Vibe-coded prototype / MVP', custom:'Custom build'} },
       what:{ title:'What you need', opts:{landing:'Landing page', promo:'Promo site', card:'Business card site / portfolio', proto:'Product prototype', unsure:'Not sure yet — help me decide'} },
       when:{ title:'When', opts:{fast:'Fast, within a week', calm:'No rush', date:'There’s a launch date'} },
       how:{ title:'How we work', opts:{sprint:'Vibe-coding sprint together — building live', solo:'You build, show me iterations', talk:'Just talk it through first'} },
@@ -855,6 +980,7 @@ const I18N = {
       budget:{ title:'Budget', opts:{talk:'Let’s discuss', have:'I have a figure — will tell you'} },
     },
     phrase:{
+      format:{launch:'fast launch — landing page or promo site', proto:'vibe-coded prototype — MVP for a hypothesis', custom:'custom build for the task'},
       what:{landing:'a landing page', promo:'a promo site', card:'a business card site', proto:'a product prototype'},
       when:{fast:'fast, ideally within a week', calm:'no rush, quality matters more', date:'there’s a launch date'},
       how:{sprint:'a vibe-coding sprint together — I want to watch it being built', solo:'you build, I review the iterations', talk:'just talk it through first'},
@@ -865,12 +991,32 @@ const I18N = {
     msg:{
       hello:'Hi!', helloName:'Hi! I’m {name}.', want:'I’d like to build <b>{what}</b> with you.',
       unsure:'I need a site, but I’m not sure what kind yet. <b>Can you help me decide?</b>', placeholder:'I need… (pick what exactly)',
-      when:'Timeline: <b>{v}</b>.', how:'Format: <b>{v}</b>.', have:'What I have: {v}.', care:'What matters: {v}.',
+      when:'Timeline: <b>{v}</b>.', format:'Format: <b>{v}</b>.', how:'How we work: <b>{v}</b>.', have:'What I have: {v}.', care:'What matters: {v}.',
       about:'About the project: {v}', links:'I like: {v}', budget:'Budget: {v}.', end:'When could you take a look?',
-      and:' and ', fallback:'Hi! I’d like to talk about a website.', subject:'Website request'
+      and:' and ', template:['Hi! I’d like to talk about a website.', 'What I need: …', 'Timeline: …', 'About the project: …', 'When could you take a look?'], subject:'Website request'
+    },
+    formats:{
+      num:'No. 2 — formats', title:'How we can <em>work together</em>',
+      lede:'Three clear formats. No made-up price tags: the cost depends on the task, and I name it after a short breakdown — before any work starts.',
+      cta:'Pick this format', picked:'Selected ✓',
+      items:{
+        launch:{ tag:'Fast launch', title:'Landing page or promo site', for:'When you need to show a product, event or service — and not a month from now.',
+                 gets:['A first screen and structure built around one target action', 'Responsive, fast, deployed to your domain', 'A live link early on, edits made on it'] },
+        proto:{  tag:'Vibe-coded prototype', title:'MVP for a hypothesis', for:'When an idea needs testing on real people, not discussing on calls.',
+                 gets:['A clickable prototype with real logic, not pictures', 'We build live; decisions go straight into code', 'Clear what to keep and what to drop before full development'] },
+        custom:{ tag:'Built for the task', title:'Custom build', for:'When the task doesn’t fit a template: an unusual interface, interactivity, integrations.',
+                 gets:['A breakdown first: what you actually need', 'I propose a format and stages for your task', 'I keep going until the result actually works'] },
+      },
+      faqTitle:'Straight answers', faqHand:'what people usually ask first',
+      faq:[
+        {q:'How long will it take?', a:'I show the first live link in the first days of work — then it grows in front of you. I give an exact timeline after breaking down the task, not before, and say up front what it depends on.'},
+        {q:'How do revisions work?', a:'Revisions happen on the live build, in short rounds: you look, write, I fix. We agree at the start how many rounds are included, so we’re both relaxed about it.'},
+        {q:'What about payment?', a:'In stages: a prepayment to start, the rest when a stage is done or before launch. We fix the scheme and amount in writing before work begins — no surprises at the end.'},
+        {q:'You’re one person. What if something goes wrong?', a:'On the upside, you talk to the person who builds — nothing gets lost in translation. The code, access and domain stay with you, so anyone can develop the site further. If a task isn’t for me, I’ll say so right away and won’t take it.'},
+      ]
     },
     contact:{
-      num:'No. 3 — contact', title:'Write to me. <em>I reply myself.</em>',
+      num:'No. 4 — contact', title:'Write to me. <em>I reply myself.</em>',
       p:'No forms, no “leave a request and a manager will get back to you”. Telegram is fastest. Want to follow the product — GitHub and X.',
       link:'Or build a request first ↑', hand:'click — it’s copied',
       mail:'Email', ghText:'code and builds', xText:'process as it happens',
@@ -882,15 +1028,16 @@ const I18N = {
       brief:'request copied', briefText:'Paste it into Telegram or an email', briefFail:'Select the text on the sheet manually',
       tg:'text copied', tgText:'If the input field is empty, just paste (Ctrl+V / Cmd+V)',
       tgFail:'couldn’t copy', tgFailText:'Copy the text from the sheet manually',
+      fmt:'format added', fmtText:'The message is ready — check it and send',
       reset:'clean sheet', resetText:'Starting over'
     },
   },
 
   /* ----------------------------------------------------------------- UK */
   uk: {
-    meta:{ description:'fioritura — один розробник. Сайти й лендинги на замовлення напряму, а також власний продукт, який я збираю сам.' },
+    meta:{ title:'fioritura — сайти на замовлення і свій продукт', description:'fioritura — один розробник. Сайти й лендинги на замовлення напряму, а також власний продукт, який я збираю сам.' },
     lang:'Мова',
-    nav:{ home:'fioritura — нагору', aria:'Навігація', note:'соло / сайти і свій продукт', build:'Що в збірці', contact:'Контакти', order:'Зібрати запит', orderShort:'Запит' },
+    nav:{ home:'fioritura — нагору', aria:'Навігація', note:'соло / сайти і свій продукт', build:'Що в збірці', formats:'Формати', contact:'Контакти', order:'Зібрати запит', orderShort:'Запит' },
     hero:{
       h1:['{c}Одна{/c} людина.', 'Сайти на замовлення', 'і {u}свій продукт.{/u}'],
       note:'без менеджерів і брифів на сорок сторінок',
@@ -911,7 +1058,7 @@ const I18N = {
     },
     press:{ never:'ще не натискали', count:'натиснуто {n} {w}', forms:{one:'раз', few:'рази', many:'разів', other:'рази'}, more:' — сподобалося ж' },
     order:{
-      num:'№2 — замовлення', title:'Зберіть запит <em>за хвилину</em>',
+      num:'№3 — замовлення', title:'Зберіть запит <em>за хвилину</em>',
       lede:'Форми не буде. Клацайте варіанти — поруч одразу пишеться готове повідомлення. Скопіюйте його або відкрийте Telegram з уже вставленим текстом. Надсилаєте ви, коли захочете.',
       sheetTitle:'Запит на сайт', to:'кому:', ready:'зібрано {n} з 5', readyDone:'запит готовий ✓',
       copy:'Скопіювати запит', tg:'Відкрити в Telegram', mail:'Листом',
@@ -919,10 +1066,12 @@ const I18N = {
       reset:'почати заново', note:'відповідаю сам ↑',
       dockText:'запит пишеться сам', dockReady:'{n} з 5', dockDone:'готово ✓', dockCopy:'Копіювати', dockTg:'У Telegram',
       extraTitle:'Кілька слів від вас', extraSub:'необов’язково, але дуже допомагає',
-      about:'Про проєкт', aboutPh:'Наприклад: відкриваю студію кераміки, потрібен сайт із розкладом майстер-класів',
+      about:'Про проєкт', aboutPh:'Наприклад: ',
+      aboutEx:['Відкриваю студію кераміки — потрібен сайт із розкладом і записом на майстер-класи', 'Запускаю застосунок для бігу — потрібен лендинг під передзамовлення', 'Хочу перевірити ідею сервісу — потрібен клікабельний прототип', 'Весільний фотограф — потрібне портфоліо, не схоже на шаблон'],
       links:'Посилання, які подобаються', linksPh:'посилання чи два', name:'Як до вас звертатися', namePh:'Ім’я', date:'Коли запуск'
     },
     q:{
+      format:{ title:'Формат роботи', sub:'можна обрати й у блоці вище', opts:{launch:'Швидкий запуск', proto:'Вайбкод-прототип / MVP', custom:'Індивідуальна збірка'} },
       what:{ title:'Що потрібно', opts:{landing:'Лендинг', promo:'Промо-сайт', card:'Сайт-візитка / портфоліо', proto:'Прототип продукту', unsure:'Поки не знаю — допоможи вирішити'} },
       when:{ title:'Коли', opts:{fast:'Швидко, до тижня', calm:'Без поспіху', date:'Є дата запуску'} },
       how:{ title:'Як працюємо', opts:{sprint:'Вайбкод-спринт разом — збираємо наживо', solo:'Збираєш сам, показуєш ітерації', talk:'Спершу просто обговорити'} },
@@ -931,6 +1080,7 @@ const I18N = {
       budget:{ title:'Бюджет', opts:{talk:'Обговоримо', have:'Орієнтир є — напишу'} },
     },
     phrase:{
+      format:{launch:'швидкий запуск — лендинг або промо-сайт', proto:'вайбкод-прототип — MVP під гіпотезу', custom:'індивідуальна збірка під задачу'},
       what:{landing:'лендинг', promo:'промо-сайт', card:'сайт-візитку', proto:'прототип продукту'},
       when:{fast:'швидко, хочеться вкластися в тиждень', calm:'без поспіху, важливіше зробити добре', date:'є дата запуску'},
       how:{sprint:'вайбкод-спринт разом — хочу бачити, як збирається', solo:'збираєш сам, а я дивлюся ітерації', talk:'спершу просто обговорити'},
@@ -941,12 +1091,32 @@ const I18N = {
     msg:{
       hello:'Привіт!', helloName:'Привіт! Мене звати {name}.', want:'Хочу зібрати з тобою <b>{what}</b>.',
       unsure:'Потрібен сайт, але поки не розумію, який саме. <b>Допоможеш вирішити?</b>', placeholder:'Потрібен… (оберіть, що саме)',
-      when:'Термін: <b>{v}</b>.', how:'Формат: <b>{v}</b>.', have:'Що вже є: {v}.', care:'Важливо: {v}.',
+      when:'Термін: <b>{v}</b>.', format:'Формат: <b>{v}</b>.', how:'Як працюємо: <b>{v}</b>.', have:'Що вже є: {v}.', care:'Важливо: {v}.',
       about:'Про проєкт: {v}', links:'Подобається: {v}', budget:'Бюджет: {v}.', end:'Коли зможеш подивитися?',
-      and:' і ', fallback:'Привіт! Хочу обговорити сайт.', subject:'Запит на сайт'
+      and:' і ', template:['Привіт! Хочу обговорити сайт.', 'Що потрібно: …', 'Термін: …', 'Про проєкт: …', 'Коли зможеш подивитися?'], subject:'Запит на сайт'
+    },
+    formats:{
+      num:'№2 — формати', title:'Як можна <em>працювати разом</em>',
+      lede:'Три зрозумілі формати. Без цін зі стелі: вартість залежить від задачі, і я називаю її після короткого розбору — до початку роботи.',
+      cta:'Обрати цей формат', picked:'Обрано ✓',
+      items:{
+        launch:{ tag:'Швидкий запуск', title:'Лендинг або промо-сайт', for:'Коли треба показати продукт, подію чи послугу — і не за місяць.',
+                 gets:['Перший екран і структура під одну цільову дію', 'Адаптив, швидкість, деплой на ваш домен', 'Живе посилання з перших днів, правки — по ньому'] },
+        proto:{  tag:'Вайбкод-прототип', title:'MVP під гіпотезу', for:'Коли ідею треба перевірити на людях, а не обговорювати на дзвінках.',
+                 gets:['Клікабельний прототип зі справжньою логікою, а не картинки', 'Збираємо наживо, рішення — одразу в коді', 'Зрозуміло, що залишити, а що викинути перед розробкою'] },
+        custom:{ tag:'Під задачу', title:'Індивідуальна збірка', for:'Коли задача не влазить у шаблон: нестандартний інтерфейс, інтерактив, інтеграції.',
+                 gets:['Спершу розбір: що справді потрібно', 'Пропоную формат і етапи під вашу задачу', 'Працюю, доки результат не стане робочим'] },
+      },
+      faqTitle:'Чесно про головне', faqHand:'те, що зазвичай питають першим',
+      faq:[
+        {q:'Скільки це займе?', a:'Перше живе посилання показую в перші дні роботи — далі воно росте у вас на очах. Точний термін називаю після розбору задачі, а не до, і одразу кажу, від чого він залежить.'},
+        {q:'Як влаштовані правки?', a:'Правки — по живій збірці, короткими колами: ви дивитеся, пишете, я виправляю. Скільки кіл входить у роботу, домовляємося на старті, щоб обом було спокійно.'},
+        {q:'Як з оплатою?', a:'За етапами: передоплата за старт, решта — після готовності етапу або перед запуском. Схему й суму фіксуємо в листуванні до початку роботи — без сюрпризів наприкінці.'},
+        {q:'Ви один. А якщо щось піде не так?', a:'Зате ви говорите з тим, хто робить, — без зіпсованого телефону. Код, доступи й домен залишаються у вас, розвивати сайт далі можна з ким завгодно. Якщо задача не моя — скажу одразу й не візьмуся.'},
+      ]
     },
     contact:{
-      num:'№3 — зв’язок', title:'Напишіть. <em>Відповідаю сам.</em>',
+      num:'№4 — зв’язок', title:'Напишіть. <em>Відповідаю сам.</em>',
       p:'Без форм і без «залиште заявку, менеджер зв’яжеться». Найшвидше — Telegram. Хочете стежити за продуктом — GitHub і X.',
       link:'Або спершу зберіть запит ↑', hand:'натиснули — скопіювалося',
       mail:'Пошта', ghText:'код і збірки', xText:'процес по ходу',
@@ -958,15 +1128,16 @@ const I18N = {
       brief:'запит скопійовано', briefText:'Вставте його в Telegram або в лист', briefFail:'Виділіть текст на аркуші вручну',
       tg:'текст скопійовано', tgText:'Якщо поле введення порожнє, просто вставте (Ctrl+V / Cmd+V)',
       tgFail:'не вдалося скопіювати', tgFailText:'Скопіюйте текст з аркуша вручну',
+      fmt:'формат у запиті', fmtText:'Текст уже зібрано — перевірте й надішліть',
       reset:'чистий аркуш', resetText:'Починаємо заново'
     },
   },
 
   /* ----------------------------------------------------------------- PL */
   pl: {
-    meta:{ description:'fioritura — jeden programista. Strony i landing page’e na zamówienie bezpośrednio, a do tego własny produkt budowany w pojedynkę.' },
+    meta:{ title:'fioritura — strony na zamówienie i własny produkt', description:'fioritura — jeden programista. Strony i landing page’e na zamówienie bezpośrednio, a do tego własny produkt budowany w pojedynkę.' },
     lang:'Język',
-    nav:{ home:'fioritura — do góry', aria:'Nawigacja', note:'solo / strony i własny produkt', build:'Co na stole', contact:'Kontakt', order:'Złóż zapytanie', orderShort:'Zapytanie' },
+    nav:{ home:'fioritura — do góry', aria:'Nawigacja', note:'solo / strony i własny produkt', build:'Co na stole', formats:'Formaty', contact:'Kontakt', order:'Złóż zapytanie', orderShort:'Zapytanie' },
     hero:{
       h1:['{c}Jedna{/c} osoba.', 'Strony na zamówienie', 'i {u}własny produkt.{/u}'],
       note:'bez managerów i briefów na czterdzieści stron',
@@ -987,7 +1158,7 @@ const I18N = {
     },
     press:{ never:'jeszcze nie naciśnięty', count:'naciśnięto {n} {w}', forms:{one:'raz', few:'razy', many:'razy', other:'razy'}, more:' — no właśnie, przyjemne' },
     order:{
-      num:'Nr 2 — zamówienie', title:'Złóż zapytanie <em>w minutę</em>',
+      num:'Nr 3 — zamówienie', title:'Złóż zapytanie <em>w minutę</em>',
       lede:'Formularza nie będzie. Klikaj w opcje — obok od razu powstaje gotowa wiadomość. Skopiuj ją albo otwórz Telegram z wklejonym tekstem. Wysyłasz Ty, kiedy chcesz.',
       sheetTitle:'Zapytanie o stronę', to:'do:', ready:'gotowe {n} z 5', readyDone:'zapytanie gotowe ✓',
       copy:'Skopiuj zapytanie', tg:'Otwórz w Telegramie', mail:'Mailem',
@@ -995,10 +1166,12 @@ const I18N = {
       reset:'zacznij od nowa', note:'odpowiadam osobiście ↑',
       dockText:'zapytanie pisze się samo', dockReady:'{n} z 5', dockDone:'gotowe ✓', dockCopy:'Kopiuj', dockTg:'Do Telegrama',
       extraTitle:'Kilka słów od Ciebie', extraSub:'opcjonalnie, ale bardzo pomaga',
-      about:'O projekcie', aboutPh:'Np.: otwieram pracownię ceramiki, potrzebuję strony z grafikiem warsztatów',
+      about:'O projekcie', aboutPh:'Np.: ',
+      aboutEx:['Otwieram pracownię ceramiki — potrzebuję strony z grafikiem i zapisami na warsztaty', 'Startuję z aplikacją do biegania — potrzebuję landing page’a pod przedsprzedaż', 'Chcę sprawdzić pomysł na usługę — potrzebuję klikalnego prototypu', 'Fotograf ślubny — potrzebuję portfolio, które nie wygląda jak szablon'],
       links:'Linki, które Ci się podobają', linksPh:'link lub dwa', name:'Jak się do Ciebie zwracać', namePh:'Imię', date:'Data startu'
     },
     q:{
+      format:{ title:'Format współpracy', sub:'możesz też wybrać w bloku wyżej', opts:{launch:'Szybki start', proto:'Prototyp vibe-coding / MVP', custom:'Indywidualny projekt'} },
       what:{ title:'Czego potrzebujesz', opts:{landing:'Landing page', promo:'Strona promocyjna', card:'Wizytówka / portfolio', proto:'Prototyp produktu', unsure:'Jeszcze nie wiem — pomóż wybrać'} },
       when:{ title:'Kiedy', opts:{fast:'Szybko, do tygodnia', calm:'Bez pośpiechu', date:'Jest data startu'} },
       how:{ title:'Jak pracujemy', opts:{sprint:'Sprint vibe-codingu razem — budujemy na żywo', solo:'Budujesz sam, pokazujesz iteracje', talk:'Najpierw po prostu porozmawiać'} },
@@ -1007,6 +1180,7 @@ const I18N = {
       budget:{ title:'Budżet', opts:{talk:'Do ustalenia', have:'Mam widełki — napiszę'} },
     },
     phrase:{
+      format:{launch:'szybki start — landing page lub strona promocyjna', proto:'prototyp vibe-coding — MVP pod hipotezę', custom:'indywidualny projekt pod zadanie'},
       what:{landing:'landing page', promo:'stronę promocyjną', card:'stronę-wizytówkę', proto:'prototyp produktu'},
       when:{fast:'szybko, najlepiej w tydzień', calm:'bez pośpiechu, ważniejsza jakość', date:'jest data startu'},
       how:{sprint:'sprint vibe-codingu razem — chcę widzieć, jak powstaje', solo:'budujesz sam, a ja oglądam iteracje', talk:'najpierw po prostu porozmawiać'},
@@ -1017,12 +1191,32 @@ const I18N = {
     msg:{
       hello:'Cześć!', helloName:'Cześć! Mam na imię {name}.', want:'Chcę zbudować z Tobą <b>{what}</b>.',
       unsure:'Potrzebuję strony, ale jeszcze nie wiem jakiej. <b>Pomożesz wybrać?</b>', placeholder:'Potrzebuję… (wybierz, czego dokładnie)',
-      when:'Termin: <b>{v}</b>.', how:'Format: <b>{v}</b>.', have:'Co już mam: {v}.', care:'Ważne: {v}.',
+      when:'Termin: <b>{v}</b>.', format:'Format: <b>{v}</b>.', how:'Jak pracujemy: <b>{v}</b>.', have:'Co już mam: {v}.', care:'Ważne: {v}.',
       about:'O projekcie: {v}', links:'Podoba mi się: {v}', budget:'Budżet: {v}.', end:'Kiedy możesz rzucić okiem?',
-      and:' i ', fallback:'Cześć! Chcę porozmawiać o stronie.', subject:'Zapytanie o stronę'
+      and:' i ', template:['Cześć! Chcę porozmawiać o stronie.', 'Czego potrzebuję: …', 'Termin: …', 'O projekcie: …', 'Kiedy możesz rzucić okiem?'], subject:'Zapytanie o stronę'
+    },
+    formats:{
+      num:'Nr 2 — formaty', title:'Jak możemy <em>pracować razem</em>',
+      lede:'Trzy jasne formaty. Bez cen z sufitu: koszt zależy od zadania, a podaję go po krótkiej analizie — zanim zaczniemy pracę.',
+      cta:'Wybierz ten format', picked:'Wybrano ✓',
+      items:{
+        launch:{ tag:'Szybki start', title:'Landing page lub strona promocyjna', for:'Gdy trzeba pokazać produkt, wydarzenie albo usługę — i to nie za miesiąc.',
+                 gets:['Pierwszy ekran i struktura pod jedno działanie docelowe', 'Responsywność, szybkość, wdrożenie na Twojej domenie', 'Działający link od pierwszych dni, poprawki na nim'] },
+        proto:{  tag:'Prototyp vibe-coding', title:'MVP pod hipotezę', for:'Gdy pomysł trzeba sprawdzić na ludziach, a nie omawiać na callach.',
+                 gets:['Klikalny prototyp z prawdziwą logiką, a nie obrazki', 'Budujemy na żywo, decyzje od razu w kodzie', 'Jasne, co zostawić, a co wyrzucić przed pełnym wdrożeniem'] },
+        custom:{ tag:'Pod zadanie', title:'Indywidualny projekt', for:'Gdy zadanie nie mieści się w szablonie: nietypowy interfejs, interaktywność, integracje.',
+                 gets:['Najpierw analiza: czego naprawdę potrzebujesz', 'Proponuję format i etapy pod Twoje zadanie', 'Pracuję, aż wynik naprawdę działa'] },
+      },
+      faqTitle:'Uczciwie o najważniejszym', faqHand:'to, o co zwykle pytacie najpierw',
+      faq:[
+        {q:'Ile to potrwa?', a:'Pierwszy działający link pokazuję w pierwszych dniach pracy — potem rośnie na Twoich oczach. Dokładny termin podaję po analizie zadania, a nie przed, i od razu mówię, od czego zależy.'},
+        {q:'Jak wyglądają poprawki?', a:'Poprawki robimy na działającej wersji, w krótkich rundach: oglądasz, piszesz, ja poprawiam. Ile rund obejmuje praca, ustalamy na starcie, żeby obu stronom było spokojnie.'},
+        {q:'Jak z płatnością?', a:'Etapami: zaliczka na start, reszta po zakończeniu etapu lub przed publikacją strony. Schemat i kwotę ustalamy na piśmie przed rozpoczęciem pracy — bez niespodzianek na końcu.'},
+        {q:'Jesteś sam. A jeśli coś pójdzie nie tak?', a:'Za to rozmawiasz z osobą, która to robi — bez głuchego telefonu. Kod, dostępy i domena zostają u Ciebie, stronę można dalej rozwijać z kimkolwiek. Jeśli zadanie nie jest dla mnie — powiem od razu i go nie wezmę.'},
+      ]
     },
     contact:{
-      num:'Nr 3 — kontakt', title:'Napisz. <em>Odpowiadam osobiście.</em>',
+      num:'Nr 4 — kontakt', title:'Napisz. <em>Odpowiadam osobiście.</em>',
       p:'Bez formularzy i bez „zostaw zgłoszenie, manager się odezwie”. Najszybciej — Telegram. Chcesz śledzić produkt — GitHub i X.',
       link:'Albo najpierw złóż zapytanie ↑', hand:'klik — skopiowane',
       mail:'E-mail', ghText:'kod i wersje', xText:'proces na bieżąco',
@@ -1034,6 +1228,7 @@ const I18N = {
       brief:'zapytanie skopiowane', briefText:'Wklej je do Telegrama albo maila', briefFail:'Zaznacz tekst na kartce ręcznie',
       tg:'tekst skopiowany', tgText:'Jeśli pole wpisywania jest puste, po prostu wklej (Ctrl+V / Cmd+V)',
       tgFail:'nie udało się skopiować', tgFailText:'Skopiuj tekst z kartki ręcznie',
+      fmt:'format w zapytaniu', fmtText:'Wiadomość gotowa — sprawdź i wyślij',
       reset:'czysta kartka', resetText:'Zaczynamy od nowa'
     },
   },
@@ -1121,6 +1316,7 @@ const TABLE = {
 
 /* Вопросы конструктора: только ключи и логика. Подписи — в I18N.<язык>.q, формулировки для сообщения — в I18N.<язык>.phrase */
 const Q = [
+  { key:'format', type:'one',  opts:['launch','proto','custom'] },
   { key:'what',   type:'one',  opts:['landing','promo','card','proto','unsure'] },
   { key:'when',   type:'one',  opts:['fast','calm','date'], field:'date' },
   { key:'how',    type:'one',  opts:['sprint','solo','talk'] },
@@ -1128,6 +1324,15 @@ const Q = [
   { key:'care',   type:'many', opts:['memorable','fastload','mobile','motion','edit','search'], max:3 },
   { key:'budget', type:'one',  opts:['talk','have'] },
 ];
+
+/* Форматы работы (блок «Форматы»): порядок карточек и что подставляется в конструктор по кнопке.
+   what: строка или список допустимых вариантов (если уже выбран один из них — не трогаем). Тексты — в I18N.<язык>.formats */
+const FORMATS = ['launch', 'proto', 'custom'];
+const FORMAT_PRESET = {
+  launch: { what:['landing', 'promo'], how:'solo' },
+  proto:  { what:'proto',              how:'sprint' },
+  custom: { what:'unsure',             how:'talk' },
+};
 
 /* ==========================================================================
    helpers
@@ -1529,7 +1734,7 @@ cards.forEach(card => {
 /* ==========================================================================
    КОНСТРУКТОР ЗАПРОСА
    ========================================================================== */
-const EMPTY = () => ({what:null, when:null, how:null, have:[], care:[], budget:null, date:'', about:'', links:'', name:''});
+const EMPTY = () => ({format:null, what:null, when:null, how:null, have:[], care:[], budget:null, date:'', about:'', links:'', name:''});
 let S = Object.assign(EMPTY(), store.get('fio-brief', {}));
 S.have = Array.isArray(S.have) ? S.have : []; S.care = Array.isArray(S.care) ? S.care : [];
 
@@ -1582,10 +1787,14 @@ function joinList(arr){
 /* строки сообщения на текущем языке: [ключ, html] */
 function lines(){
   const m = t('msg'), ph = t('phrase'), L = [];
+  // ничего не выбрано — показываем и копируем понятный шаблон, который легко дописать
+  const blank = !S.format && !S.what && !S.when && !S.how && !S.have.length && !S.care.length && !S.budget && !S.about.trim() && !S.links.trim();
+  if (blank) return m.template.map((line, i) => ['tpl' + i, i === 0 || i === m.template.length - 1 ? esc(line) : `<span class="ph">${esc(line)}</span>`]);
   const hi = S.name.trim() ? fill(m.helloName, {name:esc(S.name.trim())}) : m.hello;
   if (!S.what) L.push(['what', `${hi} <span class="ph">${m.placeholder}</span>`]);
   else if (S.what === 'unsure') L.push(['what', `${hi} ${m.unsure}`]);
   else L.push(['what', `${hi} ${fill(m.want, {what:ph.what[S.what]})}`]);
+  if (S.format) L.push(['format', fill(m.format, {v:ph.format[S.format]})]);
   if (S.when){
     let v = ph.when[S.when];
     if (S.when === 'date' && S.date){
@@ -1605,7 +1814,7 @@ function lines(){
 }
 const toPlain = h => h.replace(/<[^>]+>/g, '').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&amp;/g,'&');
 /* готовый текст для буфера, Telegram и письма — всегда на текущем языке */
-const plain = () => S.what ? lines().map(([, h]) => toPlain(h)).join('\n') : t('msg.fallback');
+const plain = () => lines().map(([, h]) => toPlain(h)).join('\n');
 
 let prev = null;
 function render(){
@@ -1616,6 +1825,12 @@ function render(){
     b.disabled = !!(q.max && !on && S[q.key].length >= q.max);
   });
   $('[data-field="date"]').classList.toggle('is-on', S.when === 'date');
+  // карточки форматов: какой сейчас в запросе
+  $$('.fmt').forEach(card => {
+    const on = card.dataset.fmt === S.format;
+    card.classList.toggle('is-picked', on);
+    $('[data-format] span', card).textContent = on ? t('formats.picked') : t('formats.cta');
+  });
 
   const L = lines(), msg = $('#msg');
   msg.innerHTML = L.map(([k, h]) => `<p data-k="${k}">${h}</p>`).join('');
@@ -1661,6 +1876,62 @@ $('#reset').addEventListener('click', () => {
 $('#dockCopy').addEventListener('click', copyBrief);
 $('#dockTg').addEventListener('click', openTelegram);
 
+/* --- форматы работы + FAQ --- */
+function renderFormats(){
+  const f = t('formats');
+  $('#formatList').innerHTML = FORMATS.map((key, i) => {
+    const it = f.items[key];
+    return `<article class="fmt" data-fmt="${key}">
+      <div class="fmt-top"><span class="fmt-n">${String(i + 1).padStart(2, '0')}</span><div class="kicker"><span>${esc(it.tag)}</span></div></div>
+      <h3>${esc(it.title)}</h3>
+      <p class="fmt-for">${esc(it.for)}</p>
+      <ul>${it.gets.map(g => `<li>${esc(g)}</li>`).join('')}</ul>
+      <button class="btn btn-ghost" type="button" data-format="${key}"><span>${esc(f.cta)}</span> <span class="ar">→</span></button>
+    </article>`;
+  }).join('');
+  const open = $$('#faqList details').map(d => d.open);
+  $('#faqList').innerHTML = f.faq.map((x, i) =>
+    `<details${open[i] ? ' open' : ''}><summary>${esc(x.q)}<i aria-hidden="true">+</i></summary><p>${esc(x.a)}</p></details>`).join('');
+}
+function pulseSheet(){
+  const sh = $('#sheet'); sh.classList.remove('is-pulse'); void sh.offsetWidth; sh.classList.add('is-pulse');
+}
+/* выбор формата: подставляем его и подходящие ответы в конструктор, сообщение собирается сразу */
+function pickFormat(key){
+  const p = FORMAT_PRESET[key]; if (!p) return;
+  S.format = key;
+  if (Array.isArray(p.what)){ if (!p.what.includes(S.what)) S.what = p.what[0]; }
+  else S.what = p.what;
+  S.how = p.how;
+  render();
+  // на телефоне лист стоит под вопросами — сразу показываем готовый текст; на десктопе он и так рядом
+  const target = innerWidth <= 900 ? $('#sheet') : $('#order');
+  target.scrollIntoView({behavior: reduced ? 'auto' : 'smooth', block:'start'});
+  setTimeout(pulseSheet, reduced ? 0 : 650);
+  toast(t('toast.fmt'), t('toast.fmtText'));
+}
+$('#formatList').addEventListener('click', e => { const b = e.target.closest('[data-format]'); if (b) pickFormat(b.dataset.format); });
+/* кнопки «Собрать запрос» в шапке и на первом экране: после прокрутки подсвечиваем лист */
+document.addEventListener('click', e => { if (e.target.closest('a[href="#order"]')) setTimeout(pulseSheet, reduced ? 0 : 650); });
+
+/* «живой» плейсхолдер в поле «О проекте»: примеры на текущем языке печатаются по очереди */
+let exI = 0, exTimer = null;
+function exampleLoop(){
+  clearTimeout(exTimer);
+  const list = t('order.aboutEx'); if (!Array.isArray(list) || !list.length) return;
+  const full = t('order.aboutPh') + list[exI % list.length];
+  let k = 0;
+  const next = () => { exI++; exampleLoop(); };
+  const step = () => {
+    const ta = $('#fAbout'); if (!ta) return;
+    if (reduced){ ta.placeholder = full; exTimer = setTimeout(next, 3600); return; }
+    k = Math.min(full.length, k + 2);
+    ta.placeholder = full.slice(0, k) + (k < full.length ? '▍' : '');
+    exTimer = setTimeout(k < full.length ? step : next, k < full.length ? 28 : 2800);
+  };
+  step();
+}
+
 /* мобильный док: виден, пока вы в конструкторе, а лист не на экране */
 const dock = $('#dock'); let inOrder = false, sheetVis = false;
 const syncDock = () => {
@@ -1680,7 +1951,16 @@ function setLang(l, first){
   if (!first) store.set('fio-lang', l);
   const root = document.documentElement;
   root.lang = l;
-  $('meta[name="description"]').content = t('meta.description');
+  // SEO / OpenGraph под текущий язык
+  const OG_LOCALE = {en:'en_GB', ru:'ru_RU', uk:'uk_UA', pl:'pl_PL'};
+  document.title = t('meta.title');
+  const setMeta = (sel, v) => { const m = $(sel); if (m) m.setAttribute('content', v); };
+  setMeta('meta[name="description"]', t('meta.description'));
+  setMeta('meta[property="og:title"]', t('meta.title'));
+  setMeta('meta[property="og:description"]', t('meta.description'));
+  setMeta('meta[property="og:locale"]', OG_LOCALE[l]);
+  setMeta('meta[name="twitter:title"]', t('meta.title'));
+  setMeta('meta[name="twitter:description"]', t('meta.description'));
 
   $$('[data-i]').forEach(el => el.textContent = t(el.dataset.i));
   $$('[data-ih]').forEach(el => el.innerHTML = t(el.dataset.ih));
@@ -1701,7 +1981,9 @@ function setLang(l, first){
 
   function renderRest(){
     renderWall();
+    renderFormats();
     renderQs(); prev = null; render();
+    exampleLoop();
     syncSeg();
     // шрифт нового языка (например, Playfair для PL) может догрузиться позже — пересчитываем размеры
     document.fonts && document.fonts.ready.then(() => { fitHeadline(); syncSeg(); if (isTable()){ resolveOverlaps(); fitBoard(); } });
