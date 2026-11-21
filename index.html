@@ -1,0 +1,1281 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16181b" media="(prefers-color-scheme: dark)">
+<title>Moja średnia</title>
+<style>
+:root{
+  --bg:#f6f5f1; --surface:#ffffff; --surface-2:#f1f0eb; --line:#e3e1d9; --line-2:#d3d0c6;
+  --ink:#1e2226; --ink-2:#565c64; --ink-3:#8a8f97;
+  --accent:#2f5d8a; --accent-ink:#ffffff; --accent-soft:#e5edf5;
+  --strong:#2b7a4b; --strong-soft:#e3f1e8;
+  --good:#2d6c87; --good-soft:#e2eef3;
+  --mid:#6a6e75; --mid-soft:#ecebe7;
+  --edge:#a86b12; --edge-soft:#faefd9;
+  --weak:#b23f2d; --weak-soft:#f8e4df;
+  --info:#7b7f87; --info-soft:#efeeea;
+  --radius:12px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16181b; --surface:#1e2125; --surface-2:#262a2f; --line:#2f343a; --line-2:#3b4148;
+    --ink:#e8e9eb; --ink-2:#a9aeb5; --ink-3:#7c828a;
+    --accent:#7aa7d6; --accent-ink:#0f1720; --accent-soft:#22303f;
+    --strong:#6cc28f; --strong-soft:#1d3226;
+    --good:#6fb2cf; --good-soft:#1c2f38;
+    --mid:#a3a7ad; --mid-soft:#2a2d31;
+    --edge:#e3a948; --edge-soft:#3a2e17;
+    --weak:#ec8270; --weak-soft:#3b221d;
+    --info:#9aa0a8; --info-soft:#2a2d31;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16181b; --surface:#1e2125; --surface-2:#262a2f; --line:#2f343a; --line-2:#3b4148;
+  --ink:#e8e9eb; --ink-2:#a9aeb5; --ink-3:#7c828a;
+  --accent:#7aa7d6; --accent-ink:#0f1720; --accent-soft:#22303f;
+  --strong:#6cc28f; --strong-soft:#1d3226;
+  --good:#6fb2cf; --good-soft:#1c2f38;
+  --mid:#a3a7ad; --mid-soft:#2a2d31;
+  --edge:#e3a948; --edge-soft:#3a2e17;
+  --weak:#ec8270; --weak-soft:#3b221d;
+  --info:#9aa0a8; --info-soft:#2a2d31;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.num,.avg,.big,td,.g{font-variant-numeric:tabular-nums}
+.wrap{max-width:880px;margin:0 auto;padding:0 16px calc(96px + env(safe-area-inset-bottom))}
+.hidden{display:none!important}
+.muted{color:var(--ink-2)}
+.small{font-size:13px}
+
+/* top */
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 0 10px}
+.brand{font-weight:650;font-size:18px;letter-spacing:-.01em;white-space:nowrap}
+.brand span{color:var(--ink-3);font-weight:500}
+.top-actions{display:flex;gap:6px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:38px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:14px;font-weight:500;white-space:nowrap}
+.btn:hover{border-color:var(--line-2)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--weak)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.icon{width:38px;padding:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
+.seg button{border:0;background:transparent;border-radius:7px;min-height:32px;padding:0 14px;font-size:14px;font-weight:500;color:var(--ink-2)}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.viewbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 0 12px;flex-wrap:wrap}
+.viewbar .seg{flex:0 0 auto}
+
+/* summary */
+.summary{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;display:grid;grid-template-columns:auto 1fr;gap:6px 20px;align-items:center}
+.big{font-size:40px;font-weight:650;letter-spacing:-.02em;line-height:1}
+.big-label{font-size:12px;color:var(--ink-2);margin-top:6px}
+.sum-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px 14px}
+.stat b{display:block;font-size:17px;font-weight:600}
+.stat span{font-size:12px;color:var(--ink-2)}
+.dist{grid-column:1/-1;margin-top:8px}
+.dist-bar{display:flex;height:8px;border-radius:5px;overflow:hidden;background:var(--surface-2)}
+.dist-bar i{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:8px;font-size:12.5px;color:var(--ink-2)}
+.legend b{color:var(--ink);font-weight:600}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:1px}
+
+.listbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:18px 0 10px}
+.listbar h2{font-size:15px;margin:0;font-weight:600;flex:0 0 auto}
+.listbar .right{display:flex;gap:6px;align-items:center}
+select.sel{min-height:38px;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:0 8px;font-size:14px;min-width:0;width:100%;max-width:220px}
+.listbar .right{min-width:0;flex:1;justify-content:flex-end}
+
+/* cards */
+.list{display:grid;gap:10px}
+.card{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--st,var(--line-2));border-radius:var(--radius);overflow:hidden}
+.st-strong{--st:var(--strong);--st-soft:var(--strong-soft)}
+.st-good{--st:var(--good);--st-soft:var(--good-soft)}
+.st-mid{--st:var(--mid);--st-soft:var(--mid-soft)}
+.st-edge{--st:var(--edge);--st-soft:var(--edge-soft)}
+.st-weak{--st:var(--weak);--st-soft:var(--weak-soft)}
+.st-none{--st:var(--line-2);--st-soft:var(--surface-2)}
+.card-head{display:flex;width:100%;align-items:center;gap:10px;border:0;background:transparent;text-align:left;padding:12px 12px 6px 12px}
+.ch-main{flex:1;min-width:0}
+.ch-name{font-weight:600;font-size:15.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch-meta{font-size:12.5px;color:var(--ink-2);margin-top:1px}
+.ch-meta .tag{display:inline-block;font-weight:600;color:var(--st);margin-right:4px}
+.ch-avg{text-align:right;flex:0 0 auto}
+.avg{display:inline-block;font-size:20px;font-weight:650;color:var(--st);background:var(--st-soft);padding:3px 9px;border-radius:9px;min-width:64px;text-align:center}
+.ch-sub{font-size:12px;color:var(--ink-3);margin-top:3px}
+.chev{flex:0 0 auto;color:var(--ink-3);transition:transform .15s}
+.card.open .chev{transform:rotate(180deg)}
+.chips{display:flex;flex-wrap:wrap;gap:5px;padding:2px 12px 12px}
+.chips .empty{font-size:13px;color:var(--ink-3)}
+.g{position:relative;display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:30px;padding:0 7px;border-radius:8px;border:1px solid transparent;font-weight:600;font-size:14px;background:var(--mid-soft);color:var(--ink)}
+.g sub{position:absolute;right:-3px;bottom:-5px;font-size:10px;line-height:1;font-weight:700;background:var(--surface);border:1px solid var(--line-2);color:var(--ink-2);border-radius:6px;padding:1px 3px}
+.g6,.g5{background:var(--strong-soft);color:var(--strong)}
+.g4{background:var(--good-soft);color:var(--good)}
+.g3{background:var(--mid-soft);color:var(--ink)}
+.g2{background:var(--edge-soft);color:var(--edge)}
+.g1{background:var(--weak-soft);color:var(--weak)}
+.ginfo{background:transparent;border-color:var(--line-2);color:var(--info);font-weight:500}
+.g.plan{background:transparent;border:1.5px dashed var(--line-2)}
+.g.w0{opacity:.55}
+button.g:hover{filter:brightness(.97)}
+
+.card-body{border-top:1px solid var(--line);padding:12px;display:grid;gap:16px;background:linear-gradient(var(--surface),var(--surface))}
+.blk h4{margin:0 0 8px;font-size:13px;font-weight:600;color:var(--ink-2);text-transform:uppercase;letter-spacing:.04em;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.blk h4 em{font-style:normal;text-transform:none;letter-spacing:0;font-weight:500;color:var(--ink-3)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.row + .row{margin-top:8px}
+.lbl{font-size:13px;color:var(--ink-2);min-width:62px}
+.chipsel{display:inline-flex;flex-wrap:wrap;gap:4px}
+.chipsel button{min-width:36px;min-height:34px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-size:14px;font-weight:500;padding:0 8px}
+.chipsel button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:650}
+.digits{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:10px}
+.digits button{min-height:48px;border-radius:10px;border:1px solid var(--line);font-size:18px;font-weight:650}
+.digits button[disabled]{opacity:.3}
+.infos{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.infos button{min-height:34px;min-width:44px;border-radius:8px;border:1px dashed var(--line-2);background:transparent;color:var(--ink-2);font-size:13.5px}
+input.inp,select.inp,textarea.inp{border:1px solid var(--line);background:var(--surface);border-radius:9px;min-height:36px;padding:6px 9px;font-size:14px;min-width:0}
+input.inp:focus,select.inp:focus,textarea.inp:focus{outline:none;border-color:var(--accent)}
+input.w-in{width:64px}
+.cat-in{flex:1;min-width:140px}
+.plan-row{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+.plan-row select{flex:1}
+.result{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--surface-2);font-size:14px}
+.result .arrow{font-weight:650}
+.delta-up{color:var(--strong);font-weight:600}
+.delta-down{color:var(--weak);font-weight:600}
+.need{font-size:14.5px;line-height:1.5}
+.need b{font-weight:650}
+.grid-wrap{overflow-x:auto;margin-top:10px}
+table.need-grid{border-collapse:collapse;font-size:13px;width:100%;min-width:300px}
+.need-grid th,.need-grid td{border:1px solid var(--line);padding:5px 6px;text-align:center}
+.need-grid th{font-weight:600;color:var(--ink-2);background:var(--surface-2)}
+.need-grid td.hl,.need-grid th.hl{background:var(--accent-soft)}
+.need-grid td.na{color:var(--ink-3)}
+.card-foot{display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;align-items:center}
+.note{font-size:12.5px;color:var(--ink-3)}
+
+.emptystate{background:var(--surface);border:1px dashed var(--line-2);border-radius:var(--radius);padding:28px 18px;text-align:center}
+.emptystate p{margin:6px 0 14px;color:var(--ink-2)}
+.emptystate .row{justify-content:center}
+.foot{margin-top:26px;font-size:12.5px;color:var(--ink-3);display:flex;gap:6px 14px;flex-wrap:wrap}
+.foot button{border:0;background:none;padding:0;color:var(--accent);font-size:12.5px}
+
+/* dialogs */
+dialog{border:0;padding:0;border-radius:16px;background:var(--surface);color:var(--ink);width:min(620px,calc(100% - 20px));max-height:calc(100dvh - 24px);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+dialog::backdrop{background:rgba(15,18,22,.45)}
+.dlg{display:flex;flex-direction:column;max-height:calc(100dvh - 24px)}
+.dlg-h{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.dlg-h h3{margin:0;font-size:16px}
+.dlg-b{padding:14px 16px;overflow:auto;display:grid;gap:12px}
+.dlg-f{display:flex;justify-content:flex-end;gap:8px;padding:12px 16px;border-top:1px solid var(--line);flex-wrap:wrap}
+.field{display:grid;gap:4px}
+.field > span{font-size:13px;color:var(--ink-2)}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+textarea.paste{min-height:150px;width:100%;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;resize:vertical}
+details.help{background:var(--surface-2);border-radius:10px;padding:8px 12px;font-size:13px;color:var(--ink-2)}
+details.help summary{cursor:pointer;color:var(--ink);font-weight:500}
+details.help ul{margin:6px 0 2px;padding-left:18px}
+details.help code{font-size:12px;background:var(--surface);padding:0 4px;border-radius:4px}
+.pv{border:1px solid var(--line);border-radius:10px;padding:10px;display:grid;gap:8px}
+.pv-h{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pv-h input[type=text]{flex:1;min-width:150px;font-weight:600}
+.pv-h .tag{font-size:12px;padding:2px 7px;border-radius:6px;background:var(--surface-2);color:var(--ink-2)}
+.pv-h .tag.new{background:var(--accent-soft);color:var(--accent)}
+.pv .chips{padding:0}
+.pv.off{opacity:.5}
+.pv-sum{font-size:13.5px;color:var(--ink-2)}
+.check{display:inline-flex;align-items:center;gap:6px}
+.check input{width:18px;height:18px;accent-color:var(--accent)}
+
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:var(--ink);color:var(--bg);border-radius:12px;padding:10px 14px;font-size:14px;display:flex;gap:14px;align-items:center;transition:.18s;max-width:calc(100% - 32px);z-index:50}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+.toast button{border:0;background:transparent;color:var(--bg);font-weight:650;text-decoration:underline;padding:0}
+
+@media (max-width:520px){
+  .summary{grid-template-columns:1fr;gap:12px}
+  .big{font-size:36px}
+  .top-actions .lab{display:none}
+  .btn.adapt{width:38px;padding:0}
+  .seg button{padding:0 12px}
+  .viewbar{flex-wrap:nowrap}
+  .viewbar .seg{flex:1}
+  .viewbar .seg button{flex:1}
+}
+@media (min-width:521px){ .top-actions .ico{display:none} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">Moja średnia <span id="semTag"></span></div>
+    <div class="top-actions">
+      <button class="btn adapt" data-act="open-import" title="Импорт из eduvulcan"><span class="ico" aria-hidden="true">⇩</span><span class="lab">Импорт</span></button>
+      <button class="btn adapt" data-act="open-data" title="Данные и бэкап"><span class="ico" aria-hidden="true">⛁</span><span class="lab">Данные</span></button>
+      <button class="btn icon" data-act="open-settings" title="Настройки" aria-label="Настройки">⚙</button>
+    </div>
+  </header>
+
+  <div class="viewbar">
+    <div class="seg" id="viewSeg" role="tablist" aria-label="Период">
+      <button data-act="view" data-view="1" role="tab">I semestr</button>
+      <button data-act="view" data-view="2" role="tab">II semestr</button>
+      <button data-act="view" data-view="year" role="tab">Rok</button>
+    </div>
+  </div>
+
+  <section class="summary" id="summary" aria-live="polite"></section>
+
+  <div class="listbar">
+    <h2>Предметы</h2>
+    <div class="right">
+      <select class="sel" id="sortSel" aria-label="Сортировка">
+        <option value="order">Порядок добавления</option>
+        <option value="name">По алфавиту</option>
+        <option value="risk">Сначала проблемные</option>
+        <option value="avg-desc">Средняя ↓</option>
+        <option value="avg-asc">Средняя ↑</option>
+      </select>
+      <button class="btn primary" data-act="open-add-subject">+ Предмет</button>
+    </div>
+  </div>
+
+  <main class="list" id="list"></main>
+
+  <div class="foot">
+    <span>Данные хранятся только в этом браузере (localStorage).</span>
+    <button data-act="open-data">Экспорт / импорт JSON</button>
+    <button data-act="theme">Тема</button>
+  </div>
+</div>
+
+<!-- Import dialog -->
+<dialog id="dlgImport">
+  <div class="dlg">
+    <div class="dlg-h"><h3>Вставить оценки из eduvulcan</h3><button class="btn icon ghost" data-act="close" aria-label="Закрыть">✕</button></div>
+    <div class="dlg-b">
+      <details class="help">
+        <summary>Как скопировать оценки</summary>
+        <ul>
+          <li>В eduvulcan откройте <b>Oceny</b>, выделите таблицу или весь текст страницы (на телефоне — долгий тап → «Выбрать всё») и скопируйте.</li>
+          <li>Вставьте сюда — предметы, оценки с <code>+</code>/<code>-</code>, <code>np</code>, <code>bz</code> распознаются автоматически.</li>
+          <li>Веса понимаются в видах: <code>5(3)</code>, <code>4+[2]</code>, <code>5 x3</code>, <code>Waga: 3</code>, колонка «Waga» в таблице; категории («Sprawdzian», «Kartkówka»…) можно сопоставить с весами в настройках.</li>
+          <li>Строки «Semestr I / II» и «Okres 1 / 2» переключают семестр. Средние (например <code>3,72</code>) и итоговые оценки после них не считаются оценками.</li>
+        </ul>
+      </details>
+      <textarea class="inp paste" id="pasteArea" placeholder="Вставьте сюда скопированный текст из eduvulcan…" spellcheck="false"></textarea>
+      <div class="row">
+        <button class="btn" data-act="parse">Распознать</button>
+        <button class="btn ghost" data-act="paste-example">Вставить пример</button>
+        <span class="small muted" id="parseInfo"></span>
+      </div>
+      <div class="fgrid">
+        <label class="field"><span>Семестр оценок</span>
+          <select class="inp" id="impSem"><option value="auto">Авто</option><option value="1">I semestr</option><option value="2">II semestr</option></select>
+        </label>
+        <label class="field"><span>Режим</span>
+          <select class="inp" id="impMode"><option value="replace">Заменить оценки семестра</option><option value="add">Добавить к имеющимся</option></select>
+        </label>
+      </div>
+      <div id="preview" class="list"></div>
+    </div>
+    <div class="dlg-f">
+      <button class="btn ghost" data-act="close">Отмена</button>
+      <button class="btn primary" data-act="do-import" id="doImportBtn" disabled>Импортировать</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- Settings dialog -->
+<dialog id="dlgSettings">
+  <form class="dlg" id="settingsForm" method="dialog">
+    <div class="dlg-h"><h3>Настройки</h3><button type="button" class="btn icon ghost" data-act="close" aria-label="Закрыть">✕</button></div>
+    <div class="dlg-b">
+      <div class="fgrid">
+        <label class="field"><span>Плюс (+) добавляет</span><input class="inp" name="plus" type="number" step="0.01" min="0" max="1"></label>
+        <label class="field"><span>Минус (−) отнимает</span><input class="inp" name="minus" type="number" step="0.01" min="0" max="1"></label>
+        <label class="field"><span>Вес по умолчанию</span><input class="inp" name="defaultWeight" type="number" step="1" min="0" max="10"></label>
+        <label class="field"><span>«На грани» если до порога ≤</span><input class="inp" name="margin" type="number" step="0.01" min="0" max="1"></label>
+      </div>
+      <div class="field"><span>Пороги средней для итоговой оценки (как в статуте школы)</span>
+        <div class="fgrid">
+          <label class="field"><span>2 (dopuszczający) от</span><input class="inp" name="t0" type="number" step="0.01"></label>
+          <label class="field"><span>3 (dostateczny) от</span><input class="inp" name="t1" type="number" step="0.01"></label>
+          <label class="field"><span>4 (dobry) от</span><input class="inp" name="t2" type="number" step="0.01"></label>
+          <label class="field"><span>5 (bardzo dobry) от</span><input class="inp" name="t3" type="number" step="0.01"></label>
+          <label class="field"><span>6 (celujący) от</span><input class="inp" name="t4" type="number" step="0.01"></label>
+        </div>
+      </div>
+      <div class="fgrid">
+        <label class="field"><span>Средняя за год (Rok)</span>
+          <select class="inp" name="yearMode"><option value="all">Все оценки за год</option><option value="mean">Среднее двух семестров</option></select>
+        </label>
+        <label class="field"><span>Текущий семестр</span>
+          <select class="inp" name="currentSem"><option value="0">Авто по дате</option><option value="1">I semestr</option><option value="2">II semestr</option></select>
+        </label>
+      </div>
+      <label class="field"><span>Веса по категориям (для импорта, если вес не указан). Формат: <code>Категория=вес</code>, по строке.</span>
+        <textarea class="inp" name="catWeights" rows="5"></textarea>
+      </label>
+      <p class="note" style="margin:0">Оценки с весом 0 не входят в średnią ważoną, но учитываются в średniej arytmetycznej. Отметки <b>np, bz, nb, +, −</b> в расчёт не входят.</p>
+    </div>
+    <div class="dlg-f">
+      <button type="button" class="btn ghost" data-act="reset-settings">По умолчанию</button>
+      <button type="submit" class="btn primary">Сохранить</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Data dialog -->
+<dialog id="dlgData">
+  <div class="dlg">
+    <div class="dlg-h"><h3>Данные</h3><button class="btn icon ghost" data-act="close" aria-label="Закрыть">✕</button></div>
+    <div class="dlg-b">
+      <div class="row"><button class="btn" data-act="export">Скачать бэкап (JSON)</button>
+        <label class="btn" style="position:relative;overflow:hidden">Загрузить бэкап<input type="file" id="fileIn" accept="application/json,.json" style="position:absolute;inset:0;opacity:0;cursor:pointer"></label></div>
+      <p class="note" style="margin:0">Бэкап содержит все предметы, оценки и настройки. Загрузка бэкапа заменяет текущие данные.</p>
+      <div class="row"><button class="btn" data-act="demo">Загрузить демо-предметы</button></div>
+      <div class="row"><button class="btn danger" data-act="wipe">Удалить все данные</button></div>
+      <p class="note" id="storageInfo" style="margin:0"></p>
+    </div>
+  </div>
+</dialog>
+
+<!-- Grade edit dialog -->
+<dialog id="dlgGrade">
+  <form class="dlg" id="gradeForm" method="dialog">
+    <div class="dlg-h"><h3 id="gradeTitle">Оценка</h3><button type="button" class="btn icon ghost" data-act="close" aria-label="Закрыть">✕</button></div>
+    <div class="dlg-b">
+      <div class="fgrid">
+        <label class="field"><span>Оценка</span><select class="inp" name="v"></select></label>
+        <label class="field"><span>Вес (waga)</span><input class="inp" name="w" type="number" min="0" max="10" step="0.5"></label>
+        <label class="field"><span>Семестр</span><select class="inp" name="sem"><option value="1">I</option><option value="2">II</option></select></label>
+        <label class="field"><span>Дата</span><input class="inp" name="date" type="date"></label>
+      </div>
+      <label class="field"><span>Категория / описание</span><input class="inp" name="cat" list="catList" maxlength="80"></label>
+    </div>
+    <div class="dlg-f" style="justify-content:space-between">
+      <button type="button" class="btn danger" data-act="delete-grade">Удалить</button>
+      <span class="row"><button type="button" class="btn ghost" data-act="close">Отмена</button><button type="submit" class="btn primary">Сохранить</button></span>
+    </div>
+  </form>
+</dialog>
+
+<!-- Subject dialog -->
+<dialog id="dlgSubject">
+  <form class="dlg" id="subjectForm" method="dialog">
+    <div class="dlg-h"><h3 id="subjectTitle">Новый предмет</h3><button type="button" class="btn icon ghost" data-act="close" aria-label="Закрыть">✕</button></div>
+    <div class="dlg-b">
+      <label class="field"><span>Название</span><input class="inp" name="name" list="subjList" required maxlength="80" autocomplete="off"></label>
+    </div>
+    <div class="dlg-f"><button type="button" class="btn ghost" data-act="close">Отмена</button><button type="submit" class="btn primary">Сохранить</button></div>
+  </form>
+</dialog>
+
+<datalist id="catList"><option>Sprawdzian</option><option>Kartkówka</option><option>Odpowiedź</option><option>Praca domowa</option><option>Aktywność</option><option>Praca klasowa</option><option>Projekt</option><option>Test</option></datalist>
+<datalist id="subjList"></datalist>
+
+<div class="toast" id="toast" role="status"><span id="toastMsg"></span><button id="toastUndo" class="hidden">Отменить</button></div>
+
+<script>
+'use strict';
+/* ===================== Константы ===================== */
+const KEY = 'moja-srednia.v1';
+const MARKS = ['1','1+','2-','2','2+','3-','3','3+','4-','4','4+','5-','5','5+','6-','6'];
+const INFO_MARKS = ['np','bz','nb','+','-'];
+const DEF_SETTINGS = {
+  plus: 0.5, minus: 0.25, defaultWeight: 1, margin: 0.15,
+  thresholds: [1.75, 2.75, 3.75, 4.75, 5.5],
+  yearMode: 'all', currentSem: 0,
+  catWeights: 'Sprawdzian=3\nPraca klasowa=3\nTest=3\nKartkówka=2\nOdpowiedź=1\nPraca domowa=1\nAktywność=1'
+};
+
+/* ===================== Парсер eduvulcan (чистые функции) ===================== */
+/*PARSER-START*/
+const KNOWN_SUBJECTS = ['matematyka','jezyk polski','jezyk angielski','jezyk niemiecki','jezyk hiszpanski','jezyk francuski','jezyk rosyjski','jezyk wloski','jezyk lacinski','jezyk ukrainski','jezyk kaszubski','lacina','historia','historia i terazniejszosc','wiedza o spoleczenstwie','biologia','chemia','fizyka','geografia','informatyka','plastyka','muzyka','technika','wychowanie fizyczne','edukacja dla bezpieczenstwa','religia','etyka','wychowanie do zycia w rodzinie','przyroda','podstawy przedsiebiorczosci','biznes i zarzadzanie','filozofia','zajecia z wychowawca','godzina wychowawcza','doradztwo zawodowe','edukacja zdrowotna','historia muzyki','historia sztuki','zajecia artystyczne','edukacja wczesnoszkolna','jezyk obcy'];
+const KEYWORDS = ['ocena','oceny','waga','data','kategoria','srednia','nauczyciel','przedmiot','brak','semestr','okres','opis','komentarz','przewidywan','proponowan','wystawi','dodal','kolumna','legenda','frekwencja','uwagi','punkty','lp','nr ','wynik','podsumowanie','zachowanie','zmodyfikowan','poprawa'];
+const CATEGORIES = ['sprawdzian','kartkowka','odpowiedz','praca domowa','praca klasowa','zadanie','aktywnosc','test','projekt','dyktando','wypracowanie','recytacja','cwiczenia','zeszyt','referat','prezentacja','praca na lekcji','praca w grupach','praca','inne','konkurs','olimpiada','czytanie','diagnoza','egzamin','probny','matura','wypowiedz','sprawnosc','umiejetnosci','postawa','badanie','pisanie','sluchanie','mowienie','wiersz','kolokwium','lektura'];
+const GRADE_RE = /^(np|bz|nb|[1-6][+\-]?|[+\-])$/i;
+const GRADE_START_RE = /^(np|bz|nb|[1-6][+\-]?)(?:[\(\[][^\)\]]*[\)\]])?[,;.]?$/i;
+
+function normTxt(s){
+  return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/ł/g,'l').replace(/[ \s]+/g,' ').trim();
+}
+function startsWithAny(n, list){ return list.some(k => n === k.trim() || n.startsWith(k)); }
+function isCategory(s){ const n = normTxt(s); return n.length <= 40 && CATEGORIES.some(c => n === c || n.startsWith(c + ' ') || n.startsWith(c)); }
+function isKeyword(s){ const n = normTxt(s); return startsWithAny(n, KEYWORDS); }
+function nameLike(s){
+  s = String(s).trim();
+  if (s.length < 3 || s.length > 70) return false;
+  if (!/^\p{L}/u.test(s) || s.includes(':')) return false;
+  const letters = (s.match(/\p{L}/gu) || []).length;
+  if (letters < s.replace(/\s/g,'').length * 0.75) return false;
+  if (isKeyword(s) || isCategory(s)) return false;
+  return true;
+}
+function knownMatch(s, extraNames){
+  const n = normTxt(s).replace(/[:\-–]+$/,'').trim();
+  const all = KNOWN_SUBJECTS.concat(extraNames || []);
+  return all.some(k => n === k || ((n.startsWith(k + ' ') || n.startsWith(k + ' (') || n.startsWith(k + ',')) && n.length - k.length <= 30));
+}
+function cleanName(s){ return String(s).replace(/[ \s]+/g,' ').replace(/[:\-–\s]+$/,'').trim(); }
+function parseNum(s){ const m = String(s).replace(',', '.').match(/\d+(?:\.\d+)?/); return m ? parseFloat(m[0]) : null; }
+
+/* Разбивает строку на куски: {t:'G', grades:[...]} | {t:'D'} (средняя / десятичное число). */
+function tokenize(str, ctx){
+  let s = ' ' + String(str).replace(/[−–—]/g, '-').replace(/ /g, ' ') + ' ';
+  s = s.replace(/\b\d{1,2}[.\-\/]\d{1,2}[.\-\/]\d{2,4}\b/g, ' ')
+       .replace(/\b\d{4}-\d{2}-\d{2}\b/g, ' ')
+       .replace(/\b\d{1,2}:\d{2}\b/g, ' ')
+       .replace(/[\(\[\{]\s*(?:waga|wag\.?|w)?\s*[:=.]?\s*(\d+(?:[.,]\d+)?)\s*[\)\]\}]/gi, (m, n) => ' §W' + n.replace(/[.,]/, '_') + ' ')
+       .replace(/\bwaga\s*[:=]?\s*(\d+(?:[.,]\d+)?)/gi, (m, n) => ' §W' + n.replace(/[.,]/, '_') + ' ')
+       .replace(/(^|\s)([1-6][+\-]?)\s*[x×*]\s*(\d+)\b/g, '$1$2 §W$3 ')
+       .replace(/\b\d+[.,]\d{2,}\b/g, ' §D ')
+       .replace(/\b\d\.\d\b/g, ' §D ');
+  if (/^\s*\d,\d\s*$/.test(s)) s = ' §D ';
+  const pieces = [];
+  let cur = null;
+  const flush = () => { if (cur && cur.grades.length) {
+      if (!(cur.grades.length === 1 && cur.grades[0].v === '-')) pieces.push(cur);
+    } cur = null; };
+  for (let t of s.split(/[\s,;|]+/)) {
+    if (!t) continue;
+    if (t.length > 1) t = t.replace(/[.:]+$/, '');
+    if (t === '§D') { flush(); pieces.push({ t: 'D' }); continue; }
+    if (t.startsWith('§W')) {
+      const w = parseFloat(t.slice(2).replace('_', '.'));
+      const target = (cur && cur.grades.length) ? cur.grades[cur.grades.length - 1] : ctx.lastGrade;
+      if (target && !target.wExplicit && isFinite(w)) { target.w = w; target.wExplicit = true; }
+      continue;
+    }
+    if (GRADE_RE.test(t)) {
+      const g = { v: t.toLowerCase(), w: null, wExplicit: false, cat: ctx.pendingCat || '' };
+      ctx.pendingCat = '';
+      if (!cur) cur = { t: 'G', grades: [] };
+      cur.grades.push(g);
+      ctx.lastGrade = g;
+      continue;
+    }
+    if (/^\p{L}{3,}$/u.test(t) && isCategory(t)) {
+      const last = cur && cur.grades.length ? cur.grades[cur.grades.length - 1] : null;
+      if (last && !last.cat) last.cat = t; else ctx.pendingCat = t;
+    }
+  }
+  flush();
+  return pieces;
+}
+
+function parseVulcan(text, opts){
+  opts = opts || {};
+  const existing = (opts.existingNames || []).map(normTxt);
+  const lines = String(text || '').replace(/\r/g, '').split('\n');
+  const subjects = []; const byKey = new Map();
+  const ctx = { lastGrade: null, pendingCat: '', sem: null };
+  let cur = null, header = null;
+  const firstCell = l => l.split('\t')[0];
+  const hasKnown = lines.some(l => { const c = cleanName(firstCell(l)); return c && knownMatch(c, existing); });
+  const isSubjectName = s => knownMatch(s, existing) || (!hasKnown && nameLike(s));
+
+  function getSubj(name){
+    name = cleanName(name);
+    const k = normTxt(name);
+    if (!byKey.has(k)) { const o = { name, grades: [], st: { group: 0, afterAvg: false, cnt: 0 } }; byKey.set(k, o); subjects.push(o); }
+    const o = byKey.get(k); o.st.afterAvg = false; o.st.cnt = 0;
+    return o;
+  }
+  function ensureCur(){ if (!cur) cur = getSubj('Без названия'); return cur; }
+  function addGrades(subj, grades){
+    for (const g of grades) {
+      g.group = subj.st.group;
+      g.semHint = ctx.sem ? Math.min(2, ctx.sem + subj.st.group) : (subj.st.group ? 2 : null);
+      subj.grades.push(g); subj.st.cnt++;
+    }
+  }
+  function feed(subj, pieces, force){
+    for (const p of pieces) {
+      if (p.t === 'D') { if (subj.st.cnt > 0) subj.st.afterAvg = true; continue; }
+      if (!subj.st.afterAvg || force) addGrades(subj, p.grades);
+      else if (p.grades.length >= 2) { subj.st.group = Math.min(1, subj.st.group + 1); subj.st.afterAvg = false; subj.st.cnt = 0; addGrades(subj, p.grades); }
+      /* одиночная оценка после средней — przewidywana / końcowa, пропускаем */
+    }
+  }
+
+  for (const raw of lines) {
+    const line = raw.replace(/ /g, ' ').trim();
+    if (!line) continue;
+    const n = normTxt(line);
+
+    // Семестр
+    let m = n.match(/^(?:semestr|okres(?: klasyfikacyjny)?|polrocze)\s*:?\s*(ii|i|1|2)\b/) || n.match(/^(ii|i|1|2)\s*\.?\s*(?:semestr|okres|polrocze)\b/);
+    if (m && line.length < 40) { ctx.sem = (m[1] === 'ii' || m[1] === '2') ? 2 : 1; if (cur) { cur.st.afterAvg = false; cur.st.cnt = 0; } continue; }
+
+    const cells = line.includes('\t') ? line.split('\t').map(c => c.trim()) : [line];
+    const lc = cells.map(normTxt);
+
+    // Заголовки таблиц
+    if (cells.length > 1 && lc.some(c => c === 'ocena') && lc.some(c => c.startsWith('waga'))) {
+      header = { ocena: lc.indexOf('ocena'), waga: lc.findIndex(c => c.startsWith('waga')),
+        kat: lc.findIndex(c => c.startsWith('kategoria') || c.startsWith('opis') || c.startsWith('rodzaj')),
+        przedmiot: lc.findIndex(c => c.startsWith('przedmiot')) };
+      continue;
+    }
+    if (lc[0].startsWith('przedmiot')) continue;
+
+    // Строки детальной таблицы (Ocena | Waga | …)
+    if (header && cells.length > 1) {
+      const pieces = tokenize(cells[header.ocena] || '', { lastGrade: null, pendingCat: '' });
+      const g = pieces.find(p => p.t === 'G');
+      if (g) {
+        const grade = g.grades[0];
+        const w = header.waga >= 0 ? parseNum(cells[header.waga] || '') : null;
+        if (w != null) { grade.w = w; grade.wExplicit = true; }
+        if (header.kat >= 0 && cells[header.kat]) grade.cat = cells[header.kat].slice(0, 80);
+        let subj = cur;
+        if (header.przedmiot >= 0 && cells[header.przedmiot]) subj = cur = getSubj(cells[header.przedmiot]);
+        addGrades(subj || ensureCur(), [grade]);
+        ctx.lastGrade = grade;
+        continue;
+      }
+    }
+
+    // Строки "Ключ: значение"
+    const kv = cells.length === 1 ? line.match(/^([\p{L} ().\-]{2,40}?)\s*:\s*(.*)$/u) : null;
+    if (kv) {
+      const key = normTxt(kv[1]), val = kv[2];
+      if (key.startsWith('wag')) { const w = parseNum(val); if (ctx.lastGrade && w != null) { ctx.lastGrade.w = w; ctx.lastGrade.wExplicit = true; } continue; }
+      if (/przewid|propon|koncow|srodroczn|roczn|semestraln|klasyfik/.test(key)) continue;
+      if (key.startsWith('ocen')) { const pcs = tokenize(val, ctx); feed(ensureCur(), pcs, true); continue; }
+      if (/^(kategori|opis|rodzaj|kolumn|tytul|nazwa)/.test(key)) { if (ctx.lastGrade && !ctx.lastGrade.cat) ctx.lastGrade.cat = val.trim().slice(0, 80); continue; }
+      if (isKeyword(kv[1])) continue;
+      if (nameLike(kv[1]) || knownMatch(kv[1], existing)) { cur = getSubj(kv[1]); feed(cur, tokenize(val, ctx)); continue; }
+      continue;
+    }
+
+    // Табличная строка: Przedmiot \t оценки \t średnia \t …
+    if (cells.length > 1) {
+      let start = 0;
+      const firstPieces = tokenize(cells[0], { lastGrade: null, pendingCat: '' });
+      if (!firstPieces.some(p => p.t === 'G') && (nameLike(cells[0]) || knownMatch(cells[0], existing))) { cur = getSubj(cells[0]); start = 1; }
+      else if (isKeyword(cells[0])) continue;
+      const subj = ensureCur();
+      const pieces = [];
+      for (let i = start; i < cells.length; i++) if (cells[i]) pieces.push(...tokenize(cells[i], ctx));
+      feed(subj, pieces);
+      continue;
+    }
+
+    // Одиночная строка
+    const words = line.split(/\s+/);
+    const gi = words.findIndex(w => GRADE_START_RE.test(w));
+    if (gi > 0) {
+      const prefix = words.slice(0, gi).join(' ');
+      if (isSubjectName(prefix) || (nameLike(prefix) && !isCategory(prefix))) {
+        cur = getSubj(prefix);
+        feed(cur, tokenize(words.slice(gi).join(' '), ctx));
+        continue;
+      }
+    }
+    if (gi === -1 && !/\d/.test(line.replace(/[\(\[]\s*\d+\s*[\)\]]/g, '')) ) {
+      if (isSubjectName(line)) { cur = getSubj(line); continue; }
+      if (isCategory(line) && line.length <= 40) { if (ctx.lastGrade && !ctx.lastGrade.cat) ctx.lastGrade.cat = line.slice(0, 80); else ctx.pendingCat = line.slice(0, 80); continue; }
+    }
+    const pcs = tokenize(line, ctx);
+    if (pcs.length) feed(ensureCur(), pcs);
+  }
+  return subjects.filter(s => s.grades.length).map(s => ({ name: s.name, grades: s.grades }));
+}
+/*PARSER-END*/
+
+/* ===================== Состояние ===================== */
+const uid = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-3);
+const clampNum = (v, d, min, max) => { v = parseFloat(String(v).replace(',', '.')); if (!isFinite(v)) return d; return Math.min(max, Math.max(min, v)); };
+
+function normalizeSettings(s){
+  s = Object.assign({}, DEF_SETTINGS, s || {});
+  s.plus = clampNum(s.plus, 0.5, 0, 1);
+  s.minus = clampNum(s.minus, 0.25, 0, 1);
+  s.defaultWeight = clampNum(s.defaultWeight, 1, 0, 10);
+  s.margin = clampNum(s.margin, 0.15, 0, 1);
+  let t = Array.isArray(s.thresholds) && s.thresholds.length === 5 ? s.thresholds.map((x, i) => clampNum(x, DEF_SETTINGS.thresholds[i], 1, 6)) : DEF_SETTINGS.thresholds.slice();
+  s.thresholds = t.sort((a, b) => a - b);
+  s.yearMode = s.yearMode === 'mean' ? 'mean' : 'all';
+  s.currentSem = [0, 1, 2].includes(+s.currentSem) ? +s.currentSem : 0;
+  s.catWeights = String(s.catWeights || '');
+  return s;
+}
+function normalizeState(d){
+  d = d || {};
+  return {
+    settings: normalizeSettings(d.settings),
+    view: ['1', '2', 'year'].includes(d.view) ? d.view : null,
+    sort: d.sort || 'order',
+    subjects: (Array.isArray(d.subjects) ? d.subjects : []).map(x => ({
+      id: String(x.id || uid()), name: String(x.name || 'Przedmiot').slice(0, 80),
+      grades: (Array.isArray(x.grades) ? x.grades : []).filter(g => g && parseMark(g.v)).map(g => ({
+        id: String(g.id || uid()), v: String(g.v).toLowerCase(), w: clampNum(g.w, 1, 0, 10),
+        sem: +g.sem === 2 ? 2 : 1, cat: g.cat ? String(g.cat).slice(0, 80) : '', date: g.date ? String(g.date).slice(0, 10) : ''
+      }))
+    }))
+  };
+}
+function load(){
+  try { const raw = localStorage.getItem(KEY); if (raw) return normalizeState(JSON.parse(raw)); } catch (e) {}
+  return normalizeState({});
+}
+let storageOk = true;
+function save(){
+  try { localStorage.setItem(KEY, JSON.stringify(state)); storageOk = true; }
+  catch (e) { if (storageOk) toast('Не удалось сохранить: localStorage недоступен'); storageOk = false; }
+}
+let state = load();
+const S = () => state.settings;
+const ui = { open: new Set(), pad: {}, sim: {}, help: {} };
+try { const o = JSON.parse(localStorage.getItem(KEY + '.open') || '[]'); o.forEach(id => ui.open.add(id)); } catch (e) {}
+const saveOpen = () => { try { localStorage.setItem(KEY + '.open', JSON.stringify([...ui.open])); } catch (e) {} };
+
+/* ===================== Расчёты ===================== */
+function parseMark(v){
+  v = String(v == null ? '' : v).trim().toLowerCase().replace(/[−–]/g, '-');
+  if (INFO_MARKS.includes(v)) return { info: true, label: v };
+  const m = v.match(/^([1-6])([+\-]?)$/);
+  return m ? { info: false, base: +m[1], mod: m[2] } : null;
+}
+function markValue(p){ return p.base + (p.mod === '+' ? S().plus : p.mod === '-' ? -S().minus : 0); }
+function valueOf(v){ const p = parseMark(v); return p && !p.info ? markValue(p) : null; }
+function autoSem(){ const m = new Date().getMonth(); return (m >= 8 || m === 0) ? 1 : 2; }
+function currentSem(){ return S().currentSem || autoSem(); }
+function targetSem(){ return state.view === 'year' ? currentSem() : +state.view; }
+
+function stats(list){
+  let Sw = 0, W = 0, A = 0, n = 0;
+  for (const g of list) {
+    const v = valueOf(g.v); if (v == null) continue;
+    A += v; n++;
+    if (g.w > 0) { Sw += v * g.w; W += g.w; }
+  }
+  return { w: W ? Sw / W : null, a: n ? A / n : null, n, S: Sw, W };
+}
+function gradesIn(sub, view){ return sub.grades.filter(g => view === 'year' || g.sem === +view); }
+function subjStats(sub, view, extra){
+  extra = extra || [];
+  if (view === 'year' && S().yearMode === 'mean') {
+    const a = stats(sub.grades.filter(g => g.sem === 1));
+    const b = stats(sub.grades.filter(g => g.sem === 2).concat(extra));
+    const ws = [a.w, b.w].filter(x => x != null), as = [a.a, b.a].filter(x => x != null);
+    return { w: ws.length ? ws.reduce((x, y) => x + y) / ws.length : null, a: as.length ? as.reduce((x, y) => x + y) / as.length : null, n: a.n + b.n };
+  }
+  return stats(gradesIn(sub, view).concat(extra));
+}
+const r2 = x => Math.round(x * 100 + 1e-9) / 100;
+const fmt = x => x == null ? '—' : r2(x).toFixed(2);
+function propose(avg){ if (avg == null) return null; const a = r2(avg); return 1 + S().thresholds.filter(t => a >= t - 1e-9).length; }
+function status(avg){
+  if (avg == null) return { cls: 'none', label: 'нет оценок', meta: '' };
+  const a = r2(avg), T = S().thresholds, mg = S().margin;
+  const next = T.find(t => t > a + 1e-9);
+  const lower = [...T].reverse().find(t => a >= t - 1e-9);
+  const p = propose(a);
+  const gap = next != null ? r2(next - a) : null;
+  if (gap != null && gap <= mg + 1e-9) return { cls: 'edge', label: 'на грани', meta: `до ${fmt(next)} не хватает ${gap.toFixed(2)}` };
+  let cls = p >= 5 ? 'strong' : p === 4 ? 'good' : p === 3 ? 'mid' : 'weak';
+  const label = { strong: 'уверенно', good: 'стабильно', mid: 'средне', weak: 'проседает' }[cls];
+  let meta = '';
+  if (lower != null && a - lower < mg - 1e-9) meta = `впритык: запас над ${fmt(lower)} всего ${r2(a - lower).toFixed(2)}`;
+  else if (next != null) meta = `до ${fmt(next)}: ${gap.toFixed(2)}`;
+  else meta = 'максимальный порог';
+  return { cls, label, meta };
+}
+
+/* ===================== Подсказчик «сколько нужно» ===================== */
+const COUNT_WORDS = ['ноль', 'одна', 'две', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь', 'девять', 'десять'];
+const countWord = n => COUNT_WORDS[n] || String(n);
+const needVerb = n => n === 1 ? 'нужна' : (n >= 2 && n <= 4) ? 'нужны' : 'нужно';
+function needCount(Sw, W, v, w, t){
+  if (v <= t + 1e-9) return Infinity;
+  if (W === 0) return 1;
+  const x = (t * W - Sw) / (w * (v - t));
+  if (x <= 1e-9) return 0;
+  return Math.ceil(x - 1e-9);
+}
+function helperBase(sub, view, extra){
+  if (view === 'year' && S().yearMode === 'mean') {
+    const a = stats(sub.grades.filter(g => g.sem === 1));
+    const b = stats(sub.grades.filter(g => g.sem === 2).concat(extra));
+    return { Sw: b.S, W: b.W, shift: a.w, note: a.w != null ? 'Год = среднее двух семестров, поэтому считаю по II семестру.' : '' };
+  }
+  const st = stats(gradesIn(sub, view).concat(extra));
+  return { Sw: st.S, W: st.W, shift: null, note: '' };
+}
+function helperHTML(sub){
+  const view = state.view, extra = ui.sim[sub.id] || [];
+  const h = ui.help[sub.id] || (ui.help[sub.id] = { t: null, w: 2 });
+  const full = subjStats(sub, view, extra);
+  const T = S().thresholds;
+  let target = h.t;
+  if (target == null) target = T.find(t => full.w == null || t > r2(full.w) + 1e-9) ?? T[T.length - 1];
+  const base = helperBase(sub, view, extra);
+  let tgt = base.shift != null ? 2 * target - base.shift : target;
+  const cur = base.W ? base.Sw / base.W : null;
+  const curFull = full.w;
+  const chipsT = T.map((t, i) => `<button type="button" data-act="h-target" data-sid="${sub.id}" data-t="${t}" class="${t === target && h.t !== 'custom' ? 'on' : ''}" title="на ${i + 2}">${t.toFixed(2)}</button>`).join('');
+  const chipsW = [1, 2, 3, 4, 5].map(w => `<button type="button" data-act="h-weight" data-sid="${sub.id}" data-w="${w}" class="${w === h.w ? 'on' : ''}">${w}</button>`).join('');
+  let out = '';
+  const planNote = extra.length ? ' <span class="note">(с учётом запланированных)</span>' : '';
+  if (tgt > 6 + 1e-9) {
+    out = `<div class="need">Цель <b>${fmt(target)}</b> в этом периоде уже недостижима: во II семестре понадобилась бы средняя ${fmt(tgt)}.</div>`;
+  } else if (curFull != null && r2(curFull) >= target - 1e-9 && cur != null) {
+    // запас
+    const rows = [1, 2, 3].map(w => {
+      let worst = null;
+      for (let g = 1; g <= 6; g++) { if ((base.Sw + g * w) / (base.W + w) >= tgt - 1e-9) { worst = g; break; } }
+      return { w, worst };
+    });
+    const pick = rows.find(r => r.w === Math.min(3, h.w)) || rows[2];
+    let msg;
+    if (pick.worst === 1) msg = `Запас хороший: даже «1» с весом ${pick.w} не опустит ниже ${fmt(target)}.`;
+    else if (pick.worst == null) msg = `Осторожно: любая следующая оценка с весом ${pick.w} опустит ниже ${fmt(target)}.`;
+    else msg = `Чтобы удержаться на ${fmt(target)}, следующая оценка с весом ${pick.w} должна быть не ниже «${pick.worst}». «${pick.worst - 1}» уже опустит ниже порога.`;
+    out = `<div class="need">Цель <b>${fmt(target)}</b> уже достигнута${planNote}. ${msg}</div>
+      <div class="note" style="margin-top:6px">Минимальная безопасная оценка: ${rows.map(r => `вес ${r.w} → ${r.worst == null ? 'никакая' : '«' + r.worst + '»'}`).join(' · ')}</div>`;
+  } else {
+    const gradesRows = [6, 5, 4, 3, 2].filter(v => v > tgt + 1e-9);
+    const w = h.w;
+    const opts = gradesRows.map(v => ({ v, n: needCount(base.Sw, base.W, v, w, tgt) })).filter(o => o.n >= 1 && o.n <= 10).slice(0, 2);
+    let sentence;
+    if (!gradesRows.length) sentence = `Цель ${fmt(target)} недостижима.`;
+    else if (!opts.length) sentence = `С весом ${w} до <b>${fmt(target)}</b> понадобится больше 10 оценок — попробуй вес побольше.`;
+    else sentence = `Чтобы выйти на <b>${fmt(target)}</b>, ${needVerb(opts[0].n)} ` + opts.map(o => `<b>${countWord(o.n)} «${o.v}»</b> с весом ${w}`).join(' или ') + '.';
+    const head = '<tr><th>оценка \\ вес</th>' + [1, 2, 3, 4, 5].map(x => `<th class="${x === w ? 'hl' : ''}">${x}</th>`).join('') + '</tr>';
+    const body = gradesRows.slice(0, 4).map(v => '<tr><th>«' + v + '»</th>' + [1, 2, 3, 4, 5].map(x => {
+      const n = needCount(base.Sw, base.W, v, x, tgt);
+      return `<td class="${x === w ? 'hl' : ''} ${n > 20 ? 'na' : ''}">${n > 20 ? '>20' : n + '×'}</td>`;
+    }).join('') + '</tr>').join('');
+    out = `<div class="need">${sentence}${planNote}</div>
+      ${gradesRows.length ? `<div class="grid-wrap"><table class="need-grid" aria-label="Сколько оценок нужно"><thead>${head}</thead><tbody>${body}</tbody></table></div>` : ''}`;
+  }
+  return `<div class="row"><span class="lbl">Цель</span><span class="chipsel">${chipsT}</span>
+      <input class="inp w-in" type="number" step="0.01" min="1" max="6" placeholder="своя" data-in="h-custom" data-sid="${sub.id}" value="${h.custom != null ? h.custom : ''}" aria-label="Своя цель"></div>
+    <div class="row"><span class="lbl">Вес</span><span class="chipsel">${chipsW}</span></div>
+    <div style="margin-top:10px">${out}${base.note ? `<div class="note" style="margin-top:6px">${base.note}</div>` : ''}</div>`;
+}
+
+/* ===================== Рендер ===================== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function chipClass(v){ const p = parseMark(v); if (!p) return 'ginfo'; return p.info ? 'ginfo' : 'g' + p.base; }
+function chipHTML(g, sid, planned, idx){
+  const w = g.w;
+  const title = `${g.v}${planned ? ' (план)' : ''} · вес ${w}${g.cat ? ' · ' + g.cat : ''}${g.date ? ' · ' + g.date : ''}`;
+  const sub = w !== 1 && !parseMark(g.v).info ? `<sub>${w}</sub>` : '';
+  const cls = `g ${chipClass(g.v)}${planned ? ' plan' : ''}${w === 0 ? ' w0' : ''}`;
+  if (planned) return `<button type="button" class="${cls}" data-act="sim-remove" data-sid="${sid}" data-i="${idx}" title="${esc(title)} — убрать">${esc(g.v)}${sub}</button>`;
+  return `<button type="button" class="${cls}" data-act="edit-grade" data-sid="${sid}" data-gid="${g.id}" title="${esc(title)}">${esc(g.v === '-' ? '−' : g.v)}${sub}</button>`;
+}
+
+function renderTabs(){
+  if (!state.view) state.view = String(currentSem());
+  document.querySelectorAll('#viewSeg button').forEach(b => { const on = b.dataset.view === state.view; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
+  $('#semTag').textContent = '';
+  $('#sortSel').value = state.sort;
+}
+
+function renderSummary(){
+  const view = state.view;
+  const rows = state.subjects.map(s => ({ s, st: subjStats(s, view) })).filter(r => r.st.w != null);
+  const el = $('#summary');
+  if (!state.subjects.length) { el.classList.add('hidden'); return; }
+  el.classList.remove('hidden');
+  const mean = arr => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null;
+  const overall = mean(rows.map(r => r.st.w));
+  const arith = mean(rows.map(r => r.st.a));
+  const finals = rows.map(r => propose(r.st.w));
+  const finalMean = mean(finals);
+  const counts = { strong: 0, good: 0, mid: 0, edge: 0, weak: 0 };
+  rows.forEach(r => counts[status(r.st.w).cls]++);
+  const total = rows.length || 1;
+  const pasek = finalMean == null ? '—' : finalMean >= 4.75 - 1e-9 ? 'да ✓' : `не хватает ${(4.75 - finalMean).toFixed(2)}`;
+  const nGrades = state.subjects.reduce((a, s) => a + gradesIn(s, view).length, 0);
+  const viewName = view === 'year' ? 'за год' : view === '1' ? 'за I semestr' : 'за II semestr';
+  const st = status(overall);
+  const order = [['strong', 'уверенно'], ['good', 'стабильно'], ['mid', 'средне'], ['edge', 'на грани'], ['weak', 'проседает']];
+  el.innerHTML = `
+    <div class="st-${st.cls}"><div class="big" style="color:var(--st, var(--ink))">${fmt(overall)}</div><div class="big-label">średnia ważona ${viewName}<br>(среднее по ${rows.length} предм.)</div></div>
+    <div class="sum-stats">
+      <div class="stat"><b>${fmt(arith)}</b><span>średnia arytmetyczna</span></div>
+      <div class="stat"><b>${finalMean == null ? '—' : finalMean.toFixed(2)}</b><span>средняя итоговых оценок</span></div>
+      <div class="stat"><b>${pasek}</b><span>pasek (≥ 4.75)</span></div>
+      <div class="stat"><b>${nGrades}</b><span>оценок в периоде</span></div>
+    </div>
+    <div class="dist">
+      <div class="dist-bar" role="img" aria-label="Распределение предметов по статусу">${order.map(([k]) => counts[k] ? `<i style="width:${counts[k] / total * 100}%;background:var(--${k})"></i>` : '').join('')}</div>
+      <div class="legend">${order.map(([k, l]) => `<span><span class="dot" style="background:var(--${k})"></span>${l} <b>${counts[k]}</b></span>`).join('')}</div>
+    </div>`;
+}
+
+function sortedSubjects(){
+  const view = state.view;
+  const arr = state.subjects.map((s, i) => ({ s, i, a: subjStats(s, view).w }));
+  const risk = { weak: 0, edge: 1, mid: 2, good: 3, strong: 4, none: 5 };
+  const cmpName = (x, y) => x.s.name.localeCompare(y.s.name, 'pl');
+  switch (state.sort) {
+    case 'name': arr.sort(cmpName); break;
+    case 'avg-desc': arr.sort((x, y) => (y.a ?? -1) - (x.a ?? -1)); break;
+    case 'avg-asc': arr.sort((x, y) => (x.a ?? 99) - (y.a ?? 99)); break;
+    case 'risk': arr.sort((x, y) => (risk[status(x.a).cls] - risk[status(y.a).cls]) || ((x.a ?? 99) - (y.a ?? 99))); break;
+  }
+  return arr.map(x => x.s);
+}
+
+function renderList(){
+  const list = $('#list');
+  if (!state.subjects.length) {
+    list.innerHTML = `<div class="emptystate"><b>Пока нет предметов</b><p>Вставьте оценки из eduvulcan, добавьте предмет вручную или посмотрите на демо-данных.</p>
+      <div class="row"><button class="btn primary" data-act="open-import">Импорт из eduvulcan</button><button class="btn" data-act="open-add-subject">+ Предмет</button><button class="btn" data-act="demo">Демо</button></div></div>`;
+    return;
+  }
+  list.innerHTML = sortedSubjects().map(cardHTML).join('');
+}
+function updateCard(sid){
+  const s = findSub(sid); const el = document.getElementById('c-' + sid);
+  if (!s || !el) return renderAll();
+  el.outerHTML = cardHTML(s);
+  renderSummary();
+}
+
+function cardHTML(sub){
+  const view = state.view;
+  const st = subjStats(sub, view);
+  const ss = status(st.w);
+  const p = propose(st.w);
+  const open = ui.open.has(sub.id);
+  const gl = gradesIn(sub, view).slice().sort((a, b) => (a.sem - b.sem));
+  const chips = gl.length ? gl.map(g => chipHTML(g, sub.id)).join('') : `<span class="empty">нет оценок в этом периоде</span>`;
+  return `<article class="card st-${ss.cls}${open ? ' open' : ''}" id="c-${sub.id}">
+    <button type="button" class="card-head" data-act="toggle" data-sid="${sub.id}" aria-expanded="${open}">
+      <div class="ch-main"><div class="ch-name">${esc(sub.name)}</div>
+        <div class="ch-meta"><span class="tag">${ss.label}</span>${ss.meta ? esc(ss.meta) : ''}</div></div>
+      <div class="ch-avg"><span class="avg">${fmt(st.w)}</span>
+        <div class="ch-sub">${st.a != null ? 'ar. ' + fmt(st.a) + ' · ' : ''}${p ? 'итог ≈ ' + p : ''}</div></div>
+      <svg class="chev" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="chips">${chips}</div>
+    ${open ? bodyHTML(sub) : ''}
+  </article>`;
+}
+
+function bodyHTML(sub){
+  const pad = ui.pad[sub.id] || (ui.pad[sub.id] = { mod: '', w: S().defaultWeight || 1, cat: '' });
+  const tsem = targetSem();
+  const mods = [['-', '−'], ['', '·'], ['+', '+']].map(([m, l]) => `<button type="button" data-act="pad-mod" data-sid="${sub.id}" data-mod="${m}" class="${pad.mod === m ? 'on' : ''}" aria-label="модификатор ${l}">${l}</button>`).join('');
+  const ws = [1, 2, 3, 4, 5].map(w => `<button type="button" data-act="pad-w" data-sid="${sub.id}" data-w="${w}" class="${pad.w === w ? 'on' : ''}">${w}</button>`).join('');
+  const digits = [1, 2, 3, 4, 5, 6].map(d => {
+    const v = d + pad.mod; const ok = MARKS.includes(v);
+    return `<button type="button" class="g g${d}" data-act="pad-add" data-sid="${sub.id}" data-v="${v}" ${ok ? '' : 'disabled'}>${v}</button>`;
+  }).join('');
+  const infos = INFO_MARKS.map(m => `<button type="button" data-act="pad-add" data-sid="${sub.id}" data-v="${m}">${m === '-' ? '−' : m}</button>`).join('');
+  const sims = ui.sim[sub.id] || [];
+  const simRows = sims.map((g, i) => `<div class="plan-row">
+      <select class="inp" data-in="sim-v" data-sid="${sub.id}" data-i="${i}" aria-label="Оценка">${MARKS.slice().reverse().map(m => `<option ${m === g.v ? 'selected' : ''}>${m}</option>`).join('')}</select>
+      <select class="inp" data-in="sim-w" data-sid="${sub.id}" data-i="${i}" aria-label="Вес">${[1, 2, 3, 4, 5].map(w => `<option value="${w}" ${w === g.w ? 'selected' : ''}>вес ${w}</option>`).join('')}</select>
+      <button type="button" class="btn icon ghost" data-act="sim-remove" data-sid="${sub.id}" data-i="${i}" aria-label="Убрать">✕</button></div>`).join('');
+  return `<div class="card-body">
+    <section class="blk">
+      <h4>Добавить оценку <em>→ ${tsem === 1 ? 'I' : 'II'} semestr</em></h4>
+      <div class="row"><span class="seg chipsel" role="group" aria-label="Плюс/минус">${mods}</span><span class="lbl" style="min-width:auto;margin-left:6px">вес</span><span class="chipsel">${ws}</span>
+        <input class="inp w-in" type="number" min="0" max="10" step="0.5" data-in="pad-w" data-sid="${sub.id}" value="${[1, 2, 3, 4, 5].includes(pad.w) ? '' : pad.w}" placeholder="др." aria-label="Другой вес"></div>
+      <div class="row"><input class="inp cat-in" list="catList" placeholder="Категория (необязательно)" data-in="pad-cat" data-sid="${sub.id}" value="${esc(pad.cat)}" maxlength="80"></div>
+      <div class="digits">${digits}</div>
+      <div class="infos">${infos}<span class="note" style="align-self:center">— отметки, не влияют на среднюю</span></div>
+    </section>
+    <section class="blk">
+      <h4>Что если? <em>до 3 планируемых оценок</em></h4>
+      <div id="simrows-${sub.id}">${simRows}</div>
+      <div class="row">
+        <button type="button" class="btn" data-act="sim-add" data-sid="${sub.id}" ${sims.length >= 3 ? 'disabled' : ''}>+ Планируемая оценка</button>
+        ${sims.length ? `<button type="button" class="btn ghost" data-act="sim-commit" data-sid="${sub.id}">Сделать настоящими</button><button type="button" class="btn ghost" data-act="sim-clear" data-sid="${sub.id}">Очистить</button>` : ''}
+      </div>
+      <div id="sim-${sub.id}">${simResultHTML(sub)}</div>
+    </section>
+    <section class="blk">
+      <h4>Сколько нужно до порога?</h4>
+      <div id="help-${sub.id}">${helperHTML(sub)}</div>
+    </section>
+    <div class="card-foot">
+      <span class="note">${sub.grades.length} оценок всего · I: ${sub.grades.filter(g => g.sem === 1).length}, II: ${sub.grades.filter(g => g.sem === 2).length}</span>
+      <span class="row"><button type="button" class="btn ghost" data-act="rename" data-sid="${sub.id}">Переименовать</button><button type="button" class="btn ghost danger" data-act="del-subject" data-sid="${sub.id}">Удалить предмет</button></span>
+    </div>
+  </div>`;
+}
+function simResultHTML(sub){
+  const sims = ui.sim[sub.id] || [];
+  if (!sims.length) return `<div class="note" style="margin-top:8px">Добавь планируемую оценку, например «контрольная, вес 3, оценка 5», — средняя пересчитается сразу.</div>`;
+  const view = state.view;
+  const a = subjStats(sub, view).w, b = subjStats(sub, view, sims).w;
+  const d = a == null ? null : r2(b) - r2(a);
+  const pa = propose(a), pb = propose(b);
+  const ss = status(b);
+  return `<div class="result st-${ss.cls}">
+    Сейчас <b>${fmt(a)}</b> <span class="arrow">→</span> станет <b style="color:var(--st)">${fmt(b)}</b>
+    ${d != null ? `<span class="${d >= 0 ? 'delta-up' : 'delta-down'}">(${d >= 0 ? '+' : ''}${d.toFixed(2)})</span>` : ''}
+    <div class="small muted" style="margin-top:3px">Итоговая: ${pa ?? '—'} → <b>${pb ?? '—'}</b>${pa != null && pb !== pa ? (pb > pa ? ' — повышение!' : ' — понижение') : ''} · ${ss.label}${ss.meta ? ', ' + esc(ss.meta) : ''}</div>
+    <div class="chips" style="padding:8px 0 0">${sims.map((g, i) => chipHTML(g, sub.id, true, i)).join('')}</div>
+  </div>`;
+}
+function refreshSim(sid){
+  const s = findSub(sid); if (!s) return;
+  const a = document.getElementById('sim-' + sid), h = document.getElementById('help-' + sid);
+  if (a) a.innerHTML = simResultHTML(s);
+  if (h) h.innerHTML = helperHTML(s);
+}
+function renderAll(){ renderTabs(); renderSummary(); renderList(); renderSubjList(); }
+function renderSubjList(){
+  const have = new Set(state.subjects.map(s => normTxt(s.name)));
+  const names = ['Matematyka', 'Język polski', 'Język angielski', 'Język niemiecki', 'Język hiszpański', 'Historia', 'Historia i teraźniejszość', 'Wiedza o społeczeństwie', 'Biologia', 'Chemia', 'Fizyka', 'Geografia', 'Informatyka', 'Wychowanie fizyczne', 'Edukacja dla bezpieczeństwa', 'Religia', 'Plastyka', 'Muzyka', 'Technika', 'Podstawy przedsiębiorczości', 'Biznes i zarządzanie', 'Filozofia'];
+  $('#subjList').innerHTML = names.filter(n => !have.has(normTxt(n))).map(n => `<option>${n}</option>`).join('');
+}
+
+/* ===================== Действия ===================== */
+const findSub = id => state.subjects.find(s => s.id === id);
+let undoSnap = null, toastTimer = null;
+function snapshot(){ return JSON.stringify(state); }
+function toast(msg, undo){
+  const t = $('#toast'); $('#toastMsg').textContent = msg;
+  const ub = $('#toastUndo');
+  if (undo) { undoSnap = undo; ub.classList.remove('hidden'); } else { undoSnap = null; ub.classList.add('hidden'); }
+  t.classList.add('show'); clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), undo ? 6000 : 2600);
+}
+$('#toastUndo').addEventListener('click', () => {
+  if (!undoSnap) return;
+  state = normalizeState(JSON.parse(undoSnap)); undoSnap = null; save(); renderAll();
+  $('#toast').classList.remove('show');
+});
+
+function addGrade(sid, v){
+  const s = findSub(sid); if (!s) return;
+  const pad = ui.pad[sid] || {};
+  const w = parseMark(v).info ? 0 : (pad.w ?? S().defaultWeight);
+  const g = { id: uid(), v, w: parseMark(v).info ? 1 : w, sem: targetSem(), cat: (pad.cat || '').trim(), date: new Date().toISOString().slice(0, 10) };
+  const snap = snapshot();
+  s.grades.push(g); pad.mod = '';
+  save(); updateCard(sid);
+  toast(`Добавлено «${v}»${parseMark(v).info ? '' : ' · вес ' + g.w} — ${s.name}`, snap);
+}
+
+let editing = null;
+function openGrade(sid, gid){
+  const s = findSub(sid); const g = s && s.grades.find(x => x.id === gid); if (!g) return;
+  editing = { sid, gid };
+  const f = $('#gradeForm');
+  f.v.innerHTML = MARKS.slice().reverse().concat(INFO_MARKS).map(m => `<option value="${m}" ${m === g.v ? 'selected' : ''}>${m}${INFO_MARKS.includes(m) ? ' (отметка)' : ''}</option>`).join('');
+  f.w.value = g.w; f.sem.value = g.sem; f.cat.value = g.cat || ''; f.date.value = g.date || '';
+  $('#gradeTitle').textContent = `Оценка · ${s.name}`;
+  $('#dlgGrade').showModal();
+}
+$('#gradeForm').addEventListener('submit', e => {
+  e.preventDefault(); if (!editing) return;
+  const s = findSub(editing.sid); const g = s && s.grades.find(x => x.id === editing.gid); if (!g) return;
+  const f = e.target;
+  g.v = f.v.value; g.w = clampNum(f.w.value, 1, 0, 10); g.sem = +f.sem.value === 2 ? 2 : 1; g.cat = f.cat.value.trim(); g.date = f.date.value;
+  save(); $('#dlgGrade').close(); updateCard(s.id);
+});
+
+let renaming = null;
+function openSubjectDlg(sid){
+  renaming = sid || null;
+  const f = $('#subjectForm');
+  f.name.value = sid ? findSub(sid).name : '';
+  $('#subjectTitle').textContent = sid ? 'Переименовать предмет' : 'Новый предмет';
+  $('#dlgSubject').showModal(); setTimeout(() => f.name.focus(), 50);
+}
+$('#subjectForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = e.target.name.value.trim().slice(0, 80); if (!name) return;
+  if (renaming) { findSub(renaming).name = name; }
+  else {
+    const ex = state.subjects.find(s => normTxt(s.name) === normTxt(name));
+    if (ex) { ui.open.add(ex.id); toast('Такой предмет уже есть'); }
+    else { const s = { id: uid(), name, grades: [] }; state.subjects.push(s); ui.open.add(s.id); saveOpen(); }
+  }
+  save(); $('#dlgSubject').close(); renderAll();
+});
+
+/* ===================== Клики ===================== */
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if (!el) return;
+  const act = el.dataset.act, sid = el.dataset.sid;
+  switch (act) {
+    case 'view': state.view = el.dataset.view; save(); renderAll(); break;
+    case 'toggle':
+      if (ui.open.has(sid)) ui.open.delete(sid); else ui.open.add(sid);
+      saveOpen(); updateCard(sid); break;
+    case 'close': el.closest('dialog').close(); break;
+    case 'theme': {
+      const r = document.documentElement; const curDark = r.dataset.theme ? r.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+      r.dataset.theme = curDark ? 'light' : 'dark';
+      try { localStorage.setItem(KEY + '.theme', r.dataset.theme); } catch (er) {}
+      break; }
+    case 'open-import': openImport(); break;
+    case 'open-settings': openSettings(); break;
+    case 'open-data': openData(); break;
+    case 'open-add-subject': openSubjectDlg(); break;
+    case 'rename': openSubjectDlg(sid); break;
+    case 'del-subject': {
+      const s = findSub(sid); if (!s) break;
+      const snap = snapshot();
+      state.subjects = state.subjects.filter(x => x.id !== sid); save(); renderAll();
+      toast(`Предмет «${s.name}» удалён`, snap); break; }
+    case 'edit-grade': openGrade(sid, el.dataset.gid); break;
+    case 'delete-grade': {
+      if (!editing) break;
+      const s = findSub(editing.sid); const snap = snapshot();
+      s.grades = s.grades.filter(g => g.id !== editing.gid); save(); $('#dlgGrade').close(); updateCard(s.id);
+      toast('Оценка удалена', snap); break; }
+    case 'pad-mod': ui.pad[sid].mod = el.dataset.mod; updateCard(sid); break;
+    case 'pad-w': ui.pad[sid].w = +el.dataset.w; updateCard(sid); break;
+    case 'pad-add': addGrade(sid, el.dataset.v); break;
+    case 'sim-add': {
+      const arr = ui.sim[sid] || (ui.sim[sid] = []);
+      if (arr.length < 3) arr.push({ v: '5', w: 3 });
+      updateCard(sid); break; }
+    case 'sim-remove': (ui.sim[sid] || []).splice(+el.dataset.i, 1); updateCard(sid); break;
+    case 'sim-clear': ui.sim[sid] = []; updateCard(sid); break;
+    case 'sim-commit': {
+      const s = findSub(sid); const snap = snapshot();
+      (ui.sim[sid] || []).forEach(g => s.grades.push({ id: uid(), v: g.v, w: g.w, sem: targetSem(), cat: 'Plan', date: new Date().toISOString().slice(0, 10) }));
+      ui.sim[sid] = []; save(); updateCard(sid); toast('Запланированные оценки добавлены', snap); break; }
+    case 'h-target': { const h = ui.help[sid]; h.t = +el.dataset.t; h.custom = null; refreshSim(sid); break; }
+    case 'h-weight': ui.help[sid].w = +el.dataset.w; refreshSim(sid); break;
+    case 'parse': runParse(); break;
+    case 'paste-example': $('#pasteArea').value = EXAMPLE; runParse(); break;
+    case 'do-import': doImport(); break;
+    case 'pv-toggle': break;
+    case 'export': exportJSON(); break;
+    case 'demo': loadDemo(); break;
+    case 'wipe':
+      if (!confirm('Удалить все предметы и оценки? Это действие можно отменить только сразу после удаления.')) break;
+      { const snap = snapshot(); state.subjects = []; save(); renderAll(); $('#dlgData').open && $('#dlgData').close(); toast('Все данные удалены', snap); }
+      break;
+    case 'reset-settings': fillSettings(normalizeSettings({})); break;
+  }
+});
+document.addEventListener('input', e => {
+  const el = e.target; const k = el.dataset && el.dataset.in; if (!k) return;
+  const sid = el.dataset.sid;
+  if (k === 'pad-cat') ui.pad[sid].cat = el.value;
+  else if (k === 'pad-w') { const v = parseFloat(el.value.replace(',', '.')); if (isFinite(v)) { ui.pad[sid].w = Math.min(10, Math.max(0, v)); document.querySelectorAll(`#c-${sid} [data-act=pad-w]`).forEach(b => b.classList.toggle('on', +b.dataset.w === ui.pad[sid].w)); } }
+  else if (k === 'h-custom') {
+    const v = parseFloat(el.value.replace(',', '.'));
+    const h = ui.help[sid]; h.custom = el.value;
+    if (isFinite(v) && v >= 1 && v <= 6) { h.t = v; const box = document.getElementById('help-' + sid); const pos = el.selectionStart; box.innerHTML = helperHTML(findSub(sid)); const ni = box.querySelector('[data-in=h-custom]'); ni.focus(); try { ni.setSelectionRange(pos, pos); } catch (er) {} }
+  }
+});
+document.addEventListener('change', e => {
+  const el = e.target; const k = el.dataset && el.dataset.in; if (!k) return;
+  const sid = el.dataset.sid;
+  if (k === 'sim-v' || k === 'sim-w') {
+    const g = ui.sim[sid][+el.dataset.i]; if (!g) return;
+    if (k === 'sim-v') g.v = el.value; else g.w = +el.value;
+    refreshSim(sid);
+  }
+});
+$('#sortSel').addEventListener('change', e => { state.sort = e.target.value; save(); renderList(); });
+
+/* ===================== Импорт из eduvulcan ===================== */
+let parsed = [];
+const EXAMPLE = `Przedmiot\tOceny cząstkowe\tŚrednia\tPrzewidywana ocena śródroczna\tOcena śródroczna
+Matematyka\t4 5- 3+ 2 4 np\t3,63\t4\t
+Język polski\t5 5- 4+ 6 4\t4,85\t5\t
+Język angielski\t4+ 5 5 3\t4,38\t4\t
+Fizyka: 5(3) 4(2) 3+[1] 6 x2
+Chemia
+Ocena: 4-
+Waga: 3
+Kategoria: Sprawdzian
+Ocena: 5
+Waga: 1
+Kategoria: Odpowiedź
+Ocena: 2+
+Waga: 2
+Kategoria: Kartkówka`;
+
+function openImport(){ $('#dlgImport').showModal(); renderPreview(); }
+let parseTimer = null;
+$('#pasteArea').addEventListener('input', () => { clearTimeout(parseTimer); parseTimer = setTimeout(runParse, 350); });
+function catWeightMap(){
+  const m = new Map();
+  S().catWeights.split(/\n|;/).forEach(l => { const p = l.split('='); if (p.length === 2) { const w = parseFloat(p[1].replace(',', '.')); if (isFinite(w)) m.set(normTxt(p[0]), w); } });
+  return m;
+}
+function matchExisting(name){
+  const n = normTxt(name);
+  return state.subjects.find(s => normTxt(s.name) === n) || state.subjects.find(s => { const k = normTxt(s.name); return n.startsWith(k + ' ') || k.startsWith(n + ' '); }) || null;
+}
+function runParse(){
+  const txt = $('#pasteArea').value;
+  const res = parseVulcan(txt, { existingNames: state.subjects.map(s => s.name) });
+  const cw = catWeightMap();
+  parsed = res.map(s => ({
+    name: s.name, include: true,
+    grades: s.grades.map(g => {
+      let w = g.w;
+      if (!g.wExplicit) { w = S().defaultWeight; if (g.cat) { const n = normTxt(g.cat); for (const [k, v] of cw) if (n.startsWith(k)) { w = v; break; } } }
+      return { v: g.v, w: clampNum(w, 1, 0, 10), cat: g.cat || '', group: g.group, semHint: g.semHint };
+    })
+  }));
+  renderPreview();
+}
+function resolveSem(g, anySecond){
+  const opt = $('#impSem').value;
+  if (opt !== 'auto') return +opt;
+  if (g.semHint) return g.semHint;
+  return anySecond ? 1 : currentSem();
+}
+function renderPreview(){
+  const box = $('#preview'); const btn = $('#doImportBtn');
+  const txt = $('#pasteArea').value.trim();
+  if (!parsed.length) {
+    box.innerHTML = txt ? `<div class="note">Ничего не распознано. Проверьте, что в тексте есть названия предметов и оценки (например «Matematyka 5 4+ 3»).</div>` : '';
+    $('#parseInfo').textContent = ''; btn.disabled = true; btn.textContent = 'Импортировать'; return;
+  }
+  const anySecond = parsed.some(s => s.grades.some(g => g.group === 1));
+  let total = 0;
+  box.innerHTML = parsed.map((s, i) => {
+    const ex = matchExisting(s.name);
+    const counted = s.grades.filter(g => !parseMark(g.v).info).length;
+    if (s.include) total += s.grades.length;
+    const sems = [...new Set(s.grades.map(g => resolveSem(g, anySecond)))].sort().map(x => x === 1 ? 'I' : 'II').join(' + ');
+    const st = stats(s.grades);
+    return `<div class="pv${s.include ? '' : ' off'}">
+      <div class="pv-h"><label class="check"><input type="checkbox" data-pv="inc" data-i="${i}" ${s.include ? 'checked' : ''} aria-label="Импортировать предмет"></label>
+        <input type="text" class="inp" data-pv="name" data-i="${i}" value="${esc(s.name)}" aria-label="Название предмета">
+        <span class="tag ${ex ? '' : 'new'}">${ex ? '→ ' + esc(ex.name) : 'новый'}</span></div>
+      <div class="chips">${s.grades.map(g => `<span class="g ${chipClass(g.v)}" title="${esc((g.cat ? g.cat + ' · ' : '') + 'вес ' + g.w)}">${esc(g.v)}${g.w !== 1 && !parseMark(g.v).info ? `<sub>${g.w}</sub>` : ''}</span>`).join('')}</div>
+      <div class="pv-sum">${s.grades.length} отм. (${counted} в расчёте) · семестр ${sems} · średnia ważona ${fmt(st.w)}</div>
+    </div>`;
+  }).join('');
+  $('#parseInfo').textContent = `Найдено предметов: ${parsed.length}`;
+  btn.disabled = !total; btn.textContent = `Импортировать (${total})`;
+}
+$('#preview').addEventListener('change', e => {
+  const el = e.target; const i = +el.dataset.i; if (!parsed[i]) return;
+  if (el.dataset.pv === 'inc') { parsed[i].include = el.checked; renderPreview(); }
+  if (el.dataset.pv === 'name') { parsed[i].name = el.value.trim() || parsed[i].name; renderPreview(); }
+});
+['#impSem', '#impMode'].forEach(s => $(s).addEventListener('change', renderPreview));
+function doImport(){
+  const mode = $('#impMode').value;
+  const anySecond = parsed.some(s => s.grades.some(g => g.group === 1));
+  const snap = snapshot();
+  let nG = 0, nS = 0;
+  for (const p of parsed) {
+    if (!p.include || !p.grades.length) continue;
+    let sub = matchExisting(p.name);
+    if (!sub) { sub = { id: uid(), name: p.name, grades: [] }; state.subjects.push(sub); nS++; }
+    const newGrades = p.grades.map(g => ({ id: uid(), v: g.v, w: g.w, sem: resolveSem(g, anySecond), cat: g.cat, date: '' }));
+    if (mode === 'replace') { const sems = new Set(newGrades.map(g => g.sem)); sub.grades = sub.grades.filter(g => !sems.has(g.sem)); }
+    sub.grades.push(...newGrades); nG += newGrades.length;
+  }
+  save(); $('#dlgImport').close();
+  $('#pasteArea').value = ''; parsed = [];
+  renderAll();
+  toast(`Импортировано: ${nG} отм.${nS ? `, новых предметов: ${nS}` : ''}`, snap);
+}
+
+/* ===================== Настройки ===================== */
+function fillSettings(s){
+  const f = $('#settingsForm');
+  f.plus.value = s.plus; f.minus.value = s.minus; f.defaultWeight.value = s.defaultWeight; f.margin.value = s.margin;
+  s.thresholds.forEach((t, i) => f['t' + i].value = t);
+  f.yearMode.value = s.yearMode; f.currentSem.value = s.currentSem; f.catWeights.value = s.catWeights;
+}
+function openSettings(){ fillSettings(S()); $('#dlgSettings').showModal(); }
+$('#settingsForm').addEventListener('submit', e => {
+  e.preventDefault(); const f = e.target;
+  state.settings = normalizeSettings({
+    plus: f.plus.value, minus: f.minus.value, defaultWeight: f.defaultWeight.value, margin: f.margin.value,
+    thresholds: [0, 1, 2, 3, 4].map(i => f['t' + i].value), yearMode: f.yearMode.value, currentSem: f.currentSem.value, catWeights: f.catWeights.value
+  });
+  ui.pad = {}; ui.help = {};
+  save(); $('#dlgSettings').close(); renderAll(); toast('Настройки сохранены');
+});
+
+/* ===================== Данные ===================== */
+function openData(){
+  const bytes = new Blob([JSON.stringify(state)]).size;
+  $('#storageInfo').textContent = `Предметов: ${state.subjects.length}, оценок: ${state.subjects.reduce((a, s) => a + s.grades.length, 0)}, объём ≈ ${(bytes / 1024).toFixed(1)} КБ.`;
+  $('#dlgData').showModal();
+}
+function exportJSON(){
+  const data = JSON.stringify({ app: 'moja-srednia', version: 1, exported: new Date().toISOString(), settings: state.settings, subjects: state.subjects }, null, 2);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([data], { type: 'application/json' }));
+  a.download = `srednia-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  toast('Бэкап скачан');
+}
+$('#fileIn').addEventListener('change', e => {
+  const file = e.target.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const d = JSON.parse(r.result);
+      if (!d || !Array.isArray(d.subjects)) throw new Error('нет списка subjects');
+      if (state.subjects.length && !confirm('Заменить текущие данные содержимым бэкапа?')) return;
+      const snap = snapshot();
+      const ns = normalizeState(d); ns.view = state.view; ns.sort = state.sort;
+      state = ns; save(); renderAll(); $('#dlgData').close();
+      toast(`Бэкап загружен: ${state.subjects.length} предм.`, snap);
+    } catch (er) { toast('Не удалось прочитать файл: ' + er.message); }
+    e.target.value = '';
+  };
+  r.readAsText(file);
+});
+const DEMO = [
+  ['Matematyka', '3:3 4-:2 3+:1 4:3 2+:2 4+:1 3:3 5-:1', '4:3 3+:2 4-:1 3:2'],
+  ['Język polski', '5:3 4+:2 5-:1 4:3 5:2 np 5:1 4+:3', '5:3 5-:2 4:1'],
+  ['Język angielski', '5:2 6:1 5+:3 5:2 4+:1 5:3', '6:3 5:2 5:1'],
+  ['Informatyka', '6:2 5:1 6:3 5+:2 +:1 6:1', '6:3 5:1'],
+  ['Historia', '4:3 3+:2 4-:1 3:3 4:2', '4:3 4+:1'],
+  ['Biologia', '5-:3 5:2 4+:1 4:3 5:1', '5:3 4:2'],
+  ['Chemia', '2+:3 3-:2 2:1 3:3 bz 2+:2', '3:3 2+:2'],
+  ['Fizyka', '3+:3 4:2 3:1 3+:3 4-:2', '4:3 3:2 4:1'],
+  ['Geografia', '4+:2 5:1 4:3 5-:2', '5:2 4+:3'],
+  ['Wychowanie fizyczne', '6:1 5+:1 6:1 5:1 np', '6:1 6:1']
+];
+const DEMO_CAT = { 3: 'Sprawdzian', 2: 'Kartkówka', 1: 'Odpowiedź' };
+function loadDemo(){
+  if (state.subjects.length && !confirm('Заменить текущие предметы демо-данными? (Можно будет отменить.)')) return;
+  const snap = state.subjects.length ? snapshot() : null;
+  state.subjects = DEMO.map(([name, s1, s2]) => ({
+    id: uid(), name,
+    grades: [[s1, 1], [s2, 2]].flatMap(([str, sem]) => str.split(' ').map((t, i) => {
+      const [v, w] = t.split(':');
+      return { id: uid(), v, w: w ? +w : 1, sem, cat: w ? DEMO_CAT[w] : 'Aktywność', date: '' };
+    }))
+  }));
+  ui.open.clear(); ui.open.add(state.subjects[0].id); saveOpen();
+  save(); renderAll();
+  const d = $('#dlgData'); if (d.open) d.close();
+  toast('Демо-предметы загружены', snap);
+}
+
+/* ===================== Старт ===================== */
+try { const th = localStorage.getItem(KEY + '.theme'); if (th) document.documentElement.dataset.theme = th; } catch (e) {}
+document.querySelectorAll('dialog').forEach(d => d.addEventListener('click', e => { if (e.target === d) d.close(); }));
+renderAll();
+</script>
+</body>
+</html>
