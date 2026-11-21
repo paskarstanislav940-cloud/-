@@ -9,7 +9,9 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23D9381E'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' text-anchor='middle' fill='%23F6F5F0'%3Ef%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Prata&family=Golos+Text:wght@400..900&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<!-- Prata: кириллица (RU/UK) + латиница, но БЕЗ польских ą ę ł ś ż → для PL заголовки идут в Playfair Display.
+     Golos Text и Caveat покрывают все четыре языка. -->
+<link href="https://fonts.googleapis.com/css2?family=Prata&family=Playfair+Display:wght@400&family=Golos+Text:wght@400..900&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
 
 <style>
 /* ==========================================================================
@@ -28,7 +30,7 @@
   --acc:#D9381E;
   --acc-soft:rgba(217,56,30,.14);
 
-  --f-display:'Prata', 'Times New Roman', serif;
+  --f-display:'Prata', 'Playfair Display', 'Times New Roman', serif;
   --f-text:'Golos Text', system-ui, sans-serif;
   --f-hand:'Caveat', cursive;
 
@@ -37,6 +39,8 @@
   --ease:cubic-bezier(.2,.8,.2,1);
   --shadow:0 1px 0 rgba(18,18,18,.06), 0 10px 24px -14px rgba(18,18,18,.35);
 }
+/* польский: в Prata нет ą ę ł ś ź ż — вся антиква переключается на Playfair Display, чтобы слова не собирались из двух шрифтов */
+html[lang="pl"]{--f-display:'Playfair Display', 'Times New Roman', serif}
 
 *,*::before,*::after{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:72px}
@@ -55,6 +59,8 @@ button,input,textarea{font:inherit;color:inherit}
 button{cursor:pointer;background:none;border:0;padding:0}
 ::selection{background:var(--acc);color:var(--paper)}
 :focus-visible{outline:2px solid var(--acc);outline-offset:3px;border-radius:4px}
+/* длинные слова (EN/RU/UK/PL) переносятся целиком, а рвутся только если физически не помещаются — без «не-дбало» */
+h2,h3,.c-title,.c-hand,.q-h,.c-row strong,.sec-num,.margin-note,.hand{overflow-wrap:break-word}
 .hand{font-family:var(--f-hand);font-weight:700}
 .acc{color:var(--acc)}
 
@@ -74,14 +80,25 @@ button{cursor:pointer;background:none;border:0;padding:0}
   border-bottom:1px solid rgba(18,18,18,.12);
 }
 .top-in{max-width:var(--max);margin:0 auto;height:64px;padding:0 var(--gut);display:flex;align-items:center;gap:18px}
-.logo{font:400 24px/1 var(--f-display);text-decoration:none;letter-spacing:-.01em;display:flex;align-items:baseline;gap:2px}
+.logo{font:400 24px/1 'Prata', serif;text-decoration:none;letter-spacing:-.01em;display:flex;align-items:baseline;gap:2px;flex:none}
 .logo i{width:7px;height:7px;border-radius:50%;background:var(--acc);display:inline-block;transform:translateY(-1px)}
-.top-note{font-size:13px;color:var(--ink-3);padding-left:18px;border-left:1px solid var(--line);white-space:nowrap}
-.top-nav{margin-left:auto;display:flex;align-items:center;gap:6px}
-.top-nav a{font-size:14px;text-decoration:none;padding:8px 12px;border-radius:999px;transition:background .2s}
+.top-note{font-size:13px;color:var(--ink-3);padding-left:18px;border-left:1px solid var(--line);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.top-nav{margin-left:auto;display:flex;align-items:center;gap:6px;flex:none}
+.top-nav a{font-size:14px;text-decoration:none;padding:8px 12px;border-radius:999px;transition:background .2s;white-space:nowrap}
 .top-nav a:hover{background:var(--kraft)}
 .top-nav .pill{background:var(--ink);color:var(--paper)}
 .top-nav .pill:hover{background:var(--acc)}
+.top-nav .pill .s{display:none}
+
+/* переключатель языка */
+.lang{display:flex;align-items:center;gap:1px;padding:3px;border:1.5px solid var(--line-2);border-radius:999px;flex:none}
+.lang button{
+  font:600 12px/1 var(--f-text);letter-spacing:.04em;min-width:31px;padding:7px 6px;border-radius:999px;color:var(--ink-2);
+  transition:background .2s,color .2s;
+}
+.lang button:hover{color:var(--ink);background:var(--kraft)}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.foot .lang{border-color:var(--line)}
 
 /* ==========================================================================
    Hero
@@ -90,10 +107,11 @@ button{cursor:pointer;background:none;border:0;padding:0}
 .hero{position:relative;padding-top:clamp(40px,7vw,96px);padding-bottom:clamp(56px,8vw,120px)}
 .hero-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:0 24px;align-items:end}
 .hero h1{
-  grid-column:1 / 11;margin:0;
+  grid-column:1 / 11;margin:0;min-width:0;
   font:400 clamp(46px,8.6vw,148px)/.96 var(--f-display);letter-spacing:-.025em;
 }
-.hero h1 .ln{display:block;overflow:hidden;padding:.1em 0 .08em;margin:-.1em 0 -.08em}
+/* строки не переносятся — вместо этого размер подгоняется скриптом под самую длинную строку (EN/RU/UK/PL) */
+.hero h1 .ln{display:block;overflow:hidden;padding:.1em 0 .08em;margin:-.1em 0 -.08em;white-space:nowrap}
 .hero h1 .ln > span{display:inline-block;transform:translateY(110%);transition:transform 1s var(--ease)}
 .hero h1 .ln:nth-child(2) > span{transition-delay:.08s}
 .hero h1 .ln:nth-child(3) > span{transition-delay:.16s}
@@ -107,10 +125,8 @@ button{cursor:pointer;background:none;border:0;padding:0}
 .mark-circle svg{left:-12%;top:-14%;width:126%;height:132%}
 .mark-under svg{left:-2%;bottom:-.06em;width:102%;height:.26em}
 .mark svg path{fill:none;stroke:var(--acc);stroke-linecap:round}
-.mark-circle svg path{stroke-width:1.6}
-.mark-under svg path{stroke-width:.9}
-.mark-circle svg path{transition-delay:.9s}
-.mark-under svg path{transition-delay:1.3s}
+.mark-circle svg path{stroke-width:1.6;transition-delay:.9s}
+.mark-under svg path{stroke-width:.9;transition-delay:1.3s}
 
 .margin-note{
   position:absolute;top:clamp(24px,5vw,70px);right:var(--gut);z-index:2;
@@ -122,19 +138,19 @@ button{cursor:pointer;background:none;border:0;padding:0}
 
 .stamp{grid-column:11 / 13;justify-self:end;align-self:end;width:132px;height:132px;position:relative;margin-bottom:10px}
 .stamp svg{width:100%;height:100%;animation:spin 22s linear infinite}
-.stamp text{font:600 11.5px var(--f-text);letter-spacing:.18em;text-transform:uppercase;fill:var(--acc)}
+.stamp text{font:600 11px var(--f-text);text-transform:uppercase;fill:var(--acc)}
 .stamp b{position:absolute;inset:0;display:grid;place-items:center;font:700 34px/1 var(--f-hand);color:var(--acc);transform:rotate(-8deg)}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 .hero-low{grid-column:1 / 13;display:grid;grid-template-columns:repeat(12,1fr);gap:24px;margin-top:clamp(36px,5vw,72px)}
 .hero-low p{grid-column:6 / 12;margin:0;font-size:clamp(17px,1.35vw,20px);color:var(--ink-2)}
 .hero-low p b{color:var(--ink);font-weight:600}
-.hero-cta{grid-column:6 / 13;display:flex;gap:22px;flex-wrap:wrap;align-items:center;margin-top:6px}
+.hero-cta{grid-column:6 / 13;display:flex;gap:16px 22px;flex-wrap:wrap;align-items:center;margin-top:6px}
 .hero-sign{grid-column:1 / 5;grid-row:1 / 3;align-self:start;font:700 28px/1.1 var(--f-hand);color:var(--ink-3);transform:rotate(-3deg)}
 
 .btn{
-  display:inline-flex;align-items:center;gap:10px;text-decoration:none;
-  font:600 16px/1 var(--f-text);padding:17px 24px;border-radius:999px;
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;text-align:left;
+  font:600 16px/1.2 var(--f-text);padding:16px 24px;border-radius:999px;
   background:var(--acc);color:var(--paper);border:1.5px solid var(--acc);
   box-shadow:0 3px 0 var(--ink);transform:translateY(-3px);
   transition:transform .15s var(--ease),box-shadow .15s var(--ease),background .2s;
@@ -155,16 +171,16 @@ button{cursor:pointer;background:none;border:0;padding:0}
 .sec{padding:clamp(64px,9vw,128px) 0;border-top:1px solid var(--line);position:relative}
 .sec-head{display:grid;grid-template-columns:repeat(12,1fr);gap:0 24px;margin-bottom:clamp(36px,5vw,64px)}
 .sec-num{grid-column:1 / 3;font:700 30px/1.1 var(--f-hand);color:var(--acc);transform:rotate(-4deg);transform-origin:left;padding-top:10px}
-.sec-title{grid-column:3 / 12;margin:0;font:400 clamp(38px,5.6vw,92px)/1 var(--f-display);letter-spacing:-.02em}
+.sec-title{grid-column:3 / 12;margin:0;font:400 clamp(36px,5.4vw,88px)/1.02 var(--f-display);letter-spacing:-.02em}
 .sec-title em{font-style:normal;color:var(--acc)}
 .sec-lede{grid-column:3 / 9;margin:22px 0 0;color:var(--ink-2);font-size:clamp(16px,1.25vw,19px)}
 
 /* продукт — колонки */
 .product{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;margin-bottom:clamp(48px,6vw,80px)}
-.product-col{grid-column:span 4;border-top:2px solid var(--ink);padding-top:16px}
+.product-col{grid-column:span 4;border-top:2px solid var(--ink);padding-top:16px;min-width:0}
 .product-col:nth-child(2){margin-top:40px}
 .product-col:nth-child(3){margin-top:80px}
-.product-col h3{margin:0 0 8px;font:400 26px/1.1 var(--f-display)}
+.product-col h3{margin:0 0 8px;font:400 26px/1.12 var(--f-display)}
 .product-col p{margin:0;color:var(--ink-2);font-size:15.5px}
 .product-col .hand{color:var(--acc);font-size:24px;display:block;margin-bottom:6px}
 
@@ -177,7 +193,7 @@ button{cursor:pointer;background:none;border:0;padding:0}
 .wall-hint svg path{fill:none;stroke:var(--acc);stroke-width:2.2;stroke-linecap:round}
 .seg{display:flex;align-items:center;gap:10px}
 .seg-in{position:relative;display:flex;background:var(--kraft);border-radius:999px;padding:4px}
-.seg-in button{position:relative;z-index:1;font-size:14px;font-weight:600;padding:10px 16px;border-radius:999px;transition:color .25s}
+.seg-in button{position:relative;z-index:1;font-size:14px;font-weight:600;padding:10px 16px;border-radius:999px;transition:color .25s;white-space:nowrap}
 .seg-in button[aria-pressed="true"]{color:var(--paper)}
 .seg-pill{position:absolute;top:4px;bottom:4px;left:0;border-radius:999px;background:var(--ink);transition:transform .45s var(--ease),width .45s var(--ease)}
 .shuffle{font-size:14px;font-weight:600;padding:10px 14px;border-radius:999px;border:1.5px dashed var(--line-2);opacity:0;pointer-events:none;transition:opacity .3s,border-color .2s,color .2s}
@@ -195,7 +211,7 @@ button{cursor:pointer;background:none;border:0;padding:0}
     var(--kraft);
   box-shadow:inset 0 0 0 1px var(--line);
 }
-.card{position:relative;grid-column:span 1;outline:none}
+.card{position:relative;grid-column:span 1;outline:none;min-width:0}
 .card.size-w{grid-column:span 2}
 .card.is-open{grid-column:span 2}
 .wall.is-table .card{position:absolute;width:var(--tw,280px);touch-action:none}
@@ -231,7 +247,7 @@ button{cursor:pointer;background:none;border:0;padding:0}
 .face{position:relative}
 .card:not(.is-open) .back{display:none}
 .card.is-open .front{display:none}
-.kicker{display:flex;justify-content:space-between;gap:10px;font-size:11.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:14px}
+.kicker{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 10px;font-size:11.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:14px}
 .kicker .acc{color:var(--acc)}
 .turn{
   position:absolute;right:10px;bottom:10px;width:32px;height:32px;border-radius:50%;
@@ -239,12 +255,13 @@ button{cursor:pointer;background:none;border:0;padding:0}
   border:1px solid var(--line-2);transition:transform .4s var(--ease),background .2s,color .2s;
 }
 .card:hover .turn{background:var(--ink);color:var(--paper);transform:rotate(180deg)}
-.c-title{font:400 clamp(24px,2.2vw,32px)/1.08 var(--f-display);margin:0 0 10px;letter-spacing:-.01em}
-.c-hand{font:700 clamp(28px,2.4vw,36px)/1.02 var(--f-hand);margin:0 0 8px}
+.c-title{font:400 clamp(22px,2.1vw,30px)/1.12 var(--f-display);margin:0 0 10px;letter-spacing:-.01em}
+.c-hand{font:700 clamp(27px,2.3vw,35px)/1.02 var(--f-hand);margin:0 0 8px}
 .c-text{margin:0;color:var(--ink-2);font-size:15px;padding-right:34px}
 .c-text + .c-text{margin-top:10px}
 .back .c-text{font-size:15.5px;color:var(--ink)}
 .back ul{margin:8px 0 0;padding:0 34px 0 0;list-style:none}
+.back ul + .c-text{margin-top:10px}
 .back li{padding:6px 0 6px 22px;position:relative;font-size:15px;border-bottom:1px dashed var(--line)}
 .back li:last-child{border:0}
 .back li::before{content:"→";position:absolute;left:0;color:var(--acc)}
@@ -259,11 +276,11 @@ button{cursor:pointer;background:none;border:0;padding:0}
 .sk{fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .sk-a{fill:none;stroke:var(--acc);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .sk-f{fill:var(--acc)}
-.sk-t{font:700 15px var(--f-hand);fill:var(--acc)}
+.sk-t{font-family:var(--f-hand);font-weight:700;fill:var(--acc)}
 .k-lab .paper{background:var(--kraft)}
 .k-quote .paper{background:var(--acc);color:var(--paper)}
 .k-quote .kicker{color:rgba(246,245,240,.75)}
-.k-quote .c-title{font-size:clamp(22px,1.9vw,28px);line-height:1.15}
+.k-quote .c-title{font-size:clamp(21px,1.8vw,27px);line-height:1.16}
 .k-quote .c-text,.k-quote .back .c-text{color:var(--paper)}
 .k-quote .turn{border-color:rgba(246,245,240,.45);color:var(--paper)}
 .k-quote.card:hover .turn{background:var(--paper);color:var(--acc)}
@@ -280,23 +297,23 @@ button{cursor:pointer;background:none;border:0;padding:0}
 .log-list span{font:700 19px/1.1 var(--f-hand);color:var(--acc);flex:none;width:24px}
 
 /* лаборатория: кнопка */
-.press-zone{display:flex;flex-direction:column;align-items:flex-start;gap:14px;margin-top:10px;padding-bottom:4px}
+.press-zone{display:flex;flex-direction:column;align-items:flex-start;gap:14px;margin-top:10px;padding-bottom:4px;padding-right:34px}
 .press{
-  font:700 18px/1 var(--f-text);padding:18px 26px;border-radius:14px;background:var(--acc);color:var(--paper);
+  font:700 18px/1.15 var(--f-text);padding:18px 24px;border-radius:14px;background:var(--acc);color:var(--paper);max-width:100%;
   box-shadow:0 6px 0 var(--ink);transform:translateY(-6px);transition:transform .08s,box-shadow .08s;
   touch-action:manipulation;
 }
 .press:active{transform:translateY(0);box-shadow:0 0 0 var(--ink)}
-.press-count{font:700 22px/1 var(--f-hand);color:var(--ink-2)}
+.press-count{font:700 22px/1.05 var(--f-hand);color:var(--ink-2)}
 
 /* лаборатория: шрифт */
 .type-sample{
-  font-family:var(--f-text);font-size:clamp(30px,3vw,44px);line-height:1.05;margin:6px 0 16px;
+  font-family:var(--f-text);font-size:clamp(28px,2.9vw,42px);line-height:1.05;margin:6px 0 16px;overflow-wrap:break-word;
   font-weight:var(--w,700);letter-spacing:var(--ls,-0.02em);
 }
-.rng{display:grid;grid-template-columns:104px 1fr 40px;align-items:center;gap:10px;font-size:13px;color:var(--ink-2);margin-top:6px;padding-right:34px}
+.rng{display:grid;grid-template-columns:minmax(92px,auto) 1fr 40px;align-items:center;gap:10px;font-size:13px;color:var(--ink-2);margin-top:6px;padding-right:34px}
 .rng output{font-variant-numeric:tabular-nums;text-align:right;color:var(--ink)}
-input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:24px;background:transparent;cursor:pointer}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:24px;background:transparent;cursor:pointer;min-width:0}
 input[type=range]::-webkit-slider-runnable-track{height:2px;background:var(--ink)}
 input[type=range]::-moz-range-track{height:2px;background:var(--ink)}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--acc);margin-top:-9px;border:2px solid var(--paper-hi);box-shadow:0 0 0 1px var(--ink)}
@@ -318,15 +335,16 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
    Конструктор
    ========================================================================== */
 .cfg{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(28px,4vw,72px);align-items:start}
-.q{padding:26px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:52px 1fr;gap:4px 12px}
+.q{padding:26px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:52px minmax(0,1fr);gap:4px 12px}
 .q:first-child{border-top:0;padding-top:0}
 .q-n{font:700 30px/1 var(--f-hand);color:var(--acc)}
 .q-h{font:400 clamp(22px,1.9vw,28px)/1.15 var(--f-display);margin:0}
 .q-sub{grid-column:2;font-size:13.5px;color:var(--ink-3);margin:2px 0 0}
-.chips{grid-column:2;display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.chips{grid-column:2;display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;min-width:0}
 .chip{
-  font-size:15px;font-weight:500;padding:11px 16px;border-radius:999px;text-align:left;line-height:1.25;
+  font-size:15px;font-weight:500;padding:11px 16px;border-radius:22px;text-align:left;line-height:1.25;max-width:100%;
   border:1.5px solid var(--line-2);background:var(--paper-hi);display:inline-flex;align-items:center;gap:9px;
+  overflow-wrap:break-word;
   transition:background .2s,border-color .2s,color .2s,transform .2s var(--ease);
 }
 .chip:hover{border-color:var(--ink);transform:translateY(-2px)}
@@ -345,7 +363,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 .inp:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 4px var(--acc-soft)}
 .inp::placeholder{color:var(--ink-3)}
 .q-fields{grid-column:2;display:grid;gap:12px;margin-top:16px}
-.q-fields .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.q-fields .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end}
 .lbl{font-size:13px;color:var(--ink-2);display:block;margin-bottom:6px}
 
 /* бриф-лист */
@@ -359,10 +377,10 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
   clip-path:polygon(2% 8%,98% 0,100% 92%,0 100%);
 }
 .sheet-h{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;border-bottom:2px solid var(--ink);padding-bottom:14px;margin-bottom:16px}
-.sheet-h h3{margin:0;font:400 30px/1 var(--f-display)}
-.sheet-h small{font-size:12.5px;color:var(--ink-3);text-align:right;line-height:1.4}
+.sheet-h h3{margin:0;font:400 30px/1.05 var(--f-display)}
+.sheet-h small{font-size:12.5px;color:var(--ink-3);text-align:right;line-height:1.4;flex:none}
 .sheet-h small b{color:var(--ink);font-weight:600}
-.msg{font-size:16px;line-height:1.55;min-height:200px}
+.msg{font-size:16px;line-height:1.55;min-height:200px;overflow-wrap:break-word}
 .msg p{margin:0 0 10px;padding:1px 4px;margin-left:-4px;border-radius:4px;transition:background 1.4s}
 .msg p b{font-weight:600}
 .msg p.is-new{background:var(--acc-soft);transition:background 0s}
@@ -375,10 +393,10 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 .acts{display:flex;flex-wrap:wrap;gap:12px 10px}
 .acts .btn{padding:15px 18px;font-size:15px}
 .sheet-foot{margin-top:16px;font-size:13px;color:var(--ink-3);display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
-.sheet-foot span{max-width:36ch}
+.sheet-foot span{max-width:38ch}
 .reset{font-size:13px;text-decoration:underline;text-underline-offset:3px;color:var(--ink-2);white-space:nowrap}
 .reset:hover{color:var(--acc)}
-.sheet-note{position:absolute;right:-10px;bottom:-44px;font:700 24px/1 var(--f-hand);color:var(--acc);transform:rotate(-5deg)}
+.sheet-note{position:absolute;right:-10px;bottom:-44px;font:700 24px/1 var(--f-hand);color:var(--acc);transform:rotate(-5deg);white-space:nowrap}
 
 /* мобильный док */
 .dock{
@@ -387,9 +405,9 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
   transform:translateY(160%);transition:transform .45s var(--ease);box-shadow:0 16px 30px -12px rgba(18,18,18,.5);
 }
 .dock.is-on{transform:none}
-.dock span{flex:1;font-size:12.5px;line-height:1.15;min-width:0}
+.dock span{flex:1;font-size:12px;line-height:1.15;min-width:0}
 .dock span b{font:700 19px/1 var(--f-hand);color:#F28C76;display:block}
-.dock button{background:var(--acc);color:var(--paper);font-weight:600;font-size:14px;padding:12px 14px;border-radius:999px;white-space:nowrap}
+.dock button{background:var(--acc);color:var(--paper);font-weight:600;font-size:13.5px;padding:12px 13px;border-radius:999px;white-space:nowrap}
 .dock button.alt{background:var(--paper);color:var(--ink)}
 
 /* ==========================================================================
@@ -399,9 +417,9 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 .contacts-l{grid-column:1 / 5}
 .contacts-l p{color:var(--ink-2);margin:0 0 18px;max-width:34ch}
 .contacts-l .hand{font-size:30px;color:var(--acc);display:block;transform:rotate(-3deg);margin-top:26px}
-.c-list{grid-column:5 / 13;border-top:2px solid var(--ink)}
+.c-list{grid-column:5 / 13;border-top:2px solid var(--ink);min-width:0}
 .c-row{
-  display:grid;grid-template-columns:130px 1fr auto;gap:18px;align-items:center;
+  display:grid;grid-template-columns:130px minmax(0,1fr) auto;gap:18px;align-items:center;
   padding:24px 0;border-bottom:1px solid var(--line);text-decoration:none;width:100%;text-align:left;
 }
 .c-row small{font-size:13px;color:var(--ink-3);font-weight:500}
@@ -413,12 +431,12 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 .c-row.is-copied .c-act{background:var(--acc);border-color:var(--acc);color:var(--paper)}
 
 .foot{border-top:1px solid var(--line);padding:28px 0 24px;overflow:hidden}
-.foot-big{font:400 clamp(70px,20vw,320px)/.85 var(--f-display);letter-spacing:-.05em;margin:0 0 18px;white-space:nowrap;user-select:none}
+.foot-big{font:400 clamp(70px,20vw,320px)/.85 'Prata', serif;letter-spacing:-.05em;margin:0 0 18px;white-space:nowrap;user-select:none}
 .foot-big span{color:var(--acc)}
-.foot-row{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;font-size:14px;color:var(--ink-2)}
+.foot-row{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;font-size:14px;color:var(--ink-2)}
 .foot-row a{text-decoration:none}
 .foot-row a:hover{color:var(--acc)}
-.foot-links{display:flex;gap:18px;flex-wrap:wrap}
+.foot-links{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
 
 /* тост */
 .toast{
@@ -439,9 +457,10 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 @media (max-width:1180px){
   .wall{grid-template-columns:repeat(3,minmax(0,1fr))}
   .margin-note{display:none}
+  .top-note{display:none}
 }
 @media (max-width:900px){
-  .top-note{display:none}
+  .top-nav a:not(.pill){display:none}
   .hero h1{grid-column:1 / 13}
   .stamp{display:none}
   .hero-low p,.hero-cta{grid-column:1 / 13}
@@ -460,20 +479,32 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 }
 @media (max-width:620px){
   body{font-size:16px}
-  .top-nav a:not(.pill){display:none}
-  .hero h1{font-size:12.4vw}
+  .top-in{gap:10px}
+  .logo{font-size:21px}
+  .top-nav{gap:8px}
+  .top-nav .pill{padding:8px 11px;font-size:13px}
+  .top-nav .pill .l{display:none}
+  .top-nav .pill .s{display:inline}
+  .lang{padding:2px}
+  .lang button{min-width:28px;padding:7px 4px;font-size:11.5px}
   .hero h1 .ln:nth-child(2){padding-left:0}
   .wall{grid-template-columns:1fr;gap:32px}
   .card,.card.size-w,.card.is-open{grid-column:auto}
-  .q{grid-template-columns:36px 1fr}
+  .q{grid-template-columns:36px minmax(0,1fr)}
   .q-fields .row2{grid-template-columns:1fr}
   .sheet{padding:30px 20px 22px;transform:none}
+  .sheet-h{flex-direction:column;gap:6px}
+  .sheet-h small{text-align:left}
   .sheet-foot{flex-direction:column;align-items:flex-start}
-  .c-row{grid-template-columns:1fr auto;gap:6px 14px}
+  .c-row{grid-template-columns:minmax(0,1fr) auto;gap:6px 14px}
   .c-row small{grid-column:1 / 3}
   .c-row strong{font-size:clamp(21px,6vw,30px)}
   .todo label{font-size:14.5px}
   .acts .btn{flex:1 1 100%;justify-content:center}
+}
+@media (max-width:360px){
+  .logo i{display:none}
+  .top-nav .pill{padding:8px 9px}
 }
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition-duration:.01s!important}
@@ -484,17 +515,21 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 </head>
 <body>
 
+<!-- Все тексты страницы берутся из словаря I18N в <script>. Атрибуты:
+     data-i — текст, data-ih — текст с разметкой, data-iph — placeholder, data-iaria — aria-label -->
+
 <!-- ======================================================================
      ВЕРХНЯЯ СТРОКА
      ====================================================================== -->
 <header class="top">
   <div class="top-in">
-    <a href="#top" class="logo" aria-label="fioritura — наверх">fioritura<i></i></a>
-    <span class="top-note">solo / sites &amp; own product</span>
-    <nav class="top-nav" aria-label="Навигация">
-      <a href="#build">Что в сборке</a>
-      <a href="#contact">Контакты</a>
-      <a href="#order" class="pill">Собрать запрос</a>
+    <a href="#top" class="logo" data-iaria="nav.home">fioritura<i></i></a>
+    <span class="top-note" data-i="nav.note"></span>
+    <nav class="top-nav" data-iaria="nav.aria">
+      <a href="#build" data-i="nav.build"></a>
+      <a href="#contact" data-i="nav.contact"></a>
+      <a href="#order" class="pill"><span class="l" data-i="nav.order"></span><span class="s" data-i="nav.orderShort"></span></a>
+      <div class="lang" role="group" data-lang-switch data-iaria="lang"></div>
     </nav>
   </div>
 </header>
@@ -506,29 +541,25 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
      ====================================================================== -->
 <section class="hero wrap" aria-labelledby="h1">
   <div class="margin-note" aria-hidden="true">
-    без менеджеров и брифов на сорок страниц
+    <span data-i="hero.note"></span>
     <svg viewBox="0 0 90 70" class="draw"><path pathLength="1" d="M80 4 C 70 30, 50 50, 12 58 M12 58 L 26 48 M12 58 L 26 66"/></svg>
   </div>
 
   <div class="hero-grid">
-    <h1 id="h1">
-      <span class="ln"><span><span class="mark mark-circle"><span class="word">Один</span><svg viewBox="0 0 200 100" preserveAspectRatio="none" class="draw" aria-hidden="true"><path pathLength="1" d="M150 14 C 92 0, 22 8, 10 46 C 0 84, 72 98, 124 92 C 178 86, 199 62, 189 36 C 181 14, 142 4, 88 10"/></svg></span> <span class="word">человек.</span></span></span>
-      <span class="ln"><span><span class="word">Сайты</span> <span class="word">на</span> <span class="word">заказ</span></span></span>
-      <span class="ln"><span><span class="word">и</span> <span class="mark mark-under"><span class="word">свой</span> <span class="word">продукт.</span><svg viewBox="0 0 200 12" preserveAspectRatio="none" class="draw" aria-hidden="true"><path pathLength="1" d="M2 8 C 30 2, 60 13, 92 7 S 150 1, 198 8"/></svg></span></span></span>
-    </h1>
+    <h1 id="h1"></h1>
 
     <div class="stamp" aria-hidden="true">
       <svg viewBox="0 0 132 132"><defs><path id="circ" d="M66 66 m-52 0 a52 52 0 1 1 104 0 a52 52 0 1 1 -104 0"/></defs>
-        <text><textPath href="#circ" id="stampText">беру новые сайты • solo • беру новые сайты • solo •</textPath></text></svg>
+        <text><textPath href="#circ" id="stampText" textLength="322" lengthAdjust="spacing"></textPath></text></svg>
       <b>f.</b>
     </div>
 
     <div class="hero-low">
-      <div class="hero-sign" data-in>— fioritura,<br>пишет код сам</div>
-      <p data-in>Я <b>fioritura</b>. Делаю лендинги и промо-сайты на заказ — от идеи до рабочей ссылки, сам и напрямую с вами. Параллельно в одиночку пилю свой продукт, и всё, чему на нём учусь, сразу идёт в клиентские сайты. <b>Готовых коммерческих кейсов пока нет</b> — зато стол открыт: ниже видно, что на нём прямо сейчас.</p>
+      <div class="hero-sign" data-in data-ih="hero.sign"></div>
+      <p data-in data-ih="hero.lead"></p>
       <div class="hero-cta" data-in>
-        <a href="#order" class="btn">Собрать запрос на сайт <span class="ar">→</span></a>
-        <a href="#build" class="link">Посмотреть, что в сборке</a>
+        <a href="#order" class="btn"><span data-i="hero.cta"></span> <span class="ar">→</span></a>
+        <a href="#build" class="link" data-i="hero.ctaLink"></a>
       </div>
     </div>
   </div>
@@ -540,28 +571,28 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 <section class="sec" id="build" aria-labelledby="buildTitle">
   <div class="wrap">
     <div class="sec-head">
-      <div class="sec-num" data-in>№1 — мастерская</div>
-      <h2 class="sec-title" id="buildTitle" data-in>Свой продукт и то, что <em>сейчас на столе</em></h2>
-      <p class="sec-lede" data-in>Я собираю собственный продукт — один, от схемы данных до последней кнопки. Название придержу, пока он не начнёт работать без моих объяснений. Зато не прячу процесс: наброски, эксперименты с интерфейсом и заметки лежат прямо тут.</p>
+      <div class="sec-num" data-in data-i="build.num"></div>
+      <h2 class="sec-title" id="buildTitle" data-in data-ih="build.title"></h2>
+      <p class="sec-lede" data-in data-i="build.lede"></p>
     </div>
 
     <div class="product">
-      <div class="product-col" data-in><span class="hand">зачем это вам</span><h3>Скорость на практике</h3><p>Продукт заставляет собирать быстро и выкатывать часто. Тот же темп я приношу в ваш сайт.</p></div>
-      <div class="product-col" data-in><span class="hand">и ещё</span><h3>Детали, проверенные на себе</h3><p>Кнопки, переходы, формы — сначала обкатываю у себя. В клиентские сайты попадает то, что уже выжило.</p></div>
-      <div class="product-col" data-in><span class="hand">и главное</span><h3>Я сам себе заказчик</h3><p>Знаю, каково ждать, сомневаться и хотеть «чуть иначе». Поэтому показываю живую сборку, а не обещания.</p></div>
+      <div class="product-col" data-in><span class="hand" data-i="build.cols.0.hand"></span><h3 data-i="build.cols.0.h"></h3><p data-i="build.cols.0.p"></p></div>
+      <div class="product-col" data-in><span class="hand" data-i="build.cols.1.hand"></span><h3 data-i="build.cols.1.h"></h3><p data-i="build.cols.1.p"></p></div>
+      <div class="product-col" data-in><span class="hand" data-i="build.cols.2.hand"></span><h3 data-i="build.cols.2.h"></h3><p data-i="build.cols.2.p"></p></div>
     </div>
 
     <div class="wall-bar">
       <div class="wall-hint">
         <svg viewBox="0 0 46 28" class="draw" aria-hidden="true"><path pathLength="1" d="M2 6 C 16 2, 30 8, 38 20 M38 20 L 30 18 M38 20 L 40 11"/></svg>
-        нажмите на карточку — она перевернётся
+        <span data-i="build.hint"></span>
       </div>
       <div class="seg">
-        <button class="shuffle" id="shuffle" type="button">перемешать</button>
-        <div class="seg-in" role="group" aria-label="Вид стены">
+        <button class="shuffle" id="shuffle" type="button" data-i="build.shuffle"></button>
+        <div class="seg-in" role="group" data-iaria="build.viewAria">
           <span class="seg-pill" id="segPill"></span>
-          <button type="button" data-view="grid" aria-pressed="true">Аккуратно</button>
-          <button type="button" data-view="table" aria-pressed="false">Вразброс на столе</button>
+          <button type="button" data-view="grid" aria-pressed="true" data-i="build.grid"></button>
+          <button type="button" data-view="table" aria-pressed="false" data-i="build.table"></button>
         </div>
       </div>
     </div>
@@ -576,9 +607,9 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 <section class="sec" id="order" aria-labelledby="orderTitle">
   <div class="wrap">
     <div class="sec-head">
-      <div class="sec-num" data-in>№2 — заказ</div>
-      <h2 class="sec-title" id="orderTitle" data-in>Соберите запрос <em>за минуту</em></h2>
-      <p class="sec-lede" data-in>Формы не будет. Кликайте по вариантам — справа сразу пишется готовое сообщение. Скопируйте его или откройте Telegram с уже вставленным текстом. Отправляете вы, когда захотите.</p>
+      <div class="sec-num" data-in data-i="order.num"></div>
+      <h2 class="sec-title" id="orderTitle" data-in data-ih="order.title"></h2>
+      <p class="sec-lede" data-in data-i="order.lede"></p>
     </div>
 
     <div class="cfg">
@@ -587,24 +618,24 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
       <div class="sheet-wrap">
         <div class="sheet" id="sheet">
           <div class="sheet-h">
-            <h3>Запрос на сайт</h3>
-            <small>кому: <b id="toWho"></b><br><span id="today"></span></small>
+            <h3 data-i="order.sheetTitle"></h3>
+            <small><span data-i="order.to"></span> <b id="toWho"></b><br><span id="today"></span></small>
           </div>
           <div class="msg" id="msg" aria-live="polite"></div>
           <div class="ready">
             <div class="ready-bar" id="readyBar"><i></i><i></i><i></i><i></i><i></i></div>
-            <span id="readyText">собрано 0 из 5</span>
+            <span id="readyText"></span>
           </div>
           <div class="acts">
-            <button class="btn btn-ink" id="copyMsg" type="button">Скопировать запрос</button>
-            <button class="btn" id="openTg" type="button">Открыть в Telegram <span class="ar">→</span></button>
-            <button class="btn btn-ghost" id="openMail" type="button">Письмом</button>
+            <button class="btn btn-ink" id="copyMsg" type="button" data-i="order.copy"></button>
+            <button class="btn" id="openTg" type="button"><span data-i="order.tg"></span> <span class="ar">→</span></button>
+            <button class="btn btn-ghost" id="openMail" type="button" data-i="order.mail"></button>
           </div>
           <div class="sheet-foot">
-            <span>Текст скопирован — если поле ввода пустое, просто вставьте (Ctrl+V / Cmd+V)</span>
-            <button class="reset" id="reset" type="button">начать заново</button>
+            <span data-i="order.hint"></span>
+            <button class="reset" id="reset" type="button" data-i="order.reset"></button>
           </div>
-          <div class="sheet-note" aria-hidden="true">отвечаю сам ↑</div>
+          <div class="sheet-note" aria-hidden="true" data-i="order.note"></div>
         </div>
       </div>
     </div>
@@ -617,27 +648,27 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 <section class="sec" id="contact" aria-labelledby="contactTitle">
   <div class="wrap">
     <div class="sec-head">
-      <div class="sec-num" data-in>№3 — связь</div>
-      <h2 class="sec-title" id="contactTitle" data-in>Напишите. <em>Отвечаю сам.</em></h2>
+      <div class="sec-num" data-in data-i="contact.num"></div>
+      <h2 class="sec-title" id="contactTitle" data-in data-ih="contact.title"></h2>
     </div>
     <div class="contacts">
       <div class="contacts-l" data-in>
-        <p>Без форм и без «оставьте заявку, менеджер свяжется». Быстрее всего — Telegram. Хотите следить за продуктом — GitHub и X.</p>
-        <a href="#order" class="link">Или сначала соберите запрос ↑</a>
-        <span class="hand">нажали — скопировалось</span>
+        <p data-i="contact.p"></p>
+        <a href="#order" class="link" data-i="contact.link"></a>
+        <span class="hand" data-i="contact.hand"></span>
       </div>
       <div class="c-list" data-in>
         <button class="c-row" data-copy="telegramHandle" type="button">
-          <small>Telegram</small><strong data-fill="telegramHandle"></strong><span class="c-act">Копировать</span>
+          <small>Telegram</small><strong data-fill="telegramHandle"></strong><span class="c-act" data-i="contact.copy"></span>
         </button>
         <button class="c-row" data-copy="email" type="button">
-          <small>Почта</small><strong data-fill="email"></strong><span class="c-act">Копировать</span>
+          <small data-i="contact.mail"></small><strong data-fill="email"></strong><span class="c-act" data-i="contact.copy"></span>
         </button>
         <a class="c-row" data-link="github" href="#" target="_blank" rel="noopener">
-          <small>GitHub</small><strong>код и сборки</strong><span class="c-act">Открыть ↗</span>
+          <small>GitHub</small><strong data-i="contact.ghText"></strong><span class="c-act" data-i="contact.open"></span>
         </a>
         <a class="c-row" data-link="x" href="#" target="_blank" rel="noopener">
-          <small>X / Twitter</small><strong>процесс по ходу</strong><span class="c-act">Открыть ↗</span>
+          <small>X / Twitter</small><strong data-i="contact.xText"></strong><span class="c-act" data-i="contact.open"></span>
         </a>
       </div>
     </div>
@@ -650,24 +681,25 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
   <div class="wrap">
     <div class="foot-big" aria-hidden="true">fioritura<span>.</span></div>
     <div class="foot-row">
-      <span>© <span id="year"></span> fioritura — один человек, один файл, никаких шаблонов</span>
+      <span id="footText"></span>
       <div class="foot-links">
         <a href="#" data-link="telegram" target="_blank" rel="noopener">Telegram</a>
         <a href="#" data-link="github" target="_blank" rel="noopener">GitHub</a>
         <a href="#" data-link="x" target="_blank" rel="noopener">X</a>
-        <a href="#top">Наверх ↑</a>
+        <a href="#top" data-i="foot.top"></a>
+        <div class="lang" role="group" data-lang-switch data-iaria="lang"></div>
       </div>
     </div>
   </div>
 </footer>
 
 <div class="dock" id="dock" aria-hidden="true">
-  <span><b id="dockReady">0 из 5</b>запрос пишется сам</span>
-  <button class="alt" id="dockCopy" type="button" tabindex="-1">Копировать</button>
-  <button id="dockTg" type="button" tabindex="-1">В Telegram</button>
+  <span><b id="dockReady"></b><span data-i="order.dockText"></span></span>
+  <button class="alt" id="dockCopy" type="button" tabindex="-1" data-i="order.dockCopy"></button>
+  <button id="dockTg" type="button" tabindex="-1" data-i="order.dockTg"></button>
 </div>
 
-<div class="toast" id="toast" role="status" aria-live="polite"><i>✓</i><span><b id="toastHead">готово</b><span id="toastText"></span></span></div>
+<div class="toast" id="toast" role="status" aria-live="polite"><i>✓</i><span><b id="toastHead"></b><span id="toastText"></span></span></div>
 
 <!-- «рукописный» фильтр для набросков -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -686,12 +718,424 @@ const ME = {
   takingOrders: true,                       // false → штамп «сейчас занят»
 };
 
+/* Языки: порядок = порядок кнопок. Если язык браузера не совпал ни с одним — DEFAULT_LANG. */
+const LANGS = ['en', 'ru', 'uk', 'pl'];
+const DEFAULT_LANG = 'ru';
+const LOCALE = {en:'en-GB', ru:'ru-RU', uk:'uk-UA', pl:'pl-PL'};   // для дат и правил множественного числа
+
+/* ==========================================================================
+   I18N — все тексты интерфейса на четырёх языках.
+   Правила:
+   • {n}, {name}, {v}, {what}, {y} — подстановки, их не трогай;
+   • в hero.h1 разметка {c}…{/c} — слово обводится от руки, {u}…{/u} — подчёркивается;
+   • поля с суффиксом в data-ih (lead, sign, title) могут содержать <b>, <em>, <br>.
+   ========================================================================== */
+const I18N = {
+  /* ----------------------------------------------------------------- RU */
+  ru: {
+    meta:{ description:'fioritura — один разработчик. Сайты и лендинги на заказ напрямую, плюс свой продукт, который я собираю в одиночку.' },
+    lang:'Язык',
+    nav:{ home:'fioritura — наверх', aria:'Навигация', note:'соло / сайты и свой продукт', build:'Что в сборке', contact:'Контакты', order:'Собрать запрос', orderShort:'Запрос' },
+    hero:{
+      h1:['{c}Один{/c} человек.', 'Сайты на заказ', 'и {u}свой продукт.{/u}'],
+      note:'без менеджеров и брифов на сорок страниц',
+      stampOn:'беру новые сайты • solo • ', stampOff:'сейчас занят • пишите всё равно • ',
+      sign:'— fioritura,<br>пишет код сам',
+      lead:'Я <b>fioritura</b>. Делаю лендинги и промо-сайты на заказ — от идеи до рабочей ссылки, сам и напрямую с вами. Параллельно в одиночку пилю свой продукт, и всё, чему на нём учусь, сразу идёт в клиентские сайты. <b>Готовых коммерческих кейсов пока нет</b> — зато стол открыт: ниже видно, что на нём прямо сейчас.',
+      cta:'Собрать запрос на сайт', ctaLink:'Посмотреть, что в сборке'
+    },
+    build:{
+      num:'№1 — мастерская', title:'Свой продукт и то, что <em>сейчас на столе</em>',
+      lede:'Я собираю собственный продукт — один, от схемы данных до последней кнопки. Название придержу, пока он не начнёт работать без моих объяснений. Зато не прячу процесс: наброски, эксперименты с интерфейсом и заметки лежат прямо тут.',
+      cols:[
+        {hand:'зачем это вам', h:'Скорость на практике', p:'Продукт заставляет собирать быстро и выкатывать часто. Тот же темп я приношу в ваш сайт.'},
+        {hand:'и ещё', h:'Детали, проверенные на себе', p:'Кнопки, переходы, формы — сначала обкатываю у себя. В клиентские сайты попадает то, что уже выжило.'},
+        {hand:'и главное', h:'Я сам себе заказчик', p:'Знаю, каково ждать, сомневаться и хотеть «чуть иначе». Поэтому показываю живую сборку, а не обещания.'}
+      ],
+      hint:'нажмите на карточку — она перевернётся', shuffle:'перемешать', grid:'Аккуратно', table:'Вразброс на столе', viewAria:'Вид стены'
+    },
+    press:{ never:'ещё не нажимали', count:'нажато {n} {w}', forms:{one:'раз', few:'раза', many:'раз', other:'раза'}, more:' — понравилось же' },
+    order:{
+      num:'№2 — заказ', title:'Соберите запрос <em>за минуту</em>',
+      lede:'Формы не будет. Кликайте по вариантам — рядом сразу пишется готовое сообщение. Скопируйте его или откройте Telegram с уже вставленным текстом. Отправляете вы, когда захотите.',
+      sheetTitle:'Запрос на сайт', to:'кому:', ready:'собрано {n} из 5', readyDone:'запрос готов ✓',
+      copy:'Скопировать запрос', tg:'Открыть в Telegram', mail:'Письмом',
+      hint:'Текст скопирован — если поле ввода пустое, просто вставьте (Ctrl+V / Cmd+V)',
+      reset:'начать заново', note:'отвечаю сам ↑',
+      dockText:'запрос пишется сам', dockReady:'{n} из 5', dockDone:'готово ✓', dockCopy:'Копировать', dockTg:'В Telegram',
+      extraTitle:'Пара слов от вас', extraSub:'необязательно, но очень помогает',
+      about:'О проекте', aboutPh:'Например: открываю студию керамики, нужен сайт с расписанием мастер-классов',
+      links:'Ссылки, которые нравятся', linksPh:'ссылка или две', name:'Как к вам обращаться', namePh:'Имя', date:'Когда запуск'
+    },
+    /* вопросы конструктора: ключи вариантов совпадают с Q ниже */
+    q:{
+      what:{ title:'Что нужно', opts:{landing:'Лендинг', promo:'Промо-сайт', card:'Сайт-визитка / портфолио', proto:'Прототип продукта', unsure:'Пока не знаю — помоги решить'} },
+      when:{ title:'Когда', opts:{fast:'Быстро, до недели', calm:'Без спешки', date:'Есть дата запуска'} },
+      how:{ title:'Как работаем', opts:{sprint:'Вайбкод-спринт вместе — собираем вживую', solo:'Собираешь сам, показываешь итерации', talk:'Сначала просто обсудить'} },
+      have:{ title:'Что уже есть', sub:'можно несколько', opts:{idea:'Только идея', texts:'Тексты', design:'Дизайн или макет', brand:'Логотип и цвета', refs:'Сайты, которые нравятся'} },
+      care:{ title:'Что важнее всего', sub:'до трёх пунктов', opts:{memorable:'Чтобы запоминался', fastload:'Быстро грузился', mobile:'Отлично на телефоне', motion:'Живые анимации', edit:'Сам(а) правлю тексты', search:'Находился в поиске'} },
+      budget:{ title:'Бюджет', opts:{talk:'Обсудим', have:'Ориентир есть — напишу'} },
+    },
+    /* как варианты звучат внутри сообщения */
+    phrase:{
+      what:{landing:'лендинг', promo:'промо-сайт', card:'сайт-визитку', proto:'прототип продукта'},
+      when:{fast:'быстро, хочется уложиться в неделю', calm:'без спешки, важнее сделать хорошо', date:'есть дата запуска'},
+      how:{sprint:'вайбкод-спринт вместе — хочу видеть, как собирается', solo:'собираешь сам, а я смотрю итерации', talk:'сначала просто обсудить'},
+      have:{idea:'идея', texts:'тексты', design:'дизайн или макет', brand:'логотип и цвета', refs:'примеры сайтов, которые нравятся'},
+      care:{memorable:'чтобы запоминался', fastload:'чтобы быстро грузился', mobile:'чтобы отлично работал на телефоне', motion:'живые анимации', edit:'чтобы я мог(ла) сам(а) править тексты', search:'чтобы находился в поиске'},
+      budget:{talk:'обсудим', have:'ориентир есть, напишу отдельно'},
+    },
+    /* шаблоны строк сообщения */
+    msg:{
+      hello:'Привет!', helloName:'Привет! Меня зовут {name}.', want:'Хочу собрать с тобой <b>{what}</b>.',
+      unsure:'Нужен сайт, но пока не понимаю, какой именно. <b>Поможешь решить?</b>', placeholder:'Нужен… (выберите, что именно)',
+      when:'Срок: <b>{v}</b>.', how:'Формат: <b>{v}</b>.', have:'Что уже есть: {v}.', care:'Важно: {v}.',
+      about:'О проекте: {v}', links:'Нравится: {v}', budget:'Бюджет: {v}.', end:'Когда сможешь посмотреть?',
+      and:' и ', fallback:'Привет! Хочу обсудить сайт.', subject:'Запрос на сайт'
+    },
+    contact:{
+      num:'№3 — связь', title:'Напишите. <em>Отвечаю сам.</em>',
+      p:'Без форм и без «оставьте заявку, менеджер свяжется». Быстрее всего — Telegram. Хотите следить за продуктом — GitHub и X.',
+      link:'Или сначала соберите запрос ↑', hand:'нажали — скопировалось',
+      mail:'Почта', ghText:'код и сборки', xText:'процесс по ходу',
+      copy:'Копировать', copied:'Скопировано ✓', manual:'Выделите вручную', open:'Открыть ↗'
+    },
+    foot:{ text:'© {y} fioritura — один человек, один файл, никаких шаблонов', top:'Наверх ↑' },
+    toast:{
+      copied:'скопировано', fail:'не вышло', failText:'Скопируйте вручную: {v}',
+      brief:'запрос скопирован', briefText:'Вставьте его в Telegram или в письмо', briefFail:'Выделите текст в листе вручную',
+      tg:'текст скопирован', tgText:'Если поле ввода пустое, просто вставьте (Ctrl+V / Cmd+V)',
+      tgFail:'не удалось скопировать', tgFailText:'Скопируйте текст из листа вручную',
+      reset:'чистый лист', resetText:'Начинаем заново'
+    },
+  },
+
+  /* ----------------------------------------------------------------- EN */
+  en: {
+    meta:{ description:'fioritura — a solo developer. Custom websites and landing pages built directly with you, plus an own product built alone.' },
+    lang:'Language',
+    nav:{ home:'fioritura — back to top', aria:'Navigation', note:'solo / sites & own product', build:'On the desk', contact:'Contact', order:'Build a request', orderShort:'Request' },
+    hero:{
+      h1:['{c}One{/c} person.', 'Websites to order', 'and {u}my own product.{/u}'],
+      note:'no managers, no forty-page briefs',
+      stampOn:'taking new sites • solo • ', stampOff:'busy right now • write anyway • ',
+      sign:'— fioritura,<br>writes every line',
+      lead:'I’m <b>fioritura</b>. I build landing pages and promo sites to order — from idea to a working link, myself and directly with you. Alongside that I’m building my own product solo, and everything I learn there goes straight into client sites. <b>No commercial case studies yet</b> — but the desk is open: below is what’s on it right now.',
+      cta:'Build a website request', ctaLink:'See what’s on the desk'
+    },
+    build:{
+      num:'No. 1 — workshop', title:'My own product and what’s <em>on the desk now</em>',
+      lede:'I’m building my own product — alone, from the data model to the last button. I’ll keep the name to myself until it works without my explanations. But the process isn’t hidden: sketches, interface experiments and notes are right here.',
+      cols:[
+        {hand:'why it matters to you', h:'Speed in practice', p:'The product makes me build fast and ship often. I bring the same pace to your site.'},
+        {hand:'also', h:'Details tested on myself', p:'Buttons, transitions, forms — I break them in on my own product first. Client sites get what survived.'},
+        {hand:'and most of all', h:'I’m my own client', p:'I know what it’s like to wait, doubt and want it “a bit different”. So I show a live build, not promises.'}
+      ],
+      hint:'click a card — it flips over', shuffle:'shuffle', grid:'Tidy', table:'Scattered on the desk', viewAria:'Wall view'
+    },
+    press:{ never:'not pressed yet', count:'pressed {n} {w}', forms:{one:'time', other:'times'}, more:' — told you it feels good' },
+    order:{
+      num:'No. 2 — order', title:'Build a request <em>in a minute</em>',
+      lede:'No form. Click the options — a ready message writes itself next to them. Copy it or open Telegram with the text already in. You send it, whenever you like.',
+      sheetTitle:'Website request', to:'to:', ready:'{n} of 5 filled', readyDone:'request ready ✓',
+      copy:'Copy request', tg:'Open in Telegram', mail:'By email',
+      hint:'Text copied — if the input field is empty, just paste (Ctrl+V / Cmd+V)',
+      reset:'start over', note:'I reply myself ↑',
+      dockText:'the request writes itself', dockReady:'{n} of 5', dockDone:'ready ✓', dockCopy:'Copy', dockTg:'To Telegram',
+      extraTitle:'A few words from you', extraSub:'optional, but it helps a lot',
+      about:'About the project', aboutPh:'E.g.: opening a ceramics studio, need a site with a workshop schedule',
+      links:'Links you like', linksPh:'a link or two', name:'What should I call you', namePh:'Name', date:'Launch date'
+    },
+    q:{
+      what:{ title:'What you need', opts:{landing:'Landing page', promo:'Promo site', card:'Business card site / portfolio', proto:'Product prototype', unsure:'Not sure yet — help me decide'} },
+      when:{ title:'When', opts:{fast:'Fast, within a week', calm:'No rush', date:'There’s a launch date'} },
+      how:{ title:'How we work', opts:{sprint:'Vibe-coding sprint together — building live', solo:'You build, show me iterations', talk:'Just talk it through first'} },
+      have:{ title:'What you already have', sub:'pick several', opts:{idea:'Just an idea', texts:'Copy', design:'Design or mockup', brand:'Logo and colours', refs:'Sites I like'} },
+      care:{ title:'What matters most', sub:'up to three', opts:{memorable:'Memorable', fastload:'Loads fast', mobile:'Great on phones', motion:'Lively animation', edit:'I edit the copy myself', search:'Findable in search'} },
+      budget:{ title:'Budget', opts:{talk:'Let’s discuss', have:'I have a figure — will tell you'} },
+    },
+    phrase:{
+      what:{landing:'a landing page', promo:'a promo site', card:'a business card site', proto:'a product prototype'},
+      when:{fast:'fast, ideally within a week', calm:'no rush, quality matters more', date:'there’s a launch date'},
+      how:{sprint:'a vibe-coding sprint together — I want to watch it being built', solo:'you build, I review the iterations', talk:'just talk it through first'},
+      have:{idea:'an idea', texts:'copy', design:'a design or mockup', brand:'a logo and colours', refs:'examples of sites I like'},
+      care:{memorable:'it should be memorable', fastload:'it should load fast', mobile:'it should work great on phones', motion:'lively animation', edit:'I want to edit the copy myself', search:'it should be findable in search'},
+      budget:{talk:'let’s discuss', have:'I have a figure in mind, will send it separately'},
+    },
+    msg:{
+      hello:'Hi!', helloName:'Hi! I’m {name}.', want:'I’d like to build <b>{what}</b> with you.',
+      unsure:'I need a site, but I’m not sure what kind yet. <b>Can you help me decide?</b>', placeholder:'I need… (pick what exactly)',
+      when:'Timeline: <b>{v}</b>.', how:'Format: <b>{v}</b>.', have:'What I have: {v}.', care:'What matters: {v}.',
+      about:'About the project: {v}', links:'I like: {v}', budget:'Budget: {v}.', end:'When could you take a look?',
+      and:' and ', fallback:'Hi! I’d like to talk about a website.', subject:'Website request'
+    },
+    contact:{
+      num:'No. 3 — contact', title:'Write to me. <em>I reply myself.</em>',
+      p:'No forms, no “leave a request and a manager will get back to you”. Telegram is fastest. Want to follow the product — GitHub and X.',
+      link:'Or build a request first ↑', hand:'click — it’s copied',
+      mail:'Email', ghText:'code and builds', xText:'process as it happens',
+      copy:'Copy', copied:'Copied ✓', manual:'Select manually', open:'Open ↗'
+    },
+    foot:{ text:'© {y} fioritura — one person, one file, no templates', top:'Back to top ↑' },
+    toast:{
+      copied:'copied', fail:'didn’t work', failText:'Copy it manually: {v}',
+      brief:'request copied', briefText:'Paste it into Telegram or an email', briefFail:'Select the text on the sheet manually',
+      tg:'text copied', tgText:'If the input field is empty, just paste (Ctrl+V / Cmd+V)',
+      tgFail:'couldn’t copy', tgFailText:'Copy the text from the sheet manually',
+      reset:'clean sheet', resetText:'Starting over'
+    },
+  },
+
+  /* ----------------------------------------------------------------- UK */
+  uk: {
+    meta:{ description:'fioritura — один розробник. Сайти й лендинги на замовлення напряму, а також власний продукт, який я збираю сам.' },
+    lang:'Мова',
+    nav:{ home:'fioritura — нагору', aria:'Навігація', note:'соло / сайти і свій продукт', build:'Що в збірці', contact:'Контакти', order:'Зібрати запит', orderShort:'Запит' },
+    hero:{
+      h1:['{c}Одна{/c} людина.', 'Сайти на замовлення', 'і {u}свій продукт.{/u}'],
+      note:'без менеджерів і брифів на сорок сторінок',
+      stampOn:'беру нові сайти • solo • ', stampOff:'зараз зайнятий • пишіть усе одно • ',
+      sign:'— fioritura,<br>пише код сам',
+      lead:'Я <b>fioritura</b>. Роблю лендинги та промо-сайти на замовлення — від ідеї до робочого посилання, сам і напряму з вами. Паралельно самотужки пиляю свій продукт, і все, чого на ньому вчуся, одразу йде в клієнтські сайти. <b>Готових комерційних кейсів поки немає</b> — зате стіл відкритий: нижче видно, що на ньому просто зараз.',
+      cta:'Зібрати запит на сайт', ctaLink:'Подивитися, що в збірці'
+    },
+    build:{
+      num:'№1 — майстерня', title:'Свій продукт і те, що <em>зараз на столі</em>',
+      lede:'Я збираю власний продукт — сам, від схеми даних до останньої кнопки. Назву притримаю, доки він не почне працювати без моїх пояснень. Зате не ховаю процес: начерки, експерименти з інтерфейсом і нотатки лежать просто тут.',
+      cols:[
+        {hand:'навіщо це вам', h:'Швидкість на практиці', p:'Продукт змушує збирати швидко й викочувати часто. Той самий темп я приношу у ваш сайт.'},
+        {hand:'і ще', h:'Деталі, перевірені на собі', p:'Кнопки, переходи, форми — спершу обкатую в себе. У клієнтські сайти потрапляє те, що вже вижило.'},
+        {hand:'і головне', h:'Я сам собі замовник', p:'Знаю, як це — чекати, сумніватися й хотіти «трохи інакше». Тому показую живу збірку, а не обіцянки.'}
+      ],
+      hint:'натисніть на картку — вона перевернеться', shuffle:'перемішати', grid:'Акуратно', table:'Врозкид на столі', viewAria:'Вигляд стіни'
+    },
+    press:{ never:'ще не натискали', count:'натиснуто {n} {w}', forms:{one:'раз', few:'рази', many:'разів', other:'рази'}, more:' — сподобалося ж' },
+    order:{
+      num:'№2 — замовлення', title:'Зберіть запит <em>за хвилину</em>',
+      lede:'Форми не буде. Клацайте варіанти — поруч одразу пишеться готове повідомлення. Скопіюйте його або відкрийте Telegram з уже вставленим текстом. Надсилаєте ви, коли захочете.',
+      sheetTitle:'Запит на сайт', to:'кому:', ready:'зібрано {n} з 5', readyDone:'запит готовий ✓',
+      copy:'Скопіювати запит', tg:'Відкрити в Telegram', mail:'Листом',
+      hint:'Текст скопійовано — якщо поле введення порожнє, просто вставте (Ctrl+V / Cmd+V)',
+      reset:'почати заново', note:'відповідаю сам ↑',
+      dockText:'запит пишеться сам', dockReady:'{n} з 5', dockDone:'готово ✓', dockCopy:'Копіювати', dockTg:'У Telegram',
+      extraTitle:'Кілька слів від вас', extraSub:'необов’язково, але дуже допомагає',
+      about:'Про проєкт', aboutPh:'Наприклад: відкриваю студію кераміки, потрібен сайт із розкладом майстер-класів',
+      links:'Посилання, які подобаються', linksPh:'посилання чи два', name:'Як до вас звертатися', namePh:'Ім’я', date:'Коли запуск'
+    },
+    q:{
+      what:{ title:'Що потрібно', opts:{landing:'Лендинг', promo:'Промо-сайт', card:'Сайт-візитка / портфоліо', proto:'Прототип продукту', unsure:'Поки не знаю — допоможи вирішити'} },
+      when:{ title:'Коли', opts:{fast:'Швидко, до тижня', calm:'Без поспіху', date:'Є дата запуску'} },
+      how:{ title:'Як працюємо', opts:{sprint:'Вайбкод-спринт разом — збираємо наживо', solo:'Збираєш сам, показуєш ітерації', talk:'Спершу просто обговорити'} },
+      have:{ title:'Що вже є', sub:'можна кілька', opts:{idea:'Лише ідея', texts:'Тексти', design:'Дизайн або макет', brand:'Логотип і кольори', refs:'Сайти, які подобаються'} },
+      care:{ title:'Що найважливіше', sub:'до трьох пунктів', opts:{memorable:'Щоб запам’ятовувався', fastload:'Швидко вантажився', mobile:'Чудово на телефоні', motion:'Живі анімації', edit:'Сам(а) правлю тексти', search:'Знаходився в пошуку'} },
+      budget:{ title:'Бюджет', opts:{talk:'Обговоримо', have:'Орієнтир є — напишу'} },
+    },
+    phrase:{
+      what:{landing:'лендинг', promo:'промо-сайт', card:'сайт-візитку', proto:'прототип продукту'},
+      when:{fast:'швидко, хочеться вкластися в тиждень', calm:'без поспіху, важливіше зробити добре', date:'є дата запуску'},
+      how:{sprint:'вайбкод-спринт разом — хочу бачити, як збирається', solo:'збираєш сам, а я дивлюся ітерації', talk:'спершу просто обговорити'},
+      have:{idea:'ідея', texts:'тексти', design:'дизайн або макет', brand:'логотип і кольори', refs:'приклади сайтів, які подобаються'},
+      care:{memorable:'щоб запам’ятовувався', fastload:'щоб швидко вантажився', mobile:'щоб чудово працював на телефоні', motion:'живі анімації', edit:'щоб я міг (могла) сам(а) правити тексти', search:'щоб знаходився в пошуку'},
+      budget:{talk:'обговоримо', have:'орієнтир є, напишу окремо'},
+    },
+    msg:{
+      hello:'Привіт!', helloName:'Привіт! Мене звати {name}.', want:'Хочу зібрати з тобою <b>{what}</b>.',
+      unsure:'Потрібен сайт, але поки не розумію, який саме. <b>Допоможеш вирішити?</b>', placeholder:'Потрібен… (оберіть, що саме)',
+      when:'Термін: <b>{v}</b>.', how:'Формат: <b>{v}</b>.', have:'Що вже є: {v}.', care:'Важливо: {v}.',
+      about:'Про проєкт: {v}', links:'Подобається: {v}', budget:'Бюджет: {v}.', end:'Коли зможеш подивитися?',
+      and:' і ', fallback:'Привіт! Хочу обговорити сайт.', subject:'Запит на сайт'
+    },
+    contact:{
+      num:'№3 — зв’язок', title:'Напишіть. <em>Відповідаю сам.</em>',
+      p:'Без форм і без «залиште заявку, менеджер зв’яжеться». Найшвидше — Telegram. Хочете стежити за продуктом — GitHub і X.',
+      link:'Або спершу зберіть запит ↑', hand:'натиснули — скопіювалося',
+      mail:'Пошта', ghText:'код і збірки', xText:'процес по ходу',
+      copy:'Копіювати', copied:'Скопійовано ✓', manual:'Виділіть вручну', open:'Відкрити ↗'
+    },
+    foot:{ text:'© {y} fioritura — одна людина, один файл, жодних шаблонів', top:'Нагору ↑' },
+    toast:{
+      copied:'скопійовано', fail:'не вийшло', failText:'Скопіюйте вручну: {v}',
+      brief:'запит скопійовано', briefText:'Вставте його в Telegram або в лист', briefFail:'Виділіть текст на аркуші вручну',
+      tg:'текст скопійовано', tgText:'Якщо поле введення порожнє, просто вставте (Ctrl+V / Cmd+V)',
+      tgFail:'не вдалося скопіювати', tgFailText:'Скопіюйте текст з аркуша вручну',
+      reset:'чистий аркуш', resetText:'Починаємо заново'
+    },
+  },
+
+  /* ----------------------------------------------------------------- PL */
+  pl: {
+    meta:{ description:'fioritura — jeden programista. Strony i landing page’e na zamówienie bezpośrednio, a do tego własny produkt budowany w pojedynkę.' },
+    lang:'Język',
+    nav:{ home:'fioritura — do góry', aria:'Nawigacja', note:'solo / strony i własny produkt', build:'Co na stole', contact:'Kontakt', order:'Złóż zapytanie', orderShort:'Zapytanie' },
+    hero:{
+      h1:['{c}Jedna{/c} osoba.', 'Strony na zamówienie', 'i {u}własny produkt.{/u}'],
+      note:'bez managerów i briefów na czterdzieści stron',
+      stampOn:'biorę nowe strony • solo • ', stampOff:'teraz zajęty • pisz śmiało • ',
+      sign:'— fioritura,<br>sam pisze kod',
+      lead:'Jestem <b>fioritura</b>. Robię landing page’e i strony promocyjne na zamówienie — od pomysłu do działającego linku, sam i bezpośrednio z Tobą. Równolegle w pojedynkę buduję własny produkt, a wszystko, czego się na nim uczę, od razu trafia do stron klientów. <b>Gotowych komercyjnych realizacji jeszcze nie ma</b> — za to stół jest otwarty: niżej widać, co na nim teraz leży.',
+      cta:'Złóż zapytanie o stronę', ctaLink:'Zobacz, co jest na stole'
+    },
+    build:{
+      num:'Nr 1 — warsztat', title:'Własny produkt i to, co <em>teraz leży na stole</em>',
+      lede:'Buduję własny produkt — sam, od schematu danych po ostatni przycisk. Nazwę zachowam dla siebie, dopóki nie zacznie działać bez moich wyjaśnień. Za to nie ukrywam procesu: szkice, eksperymenty z interfejsem i notatki leżą właśnie tutaj.',
+      cols:[
+        {hand:'po co to Tobie', h:'Szybkość w praktyce', p:'Produkt zmusza mnie do szybkiego budowania i częstych wdrożeń. To samo tempo wnoszę do Twojej strony.'},
+        {hand:'i jeszcze', h:'Detale sprawdzone na sobie', p:'Przyciski, przejścia, formularze — najpierw testuję u siebie. Do stron klientów trafia to, co przetrwało.'},
+        {hand:'i najważniejsze', h:'Sam jestem swoim klientem', p:'Wiem, jak to jest czekać, wątpić i chcieć „trochę inaczej”. Dlatego pokazuję działającą wersję, a nie obietnice.'}
+      ],
+      hint:'kliknij kartkę — odwróci się', shuffle:'przetasuj', grid:'Porządnie', table:'Rozrzucone na stole', viewAria:'Widok ściany'
+    },
+    press:{ never:'jeszcze nie naciśnięty', count:'naciśnięto {n} {w}', forms:{one:'raz', few:'razy', many:'razy', other:'razy'}, more:' — no właśnie, przyjemne' },
+    order:{
+      num:'Nr 2 — zamówienie', title:'Złóż zapytanie <em>w minutę</em>',
+      lede:'Formularza nie będzie. Klikaj w opcje — obok od razu powstaje gotowa wiadomość. Skopiuj ją albo otwórz Telegram z wklejonym tekstem. Wysyłasz Ty, kiedy chcesz.',
+      sheetTitle:'Zapytanie o stronę', to:'do:', ready:'gotowe {n} z 5', readyDone:'zapytanie gotowe ✓',
+      copy:'Skopiuj zapytanie', tg:'Otwórz w Telegramie', mail:'Mailem',
+      hint:'Tekst skopiowany — jeśli pole wpisywania jest puste, po prostu wklej (Ctrl+V / Cmd+V)',
+      reset:'zacznij od nowa', note:'odpowiadam osobiście ↑',
+      dockText:'zapytanie pisze się samo', dockReady:'{n} z 5', dockDone:'gotowe ✓', dockCopy:'Kopiuj', dockTg:'Do Telegrama',
+      extraTitle:'Kilka słów od Ciebie', extraSub:'opcjonalnie, ale bardzo pomaga',
+      about:'O projekcie', aboutPh:'Np.: otwieram pracownię ceramiki, potrzebuję strony z grafikiem warsztatów',
+      links:'Linki, które Ci się podobają', linksPh:'link lub dwa', name:'Jak się do Ciebie zwracać', namePh:'Imię', date:'Data startu'
+    },
+    q:{
+      what:{ title:'Czego potrzebujesz', opts:{landing:'Landing page', promo:'Strona promocyjna', card:'Wizytówka / portfolio', proto:'Prototyp produktu', unsure:'Jeszcze nie wiem — pomóż wybrać'} },
+      when:{ title:'Kiedy', opts:{fast:'Szybko, do tygodnia', calm:'Bez pośpiechu', date:'Jest data startu'} },
+      how:{ title:'Jak pracujemy', opts:{sprint:'Sprint vibe-codingu razem — budujemy na żywo', solo:'Budujesz sam, pokazujesz iteracje', talk:'Najpierw po prostu porozmawiać'} },
+      have:{ title:'Co już masz', sub:'można kilka', opts:{idea:'Tylko pomysł', texts:'Teksty', design:'Projekt lub makieta', brand:'Logo i kolory', refs:'Strony, które mi się podobają'} },
+      care:{ title:'Co jest najważniejsze', sub:'do trzech punktów', opts:{memorable:'Żeby zapadała w pamięć', fastload:'Szybko się ładowała', mobile:'Świetnie na telefonie', motion:'Żywe animacje', edit:'Sam(a) edytuję teksty', search:'Widoczna w wyszukiwarce'} },
+      budget:{ title:'Budżet', opts:{talk:'Do ustalenia', have:'Mam widełki — napiszę'} },
+    },
+    phrase:{
+      what:{landing:'landing page', promo:'stronę promocyjną', card:'stronę-wizytówkę', proto:'prototyp produktu'},
+      when:{fast:'szybko, najlepiej w tydzień', calm:'bez pośpiechu, ważniejsza jakość', date:'jest data startu'},
+      how:{sprint:'sprint vibe-codingu razem — chcę widzieć, jak powstaje', solo:'budujesz sam, a ja oglądam iteracje', talk:'najpierw po prostu porozmawiać'},
+      have:{idea:'pomysł', texts:'teksty', design:'projekt lub makieta', brand:'logo i kolory', refs:'przykłady stron, które mi się podobają'},
+      care:{memorable:'żeby zapadała w pamięć', fastload:'żeby szybko się ładowała', mobile:'żeby świetnie działała na telefonie', motion:'żywe animacje', edit:'żebym mógł(a) sam(a) edytować teksty', search:'żeby była widoczna w wyszukiwarce'},
+      budget:{talk:'do ustalenia', have:'mam widełki, napiszę osobno'},
+    },
+    msg:{
+      hello:'Cześć!', helloName:'Cześć! Mam na imię {name}.', want:'Chcę zbudować z Tobą <b>{what}</b>.',
+      unsure:'Potrzebuję strony, ale jeszcze nie wiem jakiej. <b>Pomożesz wybrać?</b>', placeholder:'Potrzebuję… (wybierz, czego dokładnie)',
+      when:'Termin: <b>{v}</b>.', how:'Format: <b>{v}</b>.', have:'Co już mam: {v}.', care:'Ważne: {v}.',
+      about:'O projekcie: {v}', links:'Podoba mi się: {v}', budget:'Budżet: {v}.', end:'Kiedy możesz rzucić okiem?',
+      and:' i ', fallback:'Cześć! Chcę porozmawiać o stronie.', subject:'Zapytanie o stronę'
+    },
+    contact:{
+      num:'Nr 3 — kontakt', title:'Napisz. <em>Odpowiadam osobiście.</em>',
+      p:'Bez formularzy i bez „zostaw zgłoszenie, manager się odezwie”. Najszybciej — Telegram. Chcesz śledzić produkt — GitHub i X.',
+      link:'Albo najpierw złóż zapytanie ↑', hand:'klik — skopiowane',
+      mail:'E-mail', ghText:'kod i wersje', xText:'proces na bieżąco',
+      copy:'Kopiuj', copied:'Skopiowano ✓', manual:'Zaznacz ręcznie', open:'Otwórz ↗'
+    },
+    foot:{ text:'© {y} fioritura — jedna osoba, jeden plik, zero szablonów', top:'Do góry ↑' },
+    toast:{
+      copied:'skopiowano', fail:'nie wyszło', failText:'Skopiuj ręcznie: {v}',
+      brief:'zapytanie skopiowane', briefText:'Wklej je do Telegrama albo maila', briefFail:'Zaznacz tekst na kartce ręcznie',
+      tg:'tekst skopiowany', tgText:'Jeśli pole wpisywania jest puste, po prostu wklej (Ctrl+V / Cmd+V)',
+      tgFail:'nie udało się skopiować', tgFailText:'Skopiuj tekst z kartki ręcznie',
+      reset:'czysta kartka', resetText:'Zaczynamy od nowa'
+    },
+  },
+};
+
+/* ==========================================================================
+   СТЕНА — карточки. Структура: id, size, kind, fix, r (+ demo для живых экспериментов)
+   и t — тексты карточки на четырёх языках. Правь t.<язык> под свой реальный статус.
+   Поля текста:
+     fk / bk   — подписи сверху лицевой / обратной стороны [слева, справа]
+     hand      — рукописный заголовок (note)      text  — абзац под ним
+     title     — заголовок антиквой (quote)       items — пункты (todo, log)
+     sk        — подписи на наброске (sketch)     btn   — текст кнопки (demo:'press')
+     sample, w, ls — образец и подписи ползунков (demo:'type')
+     back: { p:[абзацы], list:[пункты], after:'абзац после списка', link:'ссылка к конструктору' }
+   size: s | w    kind: note | sketch | lab | todo | quote | log    fix: tape | pin
+   ========================================================================== */
+const WALL = [
+  { id:'product', size:'w', kind:'note', fix:'tape', r:-2, t:{
+    ru:{ fk:['свой продукт','● в работе'], hand:'Пилю свой продукт. Один.', text:'Название пока не скажу — сначала пусть заработает. Здесь будет видно, как он растёт.',
+         bk:['как устроено','оборот'], back:{ p:['Сначала маленькое ядро, которое не жалко переписать. Потом интерфейс — из тех же деталей, что идут в клиентские сайты.'], list:['Следующий шаг — закрытая версия для первых людей','Хотите попасть в их число — напишите в Telegram'] } },
+    en:{ fk:['own product','● in progress'], hand:'Building my own product. Alone.', text:'Not telling the name yet — first it has to work. You’ll see it grow here.',
+         bk:['how it’s built','back side'], back:{ p:['First a small core that’s fine to rewrite. Then the interface — made of the same parts that go into client sites.'], list:['Next step — a closed version for the first people','Want to be one of them? Message me on Telegram'] } },
+    uk:{ fk:['свій продукт','● у роботі'], hand:'Пиляю свій продукт. Сам.', text:'Назву поки не скажу — спершу хай запрацює. Тут буде видно, як він росте.',
+         bk:['як влаштовано','зворот'], back:{ p:['Спершу маленьке ядро, яке не шкода переписати. Потім інтерфейс — з тих самих деталей, що йдуть у клієнтські сайти.'], list:['Наступний крок — закрита версія для перших людей','Хочете бути серед них — напишіть у Telegram'] } },
+    pl:{ fk:['własny produkt','● w pracy'], hand:'Buduję własny produkt. Sam.', text:'Nazwy jeszcze nie zdradzę — najpierw niech działa. Tutaj będzie widać, jak rośnie.',
+         bk:['jak to działa','rewers'], back:{ p:['Najpierw mały rdzeń, którego nie szkoda przepisać. Potem interfejs — z tych samych elementów, które trafiają na strony klientów.'], list:['Następny krok — zamknięta wersja dla pierwszych osób','Chcesz być wśród nich — napisz na Telegramie'] } },
+  }},
+  { id:'screen', size:'s', kind:'sketch', fix:'pin', r:3, t:{
+    ru:{ fk:['набросок','экран продукта'], sk:['главное','— сюда'], bk:['что тут решаю',''], back:{ p:['Главное действие — с первого экрана и в одно касание. Всё остальное прячется, пока не понадобится.','Этот набросок уже переделывал. Скорее всего, переделаю ещё.'] } },
+    en:{ fk:['sketch','product screen'], sk:['the main','thing here'], bk:['what I’m solving',''], back:{ p:['The main action — on the first screen, in one tap. Everything else hides until it’s needed.','I’ve redone this sketch already. Probably will again.'] } },
+    uk:{ fk:['начерк','екран продукту'], sk:['головне','— сюди'], bk:['що тут вирішую',''], back:{ p:['Головна дія — з першого екрана й в один дотик. Усе інше ховається, доки не знадобиться.','Цей начерк я вже переробляв. Найімовірніше, перероблю ще.'] } },
+    pl:{ fk:['szkic','ekran produktu'], sk:['najważniejsze','— tutaj'], bk:['co tu rozwiązuję',''], back:{ p:['Główna akcja — na pierwszym ekranie i jednym dotknięciem. Reszta chowa się, dopóki nie będzie potrzebna.','Ten szkic już przerabiałem. Pewnie przerobię jeszcze raz.'] } },
+  }},
+  { id:'press', size:'s', kind:'lab', demo:'press', fix:'tape', r:-3, t:{
+    ru:{ fk:['эксперимент','кнопка'], btn:'Нажми меня', bk:['зачем',''], back:{ p:['Кнопка — самое частое касание на сайте. Если на неё приятно жать, весь сайт кажется лучше. Отсюда это едет в лендинги.'] } },
+    en:{ fk:['experiment','button'], btn:'Press me', bk:['why',''], back:{ p:['A button is the most frequent touch on a site. If it feels good to press, the whole site feels better. From here it goes into landing pages.'] } },
+    uk:{ fk:['експеримент','кнопка'], btn:'Натисни мене', bk:['навіщо',''], back:{ p:['Кнопка — найчастіший дотик на сайті. Якщо на неї приємно тиснути, увесь сайт здається кращим. Звідси це їде в лендинги.'] } },
+    pl:{ fk:['eksperyment','przycisk'], btn:'Naciśnij mnie', bk:['po co',''], back:{ p:['Przycisk to najczęstszy dotyk na stronie. Jeśli przyjemnie się go naciska, cała strona wydaje się lepsza. Stąd to trafia na landing page’e.'] } },
+  }},
+  { id:'now', size:'s', kind:'todo', fix:'pin', r:2, t:{
+    ru:{ fk:['кручу сейчас',''], items:['Онбординг — минус один шаг','Переходы между экранами','Заготовка для быстрых лендингов','Проверка на старом телефоне'], bk:['про этот список',''], back:{ p:['Работаю маленькими кусками: один пункт — одна выкатка. Галочки ставить можно — они сохранятся только у вас в браузере.'] } },
+    en:{ fk:['working on now',''], items:['Onboarding — one step fewer','Transitions between screens','A starter for fast landing pages','Testing on an old phone'], bk:['about this list',''], back:{ p:['I work in small pieces: one item — one release. Feel free to tick the boxes — they’re saved only in your browser.'] } },
+    uk:{ fk:['кручу зараз',''], items:['Онбординг — мінус один крок','Переходи між екранами','Заготовка для швидких лендингів','Перевірка на старому телефоні'], bk:['про цей список',''], back:{ p:['Працюю маленькими шматками: один пункт — одна викатка. Галочки ставити можна — вони збережуться лише у вашому браузері.'] } },
+    pl:{ fk:['teraz w robocie',''], items:['Onboarding — o jeden krok mniej','Przejścia między ekranami','Szablon do szybkich landingów','Test na starym telefonie'], bk:['o tej liście',''], back:{ p:['Pracuję małymi kawałkami: jeden punkt — jedno wdrożenie. Możesz zaznaczać — zapisze się tylko w Twojej przeglądarce.'] } },
+  }},
+  { id:'quote', size:'s', kind:'quote', fix:'tape', r:-1.5, t:{
+    ru:{ fk:['мысль',''], title:'Быстро — это не небрежно. Это когда между идеей и кодом нет лишних людей.', bk:['поэтому',''], back:{ p:['Со мной — напрямую. Вы пишете тому, кто делает. Решения принимаются в переписке, а не на третьем созвоне.'] } },
+    en:{ fk:['thought',''], title:'Fast doesn’t mean sloppy. It means no extra people between the idea and the code.', bk:['so',''], back:{ p:['With me it’s direct. You write to the person who builds. Decisions happen in chat, not on the third call.'] } },
+    uk:{ fk:['думка',''], title:'Швидко — це не недбало. Це коли між ідеєю і кодом немає зайвих людей.', bk:['тому',''], back:{ p:['Зі мною — напряму. Ви пишете тому, хто робить. Рішення ухвалюються в листуванні, а не на третьому дзвінку.'] } },
+    pl:{ fk:['myśl',''], title:'Szybko nie znaczy niedbale. To znaczy, że między pomysłem a kodem nie ma zbędnych ludzi.', bk:['dlatego',''], back:{ p:['Ze mną — bezpośrednio. Piszesz do osoby, która to robi. Decyzje zapadają na czacie, a nie na trzecim callu.'] } },
+  }},
+  { id:'type', size:'w', kind:'lab', demo:'type', fix:'pin', r:1.5, t:{
+    ru:{ fk:['эксперимент','голос заголовка'], sample:'Заголовок должен звучать', w:'насыщенность', ls:'разрядка', bk:['к чему это',''], back:{ p:['Голос заголовков подбираю под каждый сайт отдельно. «Жирное по центру, как у всех» — не мой вариант.'], list:['Сначала типографика, потом всё остальное','Проверка на телефоне — до, а не после'] } },
+    en:{ fk:['experiment','headline voice'], sample:'A headline should have a voice', w:'weight', ls:'tracking', bk:['what for',''], back:{ p:['I pick the headline voice for each site separately. “Bold and centred like everyone else” isn’t my thing.'], list:['Typography first, everything else after','Phone check — before, not after'] } },
+    uk:{ fk:['експеримент','голос заголовка'], sample:'Заголовок має звучати', w:'насиченість', ls:'розрядка', bk:['до чого це',''], back:{ p:['Голос заголовків добираю під кожен сайт окремо. «Жирне по центру, як у всіх» — не мій варіант.'], list:['Спершу типографіка, потім усе інше','Перевірка на телефоні — до, а не після'] } },
+    pl:{ fk:['eksperyment','głos nagłówka'], sample:'Nagłówek musi brzmieć', w:'grubość', ls:'rozstrzelenie', bk:['po co to',''], back:{ p:['Głos nagłówków dobieram do każdej strony osobno. „Pogrubione na środku, jak u wszystkich” — to nie mój styl.'], list:['Najpierw typografia, potem cała reszta','Test na telefonie — przed, a nie po'] } },
+  }},
+  { id:'landing', size:'s', kind:'sketch', fix:'tape', r:2.5, t:{
+    ru:{ fk:['набросок','первый экран'], sk:['1 действие'], bk:['правило первого экрана',''], back:{ list:['Что это','Для кого','Что сделать дальше'], after:'Три ответа — без прокрутки.' } },
+    en:{ fk:['sketch','first screen'], sk:['1 action'], bk:['first-screen rule',''], back:{ list:['What it is','Who it’s for','What to do next'], after:'Three answers — no scrolling.' } },
+    uk:{ fk:['начерк','перший екран'], sk:['1 дія'], bk:['правило першого екрана',''], back:{ list:['Що це','Для кого','Що робити далі'], after:'Три відповіді — без прокручування.' } },
+    pl:{ fk:['szkic','pierwszy ekran'], sk:['1 akcja'], bk:['zasada pierwszego ekranu',''], back:{ list:['Co to jest','Dla kogo','Co zrobić dalej'], after:'Trzy odpowiedzi — bez przewijania.' } },
+  }},
+  { id:'log', size:'w', kind:'log', fix:'pin', r:-1, t:{
+    ru:{ fk:['журнал сборки','последнее'], items:['Переписал навигацию — стало на один экран короче.','Выкинул анимацию, которая мешала читать.','Понял, что форма заказа не нужна. Хватит одного сообщения.'], bk:['отсюда и',''], back:{ p:['…конструктор запроса ниже. Вместо формы на десять полей — готовое сообщение, которое вы отправляете сами, когда удобно.'], link:'Собрать запрос ↓' } },
+    en:{ fk:['build log','latest'], items:['Rewrote the navigation — one screen shorter now.','Dropped an animation that got in the way of reading.','Realised an order form isn’t needed. One message is enough.'], bk:['hence',''], back:{ p:['…the request builder below. Instead of a ten-field form — a ready message you send yourself, whenever it suits you.'], link:'Build a request ↓' } },
+    uk:{ fk:['журнал збірки','останнє'], items:['Переписав навігацію — стало на один екран коротше.','Викинув анімацію, яка заважала читати.','Зрозумів, що форма замовлення не потрібна. Вистачить одного повідомлення.'], bk:['звідси й',''], back:{ p:['…конструктор запиту нижче. Замість форми на десять полів — готове повідомлення, яке ви надсилаєте самі, коли зручно.'], link:'Зібрати запит ↓' } },
+    pl:{ fk:['dziennik budowy','ostatnie'], items:['Przepisałem nawigację — jest krótsza o jeden ekran.','Wyrzuciłem animację, która przeszkadzała w czytaniu.','Zrozumiałem, że formularz zamówienia jest zbędny. Wystarczy jedna wiadomość.'], bk:['stąd też',''], back:{ p:['…kreator zapytania poniżej. Zamiast formularza na dziesięć pól — gotowa wiadomość, którą wysyłasz samodzielnie, kiedy chcesz.'], link:'Złóż zapytanie ↓' } },
+  }},
+  { id:'question', size:'s', kind:'note', fix:'tape', r:3.5, t:{
+    ru:{ fk:['вопрос недели',''], hand:'Сколько настроек нужно человеку в первый день?', text:'Подозреваю, что ноль.', bk:['что делаю с этим',''], back:{ p:['Разумные значения по умолчанию, настройки спрятаны. Проверю на первых людях — и честно напишу, если ошибся.'] } },
+    en:{ fk:['question of the week',''], hand:'How many settings does a person need on day one?', text:'I suspect zero.', bk:['what I do about it',''], back:{ p:['Sensible defaults, settings tucked away. I’ll test it on the first people — and say honestly if I was wrong.'] } },
+    uk:{ fk:['питання тижня',''], hand:'Скільки налаштувань потрібно людині першого дня?', text:'Підозрюю, що нуль.', bk:['що з цим роблю',''], back:{ p:['Розумні значення за замовчуванням, налаштування сховані. Перевірю на перших людях — і чесно напишу, якщо помилився.'] } },
+    pl:{ fk:['pytanie tygodnia',''], hand:'Ile ustawień potrzebuje człowiek pierwszego dnia?', text:'Podejrzewam, że zero.', bk:['co z tym robię',''], back:{ p:['Rozsądne wartości domyślne, ustawienia schowane. Sprawdzę na pierwszych osobach — i uczciwie napiszę, jeśli się myliłem.'] } },
+  }},
+];
+
+/* позиции «на столе»: x — доля ширины, y — px, r — наклон */
+const TABLE = {
+  product:[.01, 40, -2.5], screen:[.37, 28, 3],  question:[.76, 44, 4],
+  now:[.03, 340, 2.5],     press:[.76, 380, -4],  quote:[.30, 480, -3],
+  type:[.53, 650, -1.5],   landing:[.04, 720, -3], log:[.31, 930, 1.5]
+};
+
+/* Вопросы конструктора: только ключи и логика. Подписи — в I18N.<язык>.q, формулировки для сообщения — в I18N.<язык>.phrase */
+const Q = [
+  { key:'what',   type:'one',  opts:['landing','promo','card','proto','unsure'] },
+  { key:'when',   type:'one',  opts:['fast','calm','date'], field:'date' },
+  { key:'how',    type:'one',  opts:['sprint','solo','talk'] },
+  { key:'have',   type:'many', opts:['idea','texts','design','brand','refs'] },
+  { key:'care',   type:'many', opts:['memorable','fastload','mobile','motion','edit','search'], max:3 },
+  { key:'budget', type:'one',  opts:['talk','have'] },
+];
+
 /* ==========================================================================
    helpers
    ========================================================================== */
 const $  = (s, r=document) => r.querySelector(s);
 const $$ = (s, r=document) => [...r.querySelectorAll(s)];
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fill = (s, vars) => String(s).replace(/\{(\w+)\}/g, (m, k) => vars[k] ?? m);
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const store = {
   get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
@@ -700,27 +1144,75 @@ const store = {
 ME.telegramHandle = '@' + ME.telegram;
 ME.telegramUrl = 'https://t.me/' + ME.telegram;
 
+/* --- язык --- */
+function detectLang(){
+  const saved = store.get('fio-lang', null);
+  if (LANGS.includes(saved)) return saved;
+  for (const l of (navigator.languages || [navigator.language || ''])){
+    const code = String(l).toLowerCase().slice(0, 2);
+    if (LANGS.includes(code)) return code;
+  }
+  return DEFAULT_LANG;
+}
+let lang = detectLang();
+const T = () => I18N[lang];
+/* путь вида 'build.cols.0.hand' → значение; если в языке нет ключа — берём из DEFAULT_LANG */
+const pick = (obj, path) => path.split('.').reduce((o, k) => (o == null ? o : o[k]), obj);
+const t = path => pick(I18N[lang], path) ?? pick(I18N[DEFAULT_LANG], path) ?? '';
+
+/* постоянное: контакты, год */
 $$('[data-fill]').forEach(el => el.textContent = ME[el.dataset.fill]);
 $$('[data-link]').forEach(el => el.href = el.dataset.link === 'telegram' ? ME.telegramUrl : ME[el.dataset.link]);
 $('#toWho').textContent = ME.telegramHandle;
-$('#year').textContent = new Date().getFullYear();
-$('#today').textContent = new Date().toLocaleDateString('ru-RU', {day:'numeric', month:'long', year:'numeric'});
-if (!ME.takingOrders) $('#stampText').textContent = 'сейчас занят • пишите всё равно • сейчас занят • solo •';
+
+/* переключатели языка (в шапке и в футере) */
+$$('[data-lang-switch]').forEach(box => {
+  box.innerHTML = LANGS.map(l => `<button type="button" data-lang="${l}" lang="${l}" aria-pressed="false">${l.toUpperCase()}</button>`).join('');
+});
+document.addEventListener('click', e => { const b = e.target.closest('[data-lang]'); if (b) setLang(b.dataset.lang); });
+
+/* ==========================================================================
+   Заголовок первого экрана: разметка {c}…{/c} и {u}…{/u} → обводка и подчёркивание
+   ========================================================================== */
+const SVG_CIRCLE = '<svg viewBox="0 0 200 100" preserveAspectRatio="none" class="draw" aria-hidden="true"><path pathLength="1" d="M150 14 C 92 0, 22 8, 10 46 C 0 84, 72 98, 124 92 C 178 86, 199 62, 189 36 C 181 14, 142 4, 88 10"/></svg>';
+const SVG_UNDER  = '<svg viewBox="0 0 200 12" preserveAspectRatio="none" class="draw" aria-hidden="true"><path pathLength="1" d="M2 8 C 30 2, 60 13, 92 7 S 150 1, 198 8"/></svg>';
+const words = s => s.split(/\s+/).filter(Boolean).map(w => `<span class="word">${esc(w)}</span>`).join(' ');
+function headlineHTML(lines){
+  return lines.map(line => {
+    const html = line.split(/(\{c\}.*?\{\/c\}|\{u\}.*?\{\/u\})/).map(part => {
+      if (part.startsWith('{c}')) return `<span class="mark mark-circle">${words(part.slice(3, -4))}${SVG_CIRCLE}</span>`;
+      if (part.startsWith('{u}')) return `<span class="mark mark-under">${words(part.slice(3, -4))}${SVG_UNDER}</span>`;
+      const lead = /^\s/.test(part) ? ' ' : '', trail = /\s$/.test(part) ? ' ' : '';
+      return lead + words(part) + trail;
+    }).join('');
+    return `<span class="ln"><span>${html}</span></span>`;
+  }).join('');
+}
+const h1 = $('#h1');
+/* строки не переносятся: если самая длинная не влезает — уменьшаем кегль ровно настолько, насколько нужно */
+function fitHeadline(){
+  h1.style.fontSize = '';
+  const base = parseFloat(getComputedStyle(h1).fontSize);
+  const avail = h1.clientWidth;
+  // текст масштабируется вместе с кеглем, а отступ слева у второй строки — нет, поэтому считаем по каждой строке отдельно
+  let scale = 1;
+  $$('.ln', h1).forEach(ln => {
+    const pad = parseFloat(getComputedStyle(ln).paddingLeft) || 0;
+    const w = ln.firstElementChild.getBoundingClientRect().width;
+    if (w + pad > avail) scale = Math.min(scale, (avail - pad) / w);
+  });
+  if (scale < 1) h1.style.fontSize = (base * scale * .98).toFixed(2) + 'px';
+}
 
 /* ==========================================================================
    Появление и рисованные линии
    ========================================================================== */
-requestAnimationFrame(() => setTimeout(() => {
-  document.body.classList.add('is-loaded');
-  setTimeout(() => document.body.classList.add('is-settled'), reduced ? 0 : 1250);
-  $$('.hero .draw').forEach(d => d.classList.add('is-drawn'));
-}, 80));
 const io = new IntersectionObserver(es => es.forEach(e => {
   if (!e.isIntersecting) return;
-  const t = e.target;
-  const sibs = [...t.parentElement.children].filter(c => c.hasAttribute('data-in'));
-  t.style.transitionDelay = (sibs.indexOf(t) * 90) + 'ms';
-  t.classList.add('is-in'); io.unobserve(t);
+  const el = e.target;
+  const sibs = [...el.parentElement.children].filter(c => c.hasAttribute('data-in'));
+  el.style.transitionDelay = (sibs.indexOf(el) * 90) + 'ms';
+  el.classList.add('is-in'); io.unobserve(el);
 }), {threshold:.12});
 $$('[data-in]').forEach(el => io.observe(el));
 const drawIO = new IntersectionObserver(es => es.forEach(e => {
@@ -734,8 +1226,8 @@ $$('.draw').forEach(el => { if (!el.closest('.hero')) drawIO.observe(el); });
 let toastT;
 function toast(head, text){
   $('#toastHead').textContent = head; $('#toastText').textContent = text;
-  const t = $('#toast'); t.classList.add('is-on');
-  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('is-on'), 2600);
+  const el = $('#toast'); el.classList.add('is-on');
+  clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('is-on'), 2600);
 }
 async function copyText(text){
   try { await navigator.clipboard.writeText(text); return true; }
@@ -749,16 +1241,22 @@ async function copyText(text){
 $$('[data-copy]').forEach(btn => btn.addEventListener('click', async () => {
   const v = ME[btn.dataset.copy]; const ok = await copyText(v);
   const act = $('.c-act', btn);
-  btn.classList.add('is-copied'); act.textContent = ok ? 'Скопировано ✓' : 'Выделите вручную';
-  toast(ok ? 'скопировано' : 'не вышло', ok ? v : 'Скопируйте вручную: ' + v);
-  setTimeout(() => { btn.classList.remove('is-copied'); act.textContent = 'Копировать'; }, 1800);
+  btn.classList.add('is-copied'); act.textContent = ok ? t('contact.copied') : t('contact.manual');
+  toast(ok ? t('toast.copied') : t('toast.fail'), ok ? v : fill(t('toast.failText'), {v}));
+  clearTimeout(btn._t);
+  btn._t = setTimeout(() => { btn.classList.remove('is-copied'); act.textContent = t('contact.copy'); }, 1800);
 }));
 
 /* ==========================================================================
-   СТЕНА — карточки. Тексты по продукту правь под свой реальный статус.
-   size: s | w    kind: note | sketch | lab | todo | quote | log    fix: tape | pin
+   СТЕНА
    ========================================================================== */
-const SK_SCREEN = `
+/* подпись на наброске: кегль уменьшается, если слово длинное (напр. «najważniejsze») */
+const skLabel = (s, x, y, room) => {
+  const fs = Math.min(15, room / (Math.max(1, s.length) * .43));
+  return `<text class="sk-t" x="${x}" y="${y}" style="font-size:${fs.toFixed(1)}px">${esc(s)}</text>`;
+};
+const SKETCH = {
+  screen: sk => `
 <svg viewBox="0 0 220 230" aria-hidden="true"><g filter="url(#rough)">
   <rect class="sk" x="30" y="8" width="120" height="214" rx="16"/>
   <path class="sk" d="M72 20 H108"/>
@@ -768,9 +1266,8 @@ const SK_SCREEN = `
   <path class="sk" d="M44 160 H136 M44 174 H122 M44 188 H132"/>
   <rect class="sk" x="44" y="198" width="44" height="14" rx="7"/>
   <path class="sk-a" d="M128 92 C 150 70, 172 66, 190 74 M128 92 l 2 -10 M128 92 l 10 -2"/>
-</g><text class="sk-t" x="156" y="96">главное</text><text class="sk-t" x="156" y="112">— сюда</text></svg>`;
-
-const SK_LANDING = `
+</g>${skLabel(sk[0] || '', 154, 96, 64)}${skLabel(sk[1] || '', 154, 112, 64)}</svg>`,
+  landing: sk => `
 <svg viewBox="0 0 240 150" aria-hidden="true"><g filter="url(#rough)">
   <rect class="sk" x="6" y="6" width="228" height="138" rx="6"/>
   <path class="sk" d="M6 22 H234"/><circle class="sk" cx="16" cy="14" r="2.5"/><circle class="sk" cx="25" cy="14" r="2.5"/>
@@ -778,112 +1275,101 @@ const SK_LANDING = `
   <path class="sk" d="M20 90 H110" style="stroke-width:1;opacity:.5"/><path class="sk" d="M20 98 H96" style="stroke-width:1;opacity:.5"/>
   <rect class="sk-f" x="20" y="110" width="58" height="18" rx="9"/>
   <rect class="sk" x="140" y="36" width="80" height="92"/><path class="sk" d="M140 36 L220 128 M220 36 L140 128"/>
-</g><text class="sk-t" x="86" y="124">1 действие</text></svg>`;
-
-const WALL = [
-  {
-    id:'product', size:'w', kind:'note', fix:'tape', r:-2,
-    front:`<div class="kicker"><span>свой продукт</span><span class="acc">● в работе</span></div>
-      <p class="c-hand">Пилю свой продукт. Один.</p>
-      <p class="c-text">Название пока не скажу — сначала пусть заработает. Здесь будет видно, как он растёт.</p>`,
-    back:`<div class="kicker"><span>как устроено</span><span class="acc">оборот</span></div>
-      <p class="c-text">Сначала маленькое ядро, которое не жалко переписать. Потом интерфейс — из тех же деталей, что идут в клиентские сайты.</p>
-      <ul><li>Следующий шаг — закрытая версия для первых людей</li><li>Хотите попасть в их число — напишите в Telegram</li></ul>`
-  },
-  {
-    id:'screen', size:'s', kind:'sketch', fix:'pin', r:3,
-    front:`<div class="kicker"><span>набросок</span><span>экран продукта</span></div>${SK_SCREEN}`,
-    back:`<div class="kicker"><span>что тут решаю</span></div>
-      <p class="c-text">Главное действие — с первого экрана и в одно касание. Всё остальное прячется, пока не понадобится.</p>
-      <p class="c-text">Этот набросок уже переделывал. Скорее всего, переделаю ещё.</p>`
-  },
-  {
-    id:'press', size:'s', kind:'lab', fix:'tape', r:-3,
-    front:`<div class="kicker"><span>эксперимент</span><span>кнопка</span></div>
-      <div class="press-zone" data-int>
-        <button class="press" type="button" data-press>Нажми меня</button>
-        <span class="press-count" data-press-count>ещё не нажимали</span>
-      </div>`,
-    back:`<div class="kicker"><span>зачем</span></div>
-      <p class="c-text">Кнопка — самое частое касание на сайте. Если на неё приятно жать, весь сайт кажется лучше. Отсюда это едет в лендинги.</p>`
-  },
-  {
-    id:'now', size:'s', kind:'todo', fix:'pin', r:2,
-    front:`<div class="kicker"><span>кручу сейчас</span></div>
-      <ul class="todo" data-int>
-        ${['Онбординг — минус один шаг','Переходы между экранами','Заготовка для быстрых лендингов','Проверка на старом телефоне'].map((t,i)=>`
-        <li><label><input type="checkbox" data-todo="${i}"><span class="box"><svg viewBox="0 0 28 28"><path pathLength="1" d="M5 14 L11 20 L24 4"/></svg></span><span class="tt">${t}</span></label></li>`).join('')}
-      </ul>`,
-    back:`<div class="kicker"><span>про этот список</span></div>
-      <p class="c-text">Работаю маленькими кусками: один пункт — одна выкатка. Галочки ставить можно — они сохранятся только у вас в браузере.</p>`
-  },
-  {
-    id:'quote', size:'s', kind:'quote', fix:'tape', r:-1.5,
-    front:`<div class="kicker"><span>мысль</span></div>
-      <p class="c-title">Быстро — это не небрежно. Это когда между идеей и кодом нет лишних людей.</p>`,
-    back:`<div class="kicker"><span>поэтому</span></div>
-      <p class="c-text">Со мной — напрямую. Вы пишете тому, кто делает. Решения принимаются в переписке, а не на третьем созвоне.</p>`
-  },
-  {
-    id:'type', size:'w', kind:'lab', fix:'pin', r:1.5,
-    front:`<div class="kicker"><span>эксперимент</span><span>голос заголовка</span></div>
-      <div data-int>
-        <p class="type-sample" data-type-sample>Заголовок должен звучать</p>
-        <label class="rng">насыщенность<input type="range" min="400" max="900" step="10" value="700" data-type-w><output data-type-wo>700</output></label>
-        <label class="rng">разрядка<input type="range" min="-6" max="8" step="1" value="-2" data-type-ls><output data-type-lso>−2</output></label>
-      </div>`,
-    back:`<div class="kicker"><span>к чему это</span></div>
-      <p class="c-text">Голос заголовков подбираю под каждый сайт отдельно. «Жирное по центру, как у всех» — не мой вариант.</p>
-      <ul><li>Сначала типографика, потом всё остальное</li><li>Проверка на телефоне — до, а не после</li></ul>`
-  },
-  {
-    id:'landing', size:'s', kind:'sketch', fix:'tape', r:2.5,
-    front:`<div class="kicker"><span>набросок</span><span>первый экран</span></div>${SK_LANDING}`,
-    back:`<div class="kicker"><span>правило первого экрана</span></div>
-      <ul><li>Что это</li><li>Для кого</li><li>Что сделать дальше</li></ul>
-      <p class="c-text" style="margin-top:10px">Три ответа — без прокрутки.</p>`
-  },
-  {
-    id:'log', size:'w', kind:'log', fix:'pin', r:-1,
-    front:`<div class="kicker"><span>журнал сборки</span><span>последнее</span></div>
-      <ul class="log-list">
-        <li><span>01</span>Переписал навигацию — стало на один экран короче.</li>
-        <li><span>02</span>Выкинул анимацию, которая мешала читать.</li>
-        <li><span>03</span>Понял, что форма заказа не нужна. Хватит одного сообщения.</li>
-      </ul>`,
-    back:`<div class="kicker"><span>отсюда и</span></div>
-      <p class="c-text">…конструктор запроса ниже. Вместо формы на десять полей — готовое сообщение, которое вы отправляете сами, когда удобно.</p>
-      <p class="c-text"><a href="#order" class="link" data-int>Собрать запрос ↓</a></p>`
-  },
-  {
-    id:'question', size:'s', kind:'note', fix:'tape', r:3.5,
-    front:`<div class="kicker"><span>вопрос недели</span></div>
-      <p class="c-hand">Сколько настроек нужно человеку в первый день?</p>
-      <p class="c-text">Подозреваю, что ноль.</p>`,
-    back:`<div class="kicker"><span>что делаю с этим</span></div>
-      <p class="c-text">Разумные значения по умолчанию, настройки спрятаны. Проверю на первых людях — и честно напишу, если ошибся.</p>`
-  },
-];
-
-/* позиции «на столе»: x — доля ширины, y — px, r — наклон */
-const TABLE = {
-  product:[.01, 40, -2.5], screen:[.37, 28, 3],  question:[.76, 44, 4],
-  now:[.03, 340, 2.5],     press:[.76, 380, -4],  quote:[.30, 480, -3],
-  type:[.53, 650, -1.5],   landing:[.04, 720, -3], log:[.31, 930, 1.5]
+</g>${skLabel(sk[0] || '', 84, 124, 52)}</svg>`,
 };
+const kicker = ([l = '', r = ''] = [], accRight) =>
+  `<div class="kicker"><span>${esc(l)}</span>${r ? `<span class="${accRight ? 'acc' : ''}">${esc(r)}</span>` : ''}</div>`;
+
+/* живое состояние карточек — переживает смену языка */
+const live = { presses:0, w:700, ls:-2 };
+const todoState = store.get('fio-todo', {});
+
+function cardFront(c, x){
+  switch (c.kind){
+    case 'note':   return kicker(x.fk, true) + `<p class="c-hand">${esc(x.hand)}</p><p class="c-text">${esc(x.text)}</p>`;
+    case 'sketch': return kicker(x.fk) + (SKETCH[c.id] ? SKETCH[c.id](x.sk || []) : '');
+    case 'quote':  return kicker(x.fk) + `<p class="c-title">${esc(x.title)}</p>`;
+    case 'todo':   return kicker(x.fk) + `<ul class="todo" data-int>${x.items.map((it, i) => `
+        <li><label><input type="checkbox" data-todo="${i}" ${todoState[i] ? 'checked' : ''}><span class="box"><svg viewBox="0 0 28 28"><path pathLength="1" d="M5 14 L11 20 L24 4"/></svg></span><span class="tt">${esc(it)}</span></label></li>`).join('')}</ul>`;
+    case 'log':    return kicker(x.fk) + `<ul class="log-list">${x.items.map((it, i) => `<li><span>${String(i + 1).padStart(2, '0')}</span>${esc(it)}</li>`).join('')}</ul>`;
+    case 'lab':
+      if (c.demo === 'press') return kicker(x.fk) + `
+        <div class="press-zone" data-int>
+          <button class="press" type="button" data-press>${esc(x.btn)}</button>
+          <span class="press-count" data-press-count>${pressText()}</span>
+        </div>`;
+      if (c.demo === 'type') return kicker(x.fk) + `
+        <div data-int>
+          <p class="type-sample" data-type-sample>${esc(x.sample)}</p>
+          <label class="rng">${esc(x.w)}<input type="range" min="400" max="900" step="10" value="${live.w}" data-type-w><output data-type-wo></output></label>
+          <label class="rng">${esc(x.ls)}<input type="range" min="-6" max="8" step="1" value="${live.ls}" data-type-ls><output data-type-lso></output></label>
+        </div>`;
+  }
+  return kicker(x.fk);
+}
+function cardBack(c, x){
+  const b = x.back || {};
+  return kicker(x.bk, true)
+    + (b.p || []).map(p => `<p class="c-text">${esc(p)}</p>`).join('')
+    + (b.list ? `<ul>${b.list.map(li => `<li>${esc(li)}</li>`).join('')}</ul>` : '')
+    + (b.after ? `<p class="c-text">${esc(b.after)}</p>` : '')
+    + (b.link ? `<p class="c-text"><a href="#order" class="link" data-int>${esc(b.link)}</a></p>` : '');
+}
+function pressText(){
+  const p = t('press');
+  if (!live.presses) return p.never;
+  const form = new Intl.PluralRules(LOCALE[lang]).select(live.presses);
+  const w = p.forms[form] || p.forms.other;
+  return fill(p.count, {n:live.presses, w}) + (live.presses >= 7 ? p.more : '');
+}
+function updType(){
+  const s = $('[data-type-sample]'); if (!s) return;
+  s.style.setProperty('--w', live.w);
+  s.style.setProperty('--ls', (live.ls / 100) + 'em');
+  $('[data-type-wo]').textContent = live.w;
+  $('[data-type-lso]').textContent = String(live.ls).replace('-', '−');
+}
 
 const wall = $('#wall');
 wall.innerHTML = WALL.map(c => `
   <article class="card size-${c.size} k-${c.kind}" data-id="${c.id}" tabindex="0" role="button" aria-expanded="false" style="--r:${c.r}deg">
     <div class="tilt" data-fix="${c.fix}">
       <div class="paper">
-        <div class="face front">${c.front}</div>
-        <div class="face back">${c.back}</div>
+        <div class="face front"></div>
+        <div class="face back"></div>
         <span class="turn" aria-hidden="true">↻</span>
       </div>
     </div>
   </article>`).join('');
 const cards = $$('.card', wall);
+
+function renderWall(){
+  cards.forEach(card => {
+    const c = WALL.find(w => w.id === card.dataset.id);
+    const x = c.t[lang] || c.t[DEFAULT_LANG];
+    $('.front', card).innerHTML = cardFront(c, x);
+    $('.back', card).innerHTML = cardBack(c, x);
+  });
+  updType();
+  if (isTable()){ cards.forEach(clampCard); resolveOverlaps(); fitBoard(); }
+}
+
+/* живые элементы — через делегирование, поэтому переживают перерисовку при смене языка */
+wall.addEventListener('click', e => {
+  if (!e.target.closest('[data-press]')) return;
+  live.presses++;
+  const out = $('[data-press-count]'); if (out) out.textContent = pressText();
+});
+wall.addEventListener('input', e => {
+  if (e.target.matches('[data-type-w]')) live.w = +e.target.value;
+  else if (e.target.matches('[data-type-ls]')) live.ls = +e.target.value;
+  else return;
+  updType();
+});
+wall.addEventListener('change', e => {
+  if (!e.target.matches('[data-todo]')) return;
+  todoState[e.target.dataset.todo] = e.target.checked; store.set('fio-todo', todoState);
+});
 
 /* FLIP: запомнить позиции → изменить → анимировать сдвиг */
 function flipLayout(mutate, dur = 520){
@@ -929,37 +1415,11 @@ cards.forEach(card => {
   });
 });
 
-/* --- живые штуки внутри карточек --- */
-let presses = 0;
-const pressCount = $('[data-press-count]');
-$('[data-press]').addEventListener('click', () => {
-  presses++;
-  const m10 = presses % 10, m100 = presses % 100;
-  const w = (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) ? 'раза' : 'раз';
-  pressCount.textContent = `нажато ${presses} ${w}` + (presses >= 7 ? ' — понравилось же' : '');
-});
-
-const tSample = $('[data-type-sample]');
-const tW = $('[data-type-w]'), tLs = $('[data-type-ls]');
-const updType = () => {
-  tSample.style.setProperty('--w', tW.value);
-  tSample.style.setProperty('--ls', (tLs.value/100) + 'em');
-  $('[data-type-wo]').textContent = tW.value;
-  $('[data-type-lso]').textContent = String(tLs.value).replace('-', '−');
-};
-tW.addEventListener('input', updType); tLs.addEventListener('input', updType); updType();
-
-const todoState = store.get('fio-todo', {});
-$$('[data-todo]').forEach(cb => {
-  cb.checked = !!todoState[cb.dataset.todo];
-  cb.addEventListener('change', () => { todoState[cb.dataset.todo] = cb.checked; store.set('fio-todo', todoState); });
-});
-
 /* --- режим «на столе» --- */
 const isTable = () => wall.classList.contains('is-table');
 const canTable = () => innerWidth > 900;
-
 const TABLE_MIN_H = 1400, TABLE_GAP = 32;   // минимальная высота стола и зазор между карточками
+
 function clampCard(card){
   // по горизонтали — в пределах стола, по вертикали только сверху: снизу стол сам растёт
   const W = wall.clientWidth, w = card.offsetWidth;
@@ -974,7 +1434,7 @@ function fitBoard(){
   wall.style.height = Math.max(TABLE_MIN_H, bottom + 120) + 'px';
 }
 function resolveOverlaps(){
-  // раздвигаем карточки, чтобы никакие две не перекрывались (с учётом наклона — зазор TABLE_GAP)
+  // раздвигаем карточки, чтобы никакие две не перекрывались (зазор TABLE_GAP учитывает наклон)
   const placed = [];
   [...cards].sort((a, b) => a.offsetTop - b.offsetTop).forEach(c => {
     const x = c.offsetLeft, w = c.offsetWidth, h = c.offsetHeight;
@@ -1004,10 +1464,10 @@ function layoutTable(random){
   }
   const jit = n => (Math.random() * 2 - 1) * n;
   cards.forEach(c => {
-    const t = random ? slot[c.dataset.id] : TABLE[c.dataset.id];
-    const x = t[0] * W + (random ? jit(36) : 0);
-    const y = t[1] + (random ? jit(30) : 0);
-    const r = random ? +jit(5).toFixed(1) : t[2];
+    const p = random ? slot[c.dataset.id] : TABLE[c.dataset.id];
+    const x = p[0] * W + (random ? jit(36) : 0);
+    const y = p[1] + (random ? jit(30) : 0);
+    const r = random ? +jit(5).toFixed(1) : p[2];
     c.style.left = x + 'px'; c.style.top = y + 'px'; c.style.setProperty('--r', r + 'deg');
     clampCard(c);
   });
@@ -1041,12 +1501,6 @@ function syncSeg(){
 }
 $$('[data-view]').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
 $('#shuffle').addEventListener('click', () => flipLayout(() => layoutTable(true), 700));
-addEventListener('resize', () => {
-  if (isTable() && !canTable()) setView('grid');
-  else if (isTable()){ cards.forEach(clampCard); fitBoard(); }
-  syncSeg();
-});
-syncSeg(); document.fonts && document.fonts.ready.then(syncSeg);
 
 /* перетаскивание по столу */
 cards.forEach(card => {
@@ -1075,56 +1529,37 @@ cards.forEach(card => {
 /* ==========================================================================
    КОНСТРУКТОР ЗАПРОСА
    ========================================================================== */
-const Q = [
-  { key:'what', title:'Что нужно', type:'one', opts:[
-    ['landing','Лендинг'],['promo','Промо-сайт'],['card','Сайт-визитка / портфолио'],['proto','Прототип продукта'],['unsure','Пока не знаю — помоги решить'] ]},
-  { key:'when', title:'Когда', type:'one', opts:[
-    ['fast','Быстро, до недели'],['calm','Без спешки'],['date','Есть дата запуска'] ], field:'date' },
-  { key:'how', title:'Как работаем', type:'one', opts:[
-    ['sprint','Вайбкод-спринт вместе — собираем вживую'],['solo','Собираешь сам, показываешь итерации'],['talk','Сначала просто обсудить'] ]},
-  { key:'have', title:'Что уже есть', sub:'можно несколько', type:'many', opts:[
-    ['idea','Только идея'],['texts','Тексты'],['design','Дизайн или макет'],['brand','Логотип и цвета'],['refs','Сайты, которые нравятся'] ]},
-  { key:'care', title:'Что важнее всего', sub:'до трёх пунктов', type:'many', max:3, opts:[
-    ['memorable','Чтобы запоминался'],['fastload','Быстро грузился'],['mobile','Отлично на телефоне'],['motion','Живые анимации'],['edit','Сам(а) правлю тексты'],['search','Находился в поиске'] ]},
-  { key:'budget', title:'Бюджет', type:'one', opts:[['talk','Обсудим'],['have','Ориентир есть — напишу']] },
-];
-const PHRASE = {
-  what:{landing:'лендинг', promo:'промо-сайт', card:'сайт-визитку', proto:'прототип продукта'},
-  when:{fast:'быстро, хочется уложиться в неделю', calm:'без спешки, важнее сделать хорошо', date:'есть дата запуска'},
-  how:{sprint:'вайбкод-спринт вместе — хочу видеть, как собирается', solo:'собираешь сам, а я смотрю итерации', talk:'сначала просто обсудить'},
-  have:{idea:'идея', texts:'тексты', design:'дизайн или макет', brand:'логотип и цвета', refs:'примеры сайтов, которые нравятся'},
-  care:{memorable:'чтобы запоминался', fastload:'чтобы быстро грузился', mobile:'чтобы отлично работал на телефоне', motion:'живые анимации', edit:'чтобы я мог(ла) сам(а) править тексты', search:'чтобы находился в поиске'},
-  budget:{talk:'обсудим', have:'ориентир есть, напишу отдельно'},
-};
-
 const EMPTY = () => ({what:null, when:null, how:null, have:[], care:[], budget:null, date:'', about:'', links:'', name:''});
 let S = Object.assign(EMPTY(), store.get('fio-brief', {}));
 S.have = Array.isArray(S.have) ? S.have : []; S.care = Array.isArray(S.care) ? S.care : [];
 
 const qs = $('#qs');
-qs.innerHTML = Q.map((q, i) => `
-  <div class="q">
-    <span class="q-n">${i+1}.</span>
-    <h3 class="q-h">${q.title}</h3>
-    ${q.sub ? `<p class="q-sub">${q.sub}</p>` : ''}
-    <div class="chips" role="group" aria-label="${q.title}">
-      ${q.opts.map(([v,l]) => `<button type="button" class="chip ${q.type==='many'?'is-multi':''}" data-k="${q.key}" data-v="${v}" aria-pressed="false"><span class="dot"></span>${l}</button>`).join('')}
-    </div>
-    ${q.field === 'date' ? `<div class="field" data-field="date"><label class="lbl" for="fDate">Когда запуск</label><input class="inp" id="fDate" type="date" data-text="date"></div>` : ''}
-  </div>`).join('') + `
-  <div class="q">
-    <span class="q-n">${Q.length+1}.</span>
-    <h3 class="q-h">Пара слов от вас</h3>
-    <p class="q-sub">необязательно, но очень помогает</p>
-    <div class="q-fields">
-      <div><label class="lbl" for="fAbout">О проекте</label><textarea class="inp" id="fAbout" rows="3" data-text="about" placeholder="Например: открываю студию керамики, нужен сайт с расписанием мастер-классов"></textarea></div>
-      <div class="row2">
-        <div><label class="lbl" for="fLinks">Ссылки, которые нравятся</label><input class="inp" id="fLinks" data-text="links" placeholder="ссылка или две"></div>
-        <div><label class="lbl" for="fName">Как к вам обращаться</label><input class="inp" id="fName" data-text="name" placeholder="Имя" autocomplete="given-name"></div>
+function renderQs(){
+  const q = t('q'), o = t('order');
+  qs.innerHTML = Q.map((item, i) => `
+    <div class="q">
+      <span class="q-n">${i+1}.</span>
+      <h3 class="q-h">${esc(q[item.key].title)}</h3>
+      ${q[item.key].sub ? `<p class="q-sub">${esc(q[item.key].sub)}</p>` : ''}
+      <div class="chips" role="group" aria-label="${esc(q[item.key].title)}">
+        ${item.opts.map(v => `<button type="button" class="chip ${item.type==='many'?'is-multi':''}" data-k="${item.key}" data-v="${v}" aria-pressed="false"><span class="dot"></span>${esc(q[item.key].opts[v])}</button>`).join('')}
       </div>
-    </div>
-  </div>`;
-
+      ${item.field === 'date' ? `<div class="field" data-field="date"><label class="lbl" for="fDate">${esc(o.date)}</label><input class="inp" id="fDate" type="date" data-text="date"></div>` : ''}
+    </div>`).join('') + `
+    <div class="q">
+      <span class="q-n">${Q.length+1}.</span>
+      <h3 class="q-h">${esc(o.extraTitle)}</h3>
+      <p class="q-sub">${esc(o.extraSub)}</p>
+      <div class="q-fields">
+        <div><label class="lbl" for="fAbout">${esc(o.about)}</label><textarea class="inp" id="fAbout" rows="3" data-text="about" placeholder="${esc(o.aboutPh)}"></textarea></div>
+        <div class="row2">
+          <div><label class="lbl" for="fLinks">${esc(o.links)}</label><input class="inp" id="fLinks" data-text="links" placeholder="${esc(o.linksPh)}"></div>
+          <div><label class="lbl" for="fName">${esc(o.name)}</label><input class="inp" id="fName" data-text="name" placeholder="${esc(o.namePh)}" autocomplete="given-name"></div>
+        </div>
+      </div>
+    </div>`;
+  $$('[data-text]', qs).forEach(inp => inp.value = S[inp.dataset.text] || '');
+}
 qs.addEventListener('click', e => {
   const b = e.target.closest('.chip'); if (!b || b.disabled) return;
   const q = Q.find(x => x.key === b.dataset.k), v = b.dataset.v;
@@ -1135,35 +1570,42 @@ qs.addEventListener('click', e => {
   }
   render();
 });
-$$('[data-text]', qs).forEach(inp => {
-  inp.value = S[inp.dataset.text] || '';
-  inp.addEventListener('input', () => { S[inp.dataset.text] = inp.value; render(); });
+qs.addEventListener('input', e => {
+  const k = e.target.dataset && e.target.dataset.text; if (!k) return;
+  S[k] = e.target.value; render();
 });
 
-const joinRu = arr => arr.length <= 1 ? (arr[0] || '') : arr.slice(0, -1).join(', ') + ' и ' + arr[arr.length - 1];
+function joinList(arr){
+  const and = t('msg.and');
+  return arr.length <= 1 ? (arr[0] || '') : arr.slice(0, -1).join(', ') + and + arr[arr.length - 1];
+}
+/* строки сообщения на текущем языке: [ключ, html] */
 function lines(){
-  const L = [];
-  const hi = S.name.trim() ? `Привет! Меня зовут ${esc(S.name.trim())}.` : 'Привет!';
-  if (!S.what) L.push(['what', `${hi} <span class="ph">Нужен… (выберите слева, что именно)</span>`]);
-  else if (S.what === 'unsure') L.push(['what', `${hi} Нужен сайт, но пока не понимаю, какой именно. <b>Поможешь решить?</b>`]);
-  else L.push(['what', `${hi} Хочу собрать с тобой <b>${PHRASE.what[S.what]}</b>.`]);
+  const m = t('msg'), ph = t('phrase'), L = [];
+  const hi = S.name.trim() ? fill(m.helloName, {name:esc(S.name.trim())}) : m.hello;
+  if (!S.what) L.push(['what', `${hi} <span class="ph">${m.placeholder}</span>`]);
+  else if (S.what === 'unsure') L.push(['what', `${hi} ${m.unsure}`]);
+  else L.push(['what', `${hi} ${fill(m.want, {what:ph.what[S.what]})}`]);
   if (S.when){
-    let t = PHRASE.when[S.when];
-    if (S.when === 'date' && S.date){ const d = new Date(S.date + 'T00:00'); if (!isNaN(d)) t += ' — ' + d.toLocaleDateString('ru-RU', {day:'numeric', month:'long'}); }
-    L.push(['when', `Срок: <b>${t}</b>.`]);
+    let v = ph.when[S.when];
+    if (S.when === 'date' && S.date){
+      const d = new Date(S.date + 'T00:00');
+      if (!isNaN(d)) v += ' — ' + d.toLocaleDateString(LOCALE[lang], {day:'numeric', month:'long'});
+    }
+    L.push(['when', fill(m.when, {v})]);
   }
-  if (S.how) L.push(['how', `Формат: <b>${PHRASE.how[S.how]}</b>.`]);
-  if (S.have.length) L.push(['have', `Что уже есть: ${joinRu(S.have.map(v => PHRASE.have[v]))}.`]);
-  if (S.care.length) L.push(['care', `Важно: ${joinRu(S.care.map(v => PHRASE.care[v]))}.`]);
-  if (S.about.trim()) L.push(['about', `О проекте: ${esc(S.about.trim())}`]);
-  if (S.links.trim()) L.push(['links', `Нравится: ${esc(S.links.trim())}`]);
-  if (S.budget) L.push(['budget', `Бюджет: ${PHRASE.budget[S.budget]}.`]);
-  if (S.what) L.push(['end', 'Когда сможешь посмотреть?']);
+  if (S.how) L.push(['how', fill(m.how, {v:ph.how[S.how]})]);
+  if (S.have.length) L.push(['have', fill(m.have, {v:joinList(S.have.map(v => ph.have[v]))})]);
+  if (S.care.length) L.push(['care', fill(m.care, {v:joinList(S.care.map(v => ph.care[v]))})]);
+  if (S.about.trim()) L.push(['about', fill(m.about, {v:esc(S.about.trim())})]);
+  if (S.links.trim()) L.push(['links', fill(m.links, {v:esc(S.links.trim())})]);
+  if (S.budget) L.push(['budget', fill(m.budget, {v:ph.budget[S.budget]})]);
+  if (S.what) L.push(['end', m.end]);
   return L;
 }
 const toPlain = h => h.replace(/<[^>]+>/g, '').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&amp;/g,'&');
-const plain = () => lines().filter(([k]) => S.what || k !== 'what').map(([, h]) => toPlain(h)).join('\n')
-  || 'Привет! Хочу обсудить сайт.';
+/* готовый текст для буфера, Telegram и письма — всегда на текущем языке */
+const plain = () => S.what ? lines().map(([, h]) => toPlain(h)).join('\n') : t('msg.fallback');
 
 let prev = null;
 function render(){
@@ -1188,35 +1630,33 @@ function render(){
   // готовность — по реально заполненным пунктам
   const n = ['what','when','how'].filter(k => S[k]).length + (S.have.length ? 1 : 0) + ((S.about.trim() || S.care.length) ? 1 : 0);
   $$('#readyBar i').forEach((i, idx) => i.classList.toggle('on', idx < n));
-  $('#readyText').textContent = n === 5 ? 'запрос готов ✓' : `собрано ${n} из 5`;
-  $('#dockReady').textContent = n === 5 ? 'готово ✓' : `${n} из 5`;
+  $('#readyText').textContent = n === 5 ? t('order.readyDone') : fill(t('order.ready'), {n});
+  $('#dockReady').textContent = n === 5 ? t('order.dockDone') : fill(t('order.dockReady'), {n});
   store.set('fio-brief', S);
 }
-render();
 
 async function copyBrief(){
   const ok = await copyText(plain());
-  toast(ok ? 'запрос скопирован' : 'не вышло', ok ? 'Вставьте его в Telegram или в письмо' : 'Выделите текст в листе вручную');
+  toast(ok ? t('toast.brief') : t('toast.fail'), ok ? t('toast.briefText') : t('toast.briefFail'));
 }
 async function openTelegram(){
   const text = plain();
   const url = `${ME.telegramUrl}?text=${encodeURIComponent(text)}`;
   // сначала копируем, пока вкладка в фокусе, потом открываем Telegram
   const ok = await copyText(text);
-  toast(ok ? 'текст скопирован' : 'не удалось скопировать',
-        ok ? 'Если поле ввода пустое, просто вставьте (Ctrl+V / Cmd+V)' : 'Скопируйте текст из листа вручную');
+  toast(ok ? t('toast.tg') : t('toast.tgFail'), ok ? t('toast.tgText') : t('toast.tgFailText'));
   const w = window.open(url, '_blank');
   if (w) w.opener = null; else location.href = url;   // всплывающее окно заблокировано — открываем здесь
 }
 $('#copyMsg').addEventListener('click', copyBrief);
 $('#openTg').addEventListener('click', openTelegram);
 $('#openMail').addEventListener('click', () => {
-  location.href = `mailto:${ME.email}?subject=${encodeURIComponent('Запрос на сайт')}&body=${encodeURIComponent(plain())}`;
+  location.href = `mailto:${ME.email}?subject=${encodeURIComponent(t('msg.subject'))}&body=${encodeURIComponent(plain())}`;
 });
 $('#reset').addEventListener('click', () => {
   S = EMPTY(); prev = null;
   $$('[data-text]', qs).forEach(i => i.value = '');
-  render(); toast('чистый лист', 'Начинаем заново');
+  render(); toast(t('toast.reset'), t('toast.resetText'));
 });
 $('#dockCopy').addEventListener('click', copyBrief);
 $('#dockTg').addEventListener('click', openTelegram);
@@ -1228,8 +1668,59 @@ const syncDock = () => {
   dock.classList.toggle('is-on', on); dock.setAttribute('aria-hidden', !on);
   $$('button', dock).forEach(b => b.tabIndex = on ? 0 : -1);
 };
-new IntersectionObserver(es => { inOrder = es[0].isIntersecting; syncDock(); }, {rootMargin:'-20% 0px -20% 0px'}).observe($('#qs'));
+new IntersectionObserver(es => { inOrder = es[0].isIntersecting; syncDock(); }, {rootMargin:'-20% 0px -20% 0px'}).observe(qs);
 new IntersectionObserver(es => { sheetVis = es[0].isIntersecting; syncDock(); }, {threshold:.2}).observe($('#sheet'));
+
+/* ==========================================================================
+   СМЕНА ЯЗЫКА — перерисовывает всё, состояние (бриф, галочки, ползунки, стол) сохраняется
+   ========================================================================== */
+function setLang(l, first){
+  if (!LANGS.includes(l)) return;
+  lang = l;
+  if (!first) store.set('fio-lang', l);
+  const root = document.documentElement;
+  root.lang = l;
+  $('meta[name="description"]').content = t('meta.description');
+
+  $$('[data-i]').forEach(el => el.textContent = t(el.dataset.i));
+  $$('[data-ih]').forEach(el => el.innerHTML = t(el.dataset.ih));
+  $$('[data-iaria]').forEach(el => el.setAttribute('aria-label', t(el.dataset.iaria)));
+  $$('[data-lang]').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === l));
+
+  $('#stampText').textContent = ME.takingOrders ? t('hero.stampOn') : t('hero.stampOff');
+  $('#footText').textContent = fill(t('foot.text'), {y:new Date().getFullYear()});
+  $('#today').textContent = new Date().toLocaleDateString(LOCALE[l], {day:'numeric', month:'long', year:'numeric'});
+
+  // заголовок: перерисовываем и заново «дорисовываем» пометки
+  h1.innerHTML = headlineHTML(t('hero.h1'));
+  fitHeadline();
+  const marks = $$('.draw', h1);
+  if (first) return renderRest();
+  requestAnimationFrame(() => marks.forEach(d => d.classList.add('is-drawn')));
+  renderRest();
+
+  function renderRest(){
+    renderWall();
+    renderQs(); prev = null; render();
+    syncSeg();
+    // шрифт нового языка (например, Playfair для PL) может догрузиться позже — пересчитываем размеры
+    document.fonts && document.fonts.ready.then(() => { fitHeadline(); syncSeg(); if (isTable()){ resolveOverlaps(); fitBoard(); } });
+  }
+}
+
+setLang(lang, true);
+requestAnimationFrame(() => setTimeout(() => {
+  document.body.classList.add('is-loaded');
+  $$('.hero .draw').forEach(d => d.classList.add('is-drawn'));
+  setTimeout(() => document.body.classList.add('is-settled'), reduced ? 0 : 1250);
+}, 80));
+addEventListener('resize', () => {
+  fitHeadline();
+  if (isTable() && !canTable()) setView('grid');
+  else if (isTable()){ cards.forEach(clampCard); fitBoard(); }
+  syncSeg();
+});
+document.fonts && document.fonts.ready.then(() => { fitHeadline(); syncSeg(); if (isTable()){ resolveOverlaps(); fitBoard(); } });
 </script>
 </body>
 </html>
