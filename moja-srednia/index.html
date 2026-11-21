@@ -815,7 +815,9 @@ function parseMark(v){
 }
 function markValue(p){ return p.base + (p.mod === '+' ? S().plus : p.mod === '-' ? -S().minus : 0); }
 function valueOf(v){ const p = parseMark(v); return p && !p.info ? markValue(p) : null; }
-function autoSem(){ const m = new Date().getMonth(); return (m >= 8 || m === 0) ? 1 : 2; }
+// I semestr заканчивается 23 декабря, со следующего дня — II semestr
+const SEM1_END = { m: 11, d: 23 };
+function autoSem(){ const now = new Date(), m = now.getMonth(); if (m >= 8 && (m < SEM1_END.m || (m === SEM1_END.m && now.getDate() <= SEM1_END.d))) return 1; return 2; }
 function currentSem(){ return S().currentSem || autoSem(); }
 function targetSem(){ return state.view === 'year' ? currentSem() : +state.view; }
 
@@ -1554,8 +1556,8 @@ const isoDate = d => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getD
 function semEndDate(){
   if (S().semEnd) return S().semEnd;
   const now = new Date(), y = now.getFullYear(), m = now.getMonth();
-  if (currentSem() === 1) return `${m >= 8 ? y + 1 : y}-01-31`;
-  return `${y}-06-26`;
+  if (currentSem() === 1) return `${m >= 8 ? y : y - 1}-${pad2(SEM1_END.m + 1)}-${pad2(SEM1_END.d)}`;
+  return `${m >= 8 ? y + 1 : y}-06-25`;
 }
 function lessonsPerDay(sub){ const k = subjKey(sub.name); return state.schedule.days.map(d => d.filter(l => subjKey(l.name) === k).length); }
 function remainingLessons(sub){
