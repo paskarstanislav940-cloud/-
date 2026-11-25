@@ -7,8 +7,8 @@
 <meta name="theme-color" content="#131517" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Деньги">
-<title>Личные финансы</title>
+<meta name="apple-mobile-web-app-title" content="Finance">
+<title>Personal Finance · Личные финансы</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231f5f8b'/%3E%3Cpath d='M18 42h28M18 32h20M18 22h12' stroke='white' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
 <style>
 :root {
@@ -89,6 +89,8 @@ button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--line);
 }
+.brand-ru { font-weight: 500; color: var(--muted); }
+@media (max-width: 899px) { .brand-ru { display: none; } }
 .brand { font-weight: 650; font-size: 16px; letter-spacing: -.01em; margin-right: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .month { display: flex; align-items: center; gap: 2px; }
 .month-label {
@@ -405,7 +407,7 @@ dialog::backdrop { background: rgba(10, 12, 14, .45); }
 <body>
 
 <header class="top">
-  <div class="brand">Личные финансы</div>
+  <div class="brand">Personal Finance <span class="brand-ru">· Личные финансы</span></div>
   <nav class="month" aria-label="Выбор месяца">
     <button class="icon-btn" id="prevMonth" aria-label="Предыдущий месяц">‹</button>
     <button class="month-label" id="monthLabel" title="Вернуться к текущему месяцу"></button>
