@@ -546,13 +546,26 @@ def cmd_test(text: str) -> None:
         print("\nалерт:\n" + html_to_plain(format_alert(Item("test", "1", text, label="тест"), res)))
 
 
+def cmd_test_interactive() -> None:
+    print("Вставьте текст объявления одной строкой и нажмите Enter. Пустая строка — выход.")
+    while True:
+        try:
+            line = input("\n> ").strip()
+        except EOFError:
+            break
+        if not line:
+            break
+        cmd_test(line)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description="fioritura lead parser")
     ap.add_argument("--dry-run", action="store_true", help="алерты в консоль вместо бота")
     ap.add_argument("--login", action="store_true", help="интерактивный вход в Telegram")
     ap.add_argument("--list-chats", action="store_true", help="показать id ваших чатов/каналов")
     ap.add_argument("--bot-chats", action="store_true", help="показать chat_id тех, кто писал боту")
-    ap.add_argument("--test", metavar="TEXT", help="проверить скоринг текста")
+    ap.add_argument("--test", nargs="?", const="", metavar="TEXT",
+                    help="проверить скоринг текста (без текста — спросит в консоли)")
     ap.add_argument("-v", "--verbose", action="store_true", help="подробный лог (видно отклонённые)")
     args = ap.parse_args()
 
@@ -563,7 +576,7 @@ def main() -> None:
 
     try:
         if args.test is not None:
-            cmd_test(args.test)
+            cmd_test(args.test) if args.test else cmd_test_interactive()
         elif args.login:
             asyncio.run(cmd_login())
         elif args.list_chats:

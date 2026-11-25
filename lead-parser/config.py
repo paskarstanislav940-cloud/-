@@ -40,11 +40,11 @@ def _int(name: str, default: int = 0) -> int:
 # ---------------------------------------------------------------------------
 API_ID: int = _int("TG_API_ID")                 # https://my.telegram.org → API development tools
 API_HASH: str = os.getenv("TG_API_HASH", "")
-SESSION_NAME: str = os.getenv("TG_SESSION", "fioritura_leads")   # файл fioritura_leads.session
+SESSION_NAME: str = os.getenv("TG_SESSION") or "fioritura_leads"   # файл fioritura_leads.session
 
 BOT_TOKEN: str = os.getenv("BOT_TOKEN", "")      # от @BotFather
 TARGET_CHAT_ID: int = _int("TARGET_CHAT_ID")     # куда слать алерты (ваш id или id группы)
-BOT_API_BASE: str = os.getenv("BOT_API_BASE", "https://api.telegram.org")
+BOT_API_BASE: str = os.getenv("BOT_API_BASE") or "https://api.telegram.org"
 
 # Чаты/каналы для мониторинга в реальном времени: @username, ссылка t.me/username или числовой id.
 # Аккаунт должен состоять в этих чатах. Числовые id приватных чатов покажет: python main.py --list-chats
@@ -53,6 +53,11 @@ TG_CHATS: list[str | int] = [
     # "https://t.me/another_public_chat",
     # -1001234567890,
 ]
+# Проще всего — вписать чаты в .env одной строкой через запятую: TG_CHATS=@chat1, @chat2, -1001234567890
+# Если строка в .env заполнена, она заменяет список выше.
+_env_chats = [c.strip() for c in os.getenv("TG_CHATS", "").replace(";", ",").split(",") if c.strip()]
+if _env_chats:
+    TG_CHATS = [int(c) if c.lstrip("-").isdigit() else c for c in _env_chats]
 
 # ---------------------------------------------------------------------------
 # Reddit (RSS, без API-ключей) и Hacker News (Algolia API)
@@ -60,7 +65,7 @@ TG_CHATS: list[str | int] = [
 REDDIT_SUBREDDITS: list[str] = ["forhire", "DesignJobs", "slavelabour", "startups", "SideProject", "Entrepreneur"]
 REDDIT_POLL_SECONDS: int = 180
 # Reddit режет запросы без внятного User-Agent. Впишите свой ник на Reddit.
-REDDIT_USER_AGENT: str = os.getenv("REDDIT_USER_AGENT", "fioritura-leads/1.0 (lead monitor; contact via u/your_reddit_name)")
+REDDIT_USER_AGENT: str = os.getenv("REDDIT_USER_AGENT") or "fioritura-leads/1.0 (lead monitor; contact via u/your_reddit_name)"
 REDDIT_BASE_URLS: list[str] = ["https://www.reddit.com", "https://old.reddit.com"]  # второй — запасной
 
 HN_ENABLED: bool = True
@@ -80,7 +85,7 @@ DEDUP_DAYS: int = 14         # одинаковый текст (кросс-по�
 SNIPPET_CHARS: int = 650     # длина фрагмента в алерте
 ALERT_MIN_INTERVAL: float = 3.0   # пауза между алертами, сек (лимиты Bot API для групп ~20 сообщ./мин)
 HTTP_TIMEOUT: float = 25.0
-DB_PATH: str = os.getenv("LEADS_DB", str(Path(__file__).with_name("leads.db")))
+DB_PATH: str = os.getenv("LEADS_DB") or str(Path(__file__).with_name("leads.db"))
 
 # Веса скоринга
 SCORE_BUY_FIRST: int = 50        # первое совпадение «это заказ»
@@ -246,7 +251,7 @@ KIND_SIGNALS: dict[str, list[str]] = {
 # Бренд и черновики первого сообщения
 # ---------------------------------------------------------------------------
 BRAND_NAME: str = "fioritura"
-PORTFOLIO_URL: str = os.getenv("PORTFOLIO_URL", "https://fioritura.example.com")
+PORTFOLIO_URL: str = os.getenv("PORTFOLIO_URL") or "https://fioritura.example.com"
 
 TOPICS: dict[str, dict[str, str]] = {
     "ru": {"site": "сайт", "landing": "лендинг", "prototype": "прототип", "mvp": "MVP"},
